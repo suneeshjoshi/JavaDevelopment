@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: sunee
+Build-Jdk: 9.0.1
+Implementation-Title: course-api
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: suneesh.springbootstarter
+Implementation-Vendor: Pivotal Software, Inc.
+Implementation-URL: http://projects.spring.io/spring-boot/course-api/
+Created-By: Maven Integration for Eclipse
+

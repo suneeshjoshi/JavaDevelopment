@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+<bean id="address" class="com.mavenSpring.SpringProject1.Address" init-method="myAddressInitMethod" destroy-method="myAddressDestroyMethod">
+<property name="street" value="Collier Close(Setter Dependency Injection)"></property>
+<property name="city" value="Slough"></property>
+<property name="country" value="UK"></property>
+</bean>
+
+<bean id="emp3" class="com.mavenSpring.SpringProject1.Employee" autowire="constructor">
+<constructor-arg name="name" value="Aadya Joshi(Constructor Dependency Injection)(Autowire Constructor)"></constructor-arg>
+<constructor-arg name="age" value="1"></constructor-arg>
+</bean>
+
+
+<bean id="emp1" class="com.mavenSpring.SpringProject1.Employee" autowire="byType">
+	<property name="name" value="Suneesh Joshi(Setter Dependency Injection)(Autowire byType)"></property>
+	<property name="age" value="33"></property>
+</bean>
+
+<bean id="emp2" class="com.mavenSpring.SpringProject1.Employee" >
+	<property name="name" value="Suneesh Joshi(Constructor Dependency Injection)"></property>
+	<property name="age" value="33"></property>
+	<constructor-arg ref="address"  />
+</bean>
+
+<bean id="emp4" class="com.mavenSpring.SpringProject1.Employee" autowire="byName">
+<property name="name" value="Aadya Joshi(Setter Dependency Injection)(Autowire byName)"></property>
+<property name="age" value="1"></property>
+</bean>
+
+
+
+
+</beans>
