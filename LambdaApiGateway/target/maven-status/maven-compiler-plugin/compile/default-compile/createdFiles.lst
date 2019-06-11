@@ -1,0 +1,3 @@
+com\amazonaws\lambda\demo\LambdaFunctionHandler.class
+com\amazonaws\lambda\demo\Request.class
+com\amazonaws\lambda\demo\Student.class
