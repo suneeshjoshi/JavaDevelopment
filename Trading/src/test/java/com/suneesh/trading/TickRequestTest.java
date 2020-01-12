@@ -18,7 +18,7 @@ public class TickRequestTest {
     private ApiWrapper api;
     @Before
     public void setup() throws Exception{
-        this.api = ApiWrapper.build("10");
+        this.api = ApiWrapper.build("21829");
     }
 
     @Test
