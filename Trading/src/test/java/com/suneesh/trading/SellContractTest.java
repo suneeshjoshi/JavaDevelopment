@@ -4,7 +4,7 @@ import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.requests.SellContractForMultipleAccountsRequest;
 import com.suneesh.trading.models.requests.SellContractRequest;
 import com.suneesh.trading.models.requests.SellExpiredContractsRequest;
-import com.binary.api.models.responses.*;
+import com.suneesh.trading.models.responses.*;
 import com.google.gson.Gson;
 import com.suneesh.trading.models.responses.*;
 import io.reactivex.observers.TestObserver;

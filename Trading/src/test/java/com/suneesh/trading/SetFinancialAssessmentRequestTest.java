@@ -1,6 +1,6 @@
 package com.suneesh.trading;
 
-import com.binary.api.models.enums.*;
+import com.suneesh.trading.models.enums.*;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.requests.SetFinancialAssessmentRequest;
 import com.suneesh.trading.models.responses.AuthorizeResponse;

@@ -4,7 +4,7 @@ import com.suneesh.trading.models.enums.Scopes;
 import com.suneesh.trading.models.requests.ApplicationDeletionRequest;
 import com.suneesh.trading.models.requests.ApplicationRegistrationRequest;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
-import com.binary.api.models.responses.*;
+import com.suneesh.trading.models.responses.*;
 import com.suneesh.trading.models.responses.ApplicationDeletionResponse;
 import com.suneesh.trading.models.responses.ApplicationRegistrationResponse;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
