@@ -4,14 +4,15 @@ import com.suneesh.trading.models.requests.AccountStatusRequest;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.requests.BalanceRequest;
 import com.suneesh.trading.models.requests.TickRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 
 public class MainApplication {
 
-    static Logger logger = LoggerFactory.getLogger(MainApplication.class);
+    private static final Logger logger = (Logger) LogManager.getLogger();
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         logger.info("Main Application");
         ApiWrapper api = ApiWrapper.build("21829");
 
