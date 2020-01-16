@@ -3,7 +3,10 @@ package com.suneesh.trading;
 import com.google.gson.Gson;
 import com.suneesh.trading.models.WebsocketEvent;
 
+import com.suneesh.trading.models.requests.TickRequest;
 import com.suneesh.trading.models.responses.ResponseBase;
+import com.suneesh.trading.models.responses.Tick;
+import com.suneesh.trading.models.responses.TickResponse;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import okhttp3.Response;
@@ -50,18 +53,73 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter.subscribe(
                 o -> {
                     logger.info("Received Massage: {}", o);
-                    Gson gson  = new Gson();
+
+//                    if(o.startsWith("{\"candles\"")){
+//                        CandlesResponse candlesResponse = gson.fromJson(o, CandlesResponse.class);
+//                    } else if( o.contains("\"msg_type\":\"ohlc\"")){
+//                        OhlcStreamResponse ohlcStreamResponse = gson.fromJson(o,OhlcStreamResponse.class);
+//                    } else if(o.startsWith("{\"balance\":{\"balance\":")){
+//                        BalanceWrapper balanceWrapper = gson.fromJson(o,BalanceWrapper.class);
+//                    } else if(o.contains("\"msg_type\":\"portfolio\"")){
+//                        PortfolioWrapper portfolioWrapper= gson.fromJson(o,PortfolioWrapper.class);
+//                    } else if(o.contains("\"msg_type\":\"transaction\"")){
+//                        TransactionWrapper transactionWrapper= gson.fromJson(o, TransactionWrapper.class);
+//                    } else if(o.contains("\"msg_type\":\"tick\"")){
+//                        String s1 = gson.toJson(o);
+//                        JsonElement jsonElement = gson.toJsonTree(o);
+//                        StringTokenizer st = new StringTokenizer(o, ", ");
+//                        while(st.nextElement()!=null){
+//                            logger.info(st.nextToken());
+//                        }
+//                        Tick tickWrapper= gson.fromJson(o, Tick.class);
+//                        logger.info("after making object");
+//                    }
+
+                    Gson gson = new Gson();
 
                     JSONObject jsonObject = new JSONObject(o);
 //                    logger.info(jsonObject.toString(2));
 
-                    Map<String, Object> stringObjectMap = jsonObject.toMap();
-                    for(Map.Entry<String, Object> entry : stringObjectMap.entrySet()){
-                        Object value = entry.getValue();
-                        String key = entry.getKey();
+                    String msg_type = jsonObject.getString("msg_type");
+                    logger.info(msg_type);
 
-                        logger.info("{} - {}",entry.getKey(),String.valueOf(entry.getValue()));
+                    switch(msg_type){
+                        case "tick":
+                            Tick tickObject = null;
+                            JSONObject tick_data = (JSONObject) jsonObject.get("tick");
+                            if(tick_data!=null) {
+                                tickObject = gson.fromJson(String.valueOf(tick_data), Tick.class);
+                                logger.info(String.valueOf(tickObject));
+                            }
+                        break;
+
+                    case "candles": logger.info("This is candles class.");
+                        break;
+                    case "ohlc": logger.info("This is ohlc class.");
+                        break;
+                    case "balance": logger.info("This is balance class.");
+                        break;
+                    case "transaction": logger.info("This is transaction class.");
+                        break;
+                    default: logger.info("Case not implemented.");
+
                     }
+
+
+                    Map<String, Object> stringObjectMap = jsonObject.toMap();
+                    for(Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
+                        String key = entry.getKey();
+                        String value = String.valueOf(entry.getValue());
+
+                        if (key.equalsIgnoreCase("msg_type")) {
+                            String objectType = value;
+                        }
+                        logger.info("{} - {}",key,String.valueOf(value));
+
+                    }
+//
+
+
 
 
                     //                    cache.put(1,o);
