@@ -26,4 +26,8 @@ public class TransactionsStreamResponse extends ResponseBase<TransactionsStreamR
     public Transaction getTransaction() {
         return transaction;
     }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
 }

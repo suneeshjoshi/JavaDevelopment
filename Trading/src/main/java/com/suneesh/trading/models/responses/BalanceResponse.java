@@ -24,4 +24,9 @@ public class BalanceResponse extends ResponseBase<BalanceRequest> {
     public Balance getBalance() {
         return balance;
     }
+
+    public void setBalance(Balance balance) {
+        this.balance = balance;
+    }
+
 }

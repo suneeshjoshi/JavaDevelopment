@@ -25,6 +25,10 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
     @Nullable
     private History history;
 
+    public void setCandles(List<Candle> candles) {
+        this.candles = candles;
+    }
+
     /**
      * Array of OHLC (open/high/low/close) price values for the given time (only for style='candles')
      */

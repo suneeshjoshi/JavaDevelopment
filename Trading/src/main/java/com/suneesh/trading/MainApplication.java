@@ -26,42 +26,40 @@ public class MainApplication {
     public static void main(String[] args) {
         logger.info("Main Application");
         ApiWrapper api = ApiWrapper.build("21829");
-
-        TickRequest request = new TickRequest("R_10");
-        api.sendRequest(request);
-
-        TickHistoryRequest tickHistoryRequest = new TickHistoryRequest("R_50", "latest");
-        TestObserver<ResponseBase> testObserver = new TestObserver<>();
-        tickHistoryRequest.setStyle(TickStyles.CANDLES);
-        tickHistoryRequest.setSubscribe(1);
-        tickHistoryRequest.setGranularity(60);
-
-        api.sendRequest(tickHistoryRequest);
-
-        //
-//        api.sendRequest(request)
-//                .subscribe(
-//                        response -> {
-//                            logger.info(String.valueOf(response));
 //
-////                            System.out.printf("epoch: %S, price: %s",
-////                                    response.getTick().getEpoch(), responce.getTick().getQuote());
-//                        }
-//                );
-
-        logger.info("Going to make another call.");
-
         AuthorizeRequest authorizeRequest = new AuthorizeRequest("9s5aGYbnsUQr3Fv");
         api.sendRequest(authorizeRequest).subscribe( response -> {
-            api.sendRequest(new BalanceRequest(true));
+            AuthorizeResponse auth = (AuthorizeResponse) response;
+            // Authorised.
+            if(auth.getAuthorize()!=null) {
+//                api.sendRequest(new BalanceRequest(true));
+//                api.sendRequest(new TransactionsStreamRequest());
+//                api.sendRequest(new AccountStatusRequest());
+                api.sendRequest( new PortfolioRequest());
+            }
         });
-//
-//
-//        AccountStatusRequest accountStatusRequest = new AccountStatusRequest();
-//        api.sendRequest(accountStatusRequest);
-//
-//        api.sendRequest(new BalanceRequest(true));
 
+//
+//        TickRequest request = new TickRequest("R_10");
+//        api.sendRequest(request);
+//
+//        TickHistoryRequest tickHistoryRequest = new TickHistoryRequest("R_50", "latest");
+//        tickHistoryRequest.setStyle(TickStyles.CANDLES);
+//        tickHistoryRequest.setSubscribe(1);
+//        tickHistoryRequest.setCount(100);
+//        tickHistoryRequest.setGranularity(60);
+//        api.sendRequest(tickHistoryRequest);
+//
+
+
+//        api.sendRequest(new AccountStatusRequest());
+
+//        api.sendRequest( new TransactionsStreamRequest());
+
+//        AuthorizeRequest authorizeRequest = new AuthorizeRequest("9s5aGYbnsUQr3Fv");
+//        api.sendRequest(authorizeRequest).subscribe( response -> {
+//            api.sendRequest( new TransactionsStreamRequest());
+//        });
 
 
     }

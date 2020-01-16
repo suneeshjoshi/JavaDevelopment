@@ -3,19 +3,22 @@ package com.suneesh.trading;
 import com.google.gson.Gson;
 import com.suneesh.trading.models.WebsocketEvent;
 
+import com.suneesh.trading.models.requests.AccountStatusRequest;
 import com.suneesh.trading.models.requests.TickRequest;
-import com.suneesh.trading.models.responses.ResponseBase;
-import com.suneesh.trading.models.responses.Tick;
-import com.suneesh.trading.models.responses.TickResponse;
+import com.suneesh.trading.models.responses.*;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -52,77 +55,104 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-                    logger.info("Received Massage: {}", o);
-
-//                    if(o.startsWith("{\"candles\"")){
-//                        CandlesResponse candlesResponse = gson.fromJson(o, CandlesResponse.class);
-//                    } else if( o.contains("\"msg_type\":\"ohlc\"")){
-//                        OhlcStreamResponse ohlcStreamResponse = gson.fromJson(o,OhlcStreamResponse.class);
-//                    } else if(o.startsWith("{\"balance\":{\"balance\":")){
-//                        BalanceWrapper balanceWrapper = gson.fromJson(o,BalanceWrapper.class);
-//                    } else if(o.contains("\"msg_type\":\"portfolio\"")){
-//                        PortfolioWrapper portfolioWrapper= gson.fromJson(o,PortfolioWrapper.class);
-//                    } else if(o.contains("\"msg_type\":\"transaction\"")){
-//                        TransactionWrapper transactionWrapper= gson.fromJson(o, TransactionWrapper.class);
-//                    } else if(o.contains("\"msg_type\":\"tick\"")){
-//                        String s1 = gson.toJson(o);
-//                        JsonElement jsonElement = gson.toJsonTree(o);
-//                        StringTokenizer st = new StringTokenizer(o, ", ");
-//                        while(st.nextElement()!=null){
-//                            logger.info(st.nextToken());
-//                        }
-//                        Tick tickWrapper= gson.fromJson(o, Tick.class);
-//                        logger.info("after making object");
-//                    }
-
+//                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
 
                     JSONObject jsonObject = new JSONObject(o);
 //                    logger.info(jsonObject.toString(2));
 
-                    String msg_type = jsonObject.getString("msg_type");
-                    logger.info(msg_type);
 
-                    switch(msg_type){
-                        case "tick":
-                            Tick tickObject = null;
-                            JSONObject tick_data = (JSONObject) jsonObject.get("tick");
-                            if(tick_data!=null) {
-                                tickObject = gson.fromJson(String.valueOf(tick_data), Tick.class);
-                                logger.info(String.valueOf(tickObject));
-                            }
-                        break;
+                    if(!jsonObject.has("error") ){
+                        String msg_type = jsonObject.getString("msg_type");
 
-                    case "candles": logger.info("This is candles class.");
-                        break;
-                    case "ohlc": logger.info("This is ohlc class.");
-                        break;
-                    case "balance": logger.info("This is balance class.");
-                        break;
-                    case "transaction": logger.info("This is transaction class.");
-                        break;
-                    default: logger.info("Case not implemented.");
+                        switch (msg_type) {
+                            case "tick":
+                                TickResponse tickResponse = new TickResponse();
+                                JSONObject tickData = (JSONObject) jsonObject.get("tick");
+                                if (tickData != null) {
+                                    tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
+                                    logger.info(String.valueOf(tickResponse.getTick()));
+                                }
+                                break;
+                            case "authorize":
+                                AuthorizeResponse authorizeResponse = new AuthorizeResponse();
+                                JSONObject authorizeData = (JSONObject) jsonObject.get("authorize");
+                                if (authorizeData != null) {
+                                    authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
+                                    logger.info(String.valueOf(authorizeResponse.getAuthorize()));
+                                }
+                                break;
+                            case "balance":
+                                BalanceResponse balanceResponse = new BalanceResponse();
+                                JSONObject balanceData = (JSONObject) jsonObject.get("balance");
+                                if (balanceData != null) {
+                                    balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
+                                    logger.info(String.valueOf(balanceResponse.getBalance()));
+                                }
+                                break;
+                            case "candles":
+                                JSONArray candleArray = (JSONArray) jsonObject.get("candles");
+                                ArrayList<Candle> candleArrayList = new ArrayList<>();
+                                TickHistoryResponse tickHistoryResponse = new TickHistoryResponse();
+                                if (candleArray != null) {
+                                    candleArray.forEach(f -> {
+                                        candleArrayList.add(gson.fromJson(String.valueOf(f), Candle.class));
+                                    });
+                                }
+                                tickHistoryResponse.setCandles(candleArrayList);
+                                logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+                                break;
+                            case "ohlc":
+                                Candle OHLCObject = new Candle();
+                                JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
+                                if (OHLCData != null) {
+                                    OHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
+                                }
+                                logger.info(String.valueOf(OHLCObject));
+                                break;
+                            case "transaction":
+                                TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
+                                JSONObject transactionData = (JSONObject) jsonObject.get("transaction");
+                                if (transactionData != null) {
+                                    transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
+                                    logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
+                                }
+                                break;
+                            case "get_account_status":
+                                AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
+                                JSONObject accountStatusData = (JSONObject) jsonObject.get("get_account_status");
+                                if (accountStatusData != null) {
+                                    accountStatusResponse.setAccountStatus(gson.fromJson(String.valueOf(accountStatusData), AccountStatus.class));
+                                    logger.info(String.valueOf(accountStatusResponse.getAccountStatus()));
+                                }
+                                break;
+                            case "portfolio":
+                                JSONArray contractArray = (JSONArray) jsonObject.get("contracts");
+                                ArrayList<Candle> contractArrayList = new ArrayList<>();
+//                                TickHistoryResponse tickHistoryResponse = new TickHistoryResponse();
+//                                if (candleArray != null) {
+//                                    candleArray.forEach(f -> {
+//                                        candleArrayList.add(gson.fromJson(String.valueOf(f), Candle.class));
+//                                    });
+//                                }
+//                                tickHistoryResponse.setCandles(candleArrayList);
+//                                logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+                                break;
 
-                    }
-
-
-                    Map<String, Object> stringObjectMap = jsonObject.toMap();
-                    for(Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
-                        String key = entry.getKey();
-                        String value = String.valueOf(entry.getValue());
-
-                        if (key.equalsIgnoreCase("msg_type")) {
-                            String objectType = value;
+                            default:
+                                logger.info("Case not implemented.");
+                                for (Map.Entry<String, Object> entry : jsonObject.toMap().entrySet()) {
+                                    logger.info("{} - {}", entry.getKey(), String.valueOf(entry.getValue()));
+                                }
                         }
-                        logger.info("{} - {}",key,String.valueOf(value));
+                        //                    cache.put(1,o);
+
 
                     }
-//
-
-
-
-
-                    //                    cache.put(1,o);
+                    else{
+                        Object jsonException = jsonObject.get("error");
+                        logger.error(String.valueOf(jsonException));
+                    }
                 }
         );
     }
@@ -155,4 +185,5 @@ WebsocketListener extends WebSocketListener {
         logger.info("Connection failed: {}", response != null ? response.message() : "");
         this.websocketEmitter.onNext(new WebsocketEvent(false, response != null ? response.message() : ""));
     }
+
 }

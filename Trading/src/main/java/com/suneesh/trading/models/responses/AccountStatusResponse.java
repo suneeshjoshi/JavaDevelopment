@@ -15,6 +15,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public class AccountStatusResponse extends ResponseBase<AccountStatusRequest> {
 
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
     /**
      * Account status details
      */

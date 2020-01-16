@@ -1,6 +1,5 @@
 package com.suneesh.trading.models.responses;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.math.BigDecimal;
@@ -104,21 +103,21 @@ public class Transaction {
      *
      */
     @SerializedName("barrier")
-    private BigDecimal barrier;
+    private String barrier;
 
     /**
      * The high barrier of a contract. Only applicable to double barrier contracts.
      *
      */
     @SerializedName("high_barrier")
-    private BigDecimal highBarrier;
+    private String highBarrier;
 
     /**
      * The low barrier of a contract. Only applicable to double barrier contracts.
      *
      */
     @SerializedName("low_barrier")
-    private BigDecimal lowBarrier;
+    private String lowBarrier;
 
     public BigDecimal getBalance() {
         return balance;
@@ -172,15 +171,15 @@ public class Transaction {
         return dateExpiry;
     }
 
-    public BigDecimal getBarrier() {
+    public String getBarrier() {
         return barrier;
     }
 
-    public BigDecimal getHighBarrier() {
+    public String getHighBarrier() {
         return highBarrier;
     }
 
-    public BigDecimal getLowBarrier() {
+    public String getLowBarrier() {
         return lowBarrier;
     }
 }
