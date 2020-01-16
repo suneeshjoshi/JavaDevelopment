@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by morteza on 7/19/2017.
@@ -36,6 +38,7 @@ public class ApiWrapper {
     public BehaviorSubject<WebsocketEvent> websocketEmitter = BehaviorSubject.create();
     private PublishSubject<String> responseEmitter = PublishSubject.create();
     private PublishSubject<String> requestEmitter = PublishSubject.create();
+    protected static Map<Long, ResponseBase> cache = new LinkedHashMap<>();
 
     private ApiWrapper(String applicationId, String language, String url){
         this.websocketUrl = url + String.format("?app_id=%s&l=%s", applicationId, language);
@@ -66,7 +69,7 @@ public class ApiWrapper {
                 .build();
 
         this.websocketListener = new WebsocketListener(this.websocketEmitter,
-                this.responseEmitter, this.requestEmitter);
+                this.responseEmitter, this.requestEmitter, cache);
 
         this.webSocket = this.client.newWebSocket(request, websocketListener);
     }

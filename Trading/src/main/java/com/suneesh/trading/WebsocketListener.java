@@ -1,7 +1,9 @@
 package com.suneesh.trading;
 
+import com.google.gson.Gson;
 import com.suneesh.trading.models.WebsocketEvent;
 
+import com.suneesh.trading.models.responses.ResponseBase;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import okhttp3.Response;
@@ -9,6 +11,10 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.json.JSONObject;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by morteza on 7/18/2017.
@@ -23,6 +29,17 @@ WebsocketListener extends WebSocketListener {
     private PublishSubject<String> responseEmitter;
     private PublishSubject<String> requestEmitter;
 
+    protected Map<Long, ResponseBase> cache;
+
+
+    public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
+                             PublishSubject<String> responseEmitter,
+                             PublishSubject<String> requestEmitter,
+                             Map<Long,ResponseBase> cache) {
+        this(wsEmitter, responseEmitter, requestEmitter);
+        this.cache = cache;
+    }
+
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
                              PublishSubject<String> requestEmitter){
@@ -33,6 +50,21 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter.subscribe(
                 o -> {
                     logger.info("Received Massage: {}", o);
+                    Gson gson  = new Gson();
+
+                    JSONObject jsonObject = new JSONObject(o);
+//                    logger.info(jsonObject.toString(2));
+
+                    Map<String, Object> stringObjectMap = jsonObject.toMap();
+                    for(Map.Entry<String, Object> entry : stringObjectMap.entrySet()){
+                        Object value = entry.getValue();
+                        String key = entry.getKey();
+
+                        logger.info("{} - {}",entry.getKey(),String.valueOf(entry.getValue()));
+                    }
+
+
+                    //                    cache.put(1,o);
                 }
         );
     }
