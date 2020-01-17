@@ -41,7 +41,7 @@ public class StartApplication implements CommandLineRunner {
         log.info("StartApplication...");
 
         oldExampleCode();
-        MainApplication mainApplication = new MainApplication();
+        Application mainApplication = new Application();
         mainApplication.init(bookRepository);
 
         mainApplication.threadCreation();

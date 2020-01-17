@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
 
-public class MainApplication {
+public class Application {
     private static final Logger LOGGER = LogManager.getLogger();
     protected BlockingQueue<Float> inputMessageQueue = new LinkedBlockingQueue<>();
     protected Publisher publisher;
