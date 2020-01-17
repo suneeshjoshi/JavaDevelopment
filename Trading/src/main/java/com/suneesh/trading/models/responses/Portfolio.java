@@ -11,6 +11,10 @@ import java.util.List;
  */
 public class Portfolio {
 
+    public void setContracts(List<PortfolioTransaction> contracts) {
+        this.contracts = contracts;
+    }
+
     /**
      * Client open positions
      */

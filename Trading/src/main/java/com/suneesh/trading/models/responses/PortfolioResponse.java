@@ -17,6 +17,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public class PortfolioResponse extends ResponseBase<PortfolioRequest> {
 
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
+    }
+
     /**
      * Client open positions
      */

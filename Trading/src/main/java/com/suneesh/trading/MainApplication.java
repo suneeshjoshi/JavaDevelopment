@@ -32,35 +32,23 @@ public class MainApplication {
             AuthorizeResponse auth = (AuthorizeResponse) response;
             // Authorised.
             if(auth.getAuthorize()!=null) {
-//                api.sendRequest(new BalanceRequest(true));
-//                api.sendRequest(new TransactionsStreamRequest());
-//                api.sendRequest(new AccountStatusRequest());
-                api.sendRequest( new PortfolioRequest());
+                api.sendRequest(new BalanceRequest(true));
+                api.sendRequest(new TransactionsStreamRequest());
+                api.sendRequest(new AccountStatusRequest());
+                api.sendRequest(new PortfolioRequest());
             }
         });
 
-//
-//        TickRequest request = new TickRequest("R_10");
-//        api.sendRequest(request);
-//
-//        TickHistoryRequest tickHistoryRequest = new TickHistoryRequest("R_50", "latest");
-//        tickHistoryRequest.setStyle(TickStyles.CANDLES);
-//        tickHistoryRequest.setSubscribe(1);
-//        tickHistoryRequest.setCount(100);
-//        tickHistoryRequest.setGranularity(60);
-//        api.sendRequest(tickHistoryRequest);
-//
 
+        TickRequest request = new TickRequest("R_10");
+        api.sendRequest(request);
 
-//        api.sendRequest(new AccountStatusRequest());
-
-//        api.sendRequest( new TransactionsStreamRequest());
-
-//        AuthorizeRequest authorizeRequest = new AuthorizeRequest("9s5aGYbnsUQr3Fv");
-//        api.sendRequest(authorizeRequest).subscribe( response -> {
-//            api.sendRequest( new TransactionsStreamRequest());
-//        });
-
+        TickHistoryRequest tickHistoryRequest = new TickHistoryRequest("R_50", "latest");
+        tickHistoryRequest.setStyle(TickStyles.CANDLES);
+        tickHistoryRequest.setSubscribe(1);
+        tickHistoryRequest.setCount(100);
+        tickHistoryRequest.setGranularity(60);
+        api.sendRequest(tickHistoryRequest);
 
     }
 }

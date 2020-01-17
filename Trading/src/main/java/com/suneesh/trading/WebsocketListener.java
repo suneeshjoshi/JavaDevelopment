@@ -55,7 +55,7 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-//                    logger.info("Received Message: {}", o);
+                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
 
                     JSONObject jsonObject = new JSONObject(o);
@@ -127,16 +127,26 @@ WebsocketListener extends WebSocketListener {
                                 }
                                 break;
                             case "portfolio":
-                                JSONArray contractArray = (JSONArray) jsonObject.get("contracts");
-                                ArrayList<Candle> contractArrayList = new ArrayList<>();
-//                                TickHistoryResponse tickHistoryResponse = new TickHistoryResponse();
-//                                if (candleArray != null) {
-//                                    candleArray.forEach(f -> {
-//                                        candleArrayList.add(gson.fromJson(String.valueOf(f), Candle.class));
-//                                    });
-//                                }
-//                                tickHistoryResponse.setCandles(candleArrayList);
-//                                logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+                                PortfolioResponse portfolioResponse = new PortfolioResponse();
+                                JSONObject portfolioObject = (JSONObject) jsonObject.get("portfolio");
+
+                                JSONArray contractArray = (JSONArray) portfolioObject.get("contracts");
+                                ArrayList<Contract> contractArrayList = new ArrayList<>();
+
+                                ArrayList<PortfolioTransaction> portfolioTransactionList = new ArrayList<>();
+
+                                if (contractArray != null) {
+                                    contractArray.forEach(f -> {
+                                        contractArrayList.add(gson.fromJson(String.valueOf(f), Contract.class));
+                                        portfolioTransactionList.add(gson.fromJson(String.valueOf(f), PortfolioTransaction.class));
+                                    });
+                                }
+
+                                Portfolio portfolio = new Portfolio();
+                                portfolio.setContracts(portfolioTransactionList);
+
+                                portfolioResponse.setPortfolio(portfolio);
+                                logger.info(String.valueOf(portfolioResponse.getPortfolio()));
                                 break;
 
                             default:
