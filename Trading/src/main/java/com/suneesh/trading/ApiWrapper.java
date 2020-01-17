@@ -69,7 +69,7 @@ public class ApiWrapper {
                 .build();
 
         this.websocketListener = new WebsocketListener(this.websocketEmitter,
-                this.responseEmitter, this.requestEmitter, cache);
+                this.responseEmitter, this.requestEmitter);
 
         this.webSocket = this.client.newWebSocket(request, websocketListener);
     }
