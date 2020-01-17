@@ -18,9 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * Created by morteza on 7/18/2017.
@@ -35,16 +36,7 @@ WebsocketListener extends WebSocketListener {
     private PublishSubject<String> responseEmitter;
     private PublishSubject<String> requestEmitter;
 
-    protected Map<Long, ResponseBase> cache;
-
-
-    public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
-                             PublishSubject<String> responseEmitter,
-                             PublishSubject<String> requestEmitter,
-                             Map<Long,ResponseBase> cache) {
-        this(wsEmitter, responseEmitter, requestEmitter);
-        this.cache = cache;
-    }
+    protected static Cache cache;
 
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
@@ -52,15 +44,15 @@ WebsocketListener extends WebSocketListener {
         this.websocketEmitter = wsEmitter;
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
+        cache.initialize();
 
         this.responseEmitter.subscribe(
                 o -> {
                     logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
-
                     JSONObject jsonObject = new JSONObject(o);
-//                    logger.info(jsonObject.toString(2));
 
+                    long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
                     if(!jsonObject.has("error") ){
                         String msg_type = jsonObject.getString("msg_type");
@@ -73,6 +65,8 @@ WebsocketListener extends WebSocketListener {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
                                     logger.info(String.valueOf(tickResponse.getTick()));
                                 }
+
+                                cache.writeToCache(epochTime,tickResponse);
                                 break;
                             case "authorize":
                                 AuthorizeResponse authorizeResponse = new AuthorizeResponse();
@@ -81,6 +75,7 @@ WebsocketListener extends WebSocketListener {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
                                     logger.info(String.valueOf(authorizeResponse.getAuthorize()));
                                 }
+                                cache.writeToCache(epochTime,authorizeResponse);
                                 break;
                             case "balance":
                                 BalanceResponse balanceResponse = new BalanceResponse();
@@ -89,6 +84,7 @@ WebsocketListener extends WebSocketListener {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
                                     logger.info(String.valueOf(balanceResponse.getBalance()));
                                 }
+                                cache.writeToCache(epochTime,balanceResponse);
                                 break;
                             case "candles":
                                 JSONArray candleArray = (JSONArray) jsonObject.get("candles");
@@ -101,14 +97,22 @@ WebsocketListener extends WebSocketListener {
                                 }
                                 tickHistoryResponse.setCandles(candleArrayList);
                                 logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+                                cache.writeToCache(epochTime,tickHistoryResponse);
                                 break;
                             case "ohlc":
+                                TickHistoryResponse ohlcTickHistoryResponse = new TickHistoryResponse();
                                 Candle OHLCObject = new Candle();
                                 JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
                                 if (OHLCData != null) {
                                     OHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
                                 }
-                                logger.info(String.valueOf(OHLCObject));
+
+                                ArrayList<Candle> candles = new ArrayList<>();
+                                candles.add(OHLCObject);
+                                ohlcTickHistoryResponse.setCandles(candles);
+                                logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+                                cache.writeToCache(epochTime,ohlcTickHistoryResponse);
+
                                 break;
                             case "transaction":
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
@@ -117,6 +121,7 @@ WebsocketListener extends WebSocketListener {
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
                                 }
+                                cache.writeToCache(epochTime,transactionsStreamResponse);
                                 break;
                             case "get_account_status":
                                 AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
@@ -125,6 +130,8 @@ WebsocketListener extends WebSocketListener {
                                     accountStatusResponse.setAccountStatus(gson.fromJson(String.valueOf(accountStatusData), AccountStatus.class));
                                     logger.info(String.valueOf(accountStatusResponse.getAccountStatus()));
                                 }
+
+                                cache.writeToCache(epochTime,accountStatusResponse);
                                 break;
                             case "portfolio":
                                 PortfolioResponse portfolioResponse = new PortfolioResponse();
@@ -147,6 +154,7 @@ WebsocketListener extends WebSocketListener {
 
                                 portfolioResponse.setPortfolio(portfolio);
                                 logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+                                cache.writeToCache(epochTime,portfolioResponse);
                                 break;
 
                             default:
@@ -155,9 +163,6 @@ WebsocketListener extends WebSocketListener {
                                     logger.info("{} - {}", entry.getKey(), String.valueOf(entry.getValue()));
                                 }
                         }
-                        //                    cache.put(1,o);
-
-
                     }
                     else{
                         Object jsonException = jsonObject.get("error");
