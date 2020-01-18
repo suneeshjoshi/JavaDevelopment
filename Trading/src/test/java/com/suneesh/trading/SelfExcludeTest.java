@@ -1,8 +1,8 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.requests.GetSelfExclusionRequest;
-import com.suneesh.trading.models.responses.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
 import com.suneesh.trading.models.responses.GetSelfExclusionResponse;
 import com.suneesh.trading.models.responses.ResponseBase;

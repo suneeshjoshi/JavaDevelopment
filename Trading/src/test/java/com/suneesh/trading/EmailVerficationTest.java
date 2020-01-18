@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.enums.EmailVerificationReasons;
 import com.suneesh.trading.models.requests.EmailVerificationRequest;
 import com.suneesh.trading.models.responses.EmailVerificationResponse;

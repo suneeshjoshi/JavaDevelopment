@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.TickRequest;
 import com.suneesh.trading.models.responses.ResponseBase;
 import io.reactivex.observers.TestObserver;

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * <h1>ApplicationRegistrationRequest</h1>
  *
- * <h2>Application Register Send</h2>
+ * <h2>Framework Register Send</h2>
  *<p>
  *     Register a new OAuth application
  *</p>
@@ -31,7 +31,7 @@ public class ApplicationRegistrationRequest extends RequestBase {
     private final int appRegister = 1;
 
     /**
-     * Application name
+     * Framework name
      *
      */
     @SerializedName("name")
@@ -41,42 +41,42 @@ public class ApplicationRegistrationRequest extends RequestBase {
     private List<String> scopes = null;
 
     /**
-     * Application's homepage
+     * Framework's homepage
      *
      */
     @SerializedName("homepage")
     private String homepageUrl;
 
     /**
-     * Application's GitHub page (for open-source projects)
+     * Framework's GitHub page (for open-source projects)
      *
      */
     @SerializedName("github")
     private String githubUrl;
 
     /**
-     * Application's App Store URL (if applicable)
+     * Framework's App Store URL (if applicable)
      *
      */
     @SerializedName("appstore")
     private String appStoreUrl;
 
     /**
-     * Application's Google Play URL (if applicable)
+     * Framework's Google Play URL (if applicable)
      *
      */
     @SerializedName("googleplay")
     private String googlePlayUrl;
 
     /**
-     * Application redirect_uri
+     * Framework redirect_uri
      *
      */
     @SerializedName("redirect_uri")
     private String redirectUri;
 
     /**
-     * Application verification_uri
+     * Framework verification_uri
      *
      */
     @SerializedName("verification_uri")

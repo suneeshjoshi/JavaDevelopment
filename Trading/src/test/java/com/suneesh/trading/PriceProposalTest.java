@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.enums.BasisTypes;
 import com.suneesh.trading.models.enums.DurationUnits;
 import com.suneesh.trading.models.requests.PriceProposalRequest;

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotEquals;
  * @version 1.0.0
  * @since 8/27/2017
  */
-public class ApplicationDeletionTest extends TestBase {
+public class FrameworkDeletionTest extends TestBase {
 
     @Test
     public void deleteApplicatoinTest() throws Exception {

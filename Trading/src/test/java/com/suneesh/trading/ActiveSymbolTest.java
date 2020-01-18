@@ -1,10 +1,10 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.ActiveSymbolRequest;
 import com.suneesh.trading.models.responses.ActiveSymbolResponse;
 import com.suneesh.trading.models.responses.ResponseBase;
 import io.reactivex.observers.TestObserver;
-import org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 

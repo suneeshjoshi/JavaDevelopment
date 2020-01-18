@@ -1,5 +1,7 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

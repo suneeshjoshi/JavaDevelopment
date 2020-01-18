@@ -1,4 +1,4 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.engineOLD;
 
 
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +15,7 @@ public class MainApplication {
     private static float startValue = 100.0f;
 
     public static void main(String[] args) {
-        logger.info("Main Application");
+        logger.info("Main Framework");
 
         Subscriber subscriber = new Subscriber(startValue, inputMessageQueue);
         Publisher publisher = new Publisher(startValue, inputMessageQueue);

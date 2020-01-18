@@ -1,4 +1,4 @@
-package com.suneesh.trading;
+package com.suneesh.trading.engine;
 
 import com.suneesh.trading.models.responses.*;
 

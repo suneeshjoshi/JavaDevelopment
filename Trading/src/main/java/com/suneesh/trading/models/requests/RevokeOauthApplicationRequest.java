@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * <h1>RevokeOauthApplicationRequest</h1>
  *
- * <h2>Revoke Oauth Application Send</h2>
+ * <h2>Revoke Oauth Framework Send</h2>
  * <p>
  *     Used for revoking access of particular app.
  * </p>

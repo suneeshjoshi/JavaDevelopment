@@ -17,7 +17,7 @@ import io.reactivex.annotations.Nullable;
 public class ApplicationDeletionRequest extends RequestBase {
 
     /**
-     * Application app_id
+     * Framework app_id
      */
     @SerializedName("app_delete")
     @Nullable

@@ -1,10 +1,8 @@
-package com.suneesh.trading;
+package com.suneesh.trading.engine;
 
 import com.google.gson.Gson;
 import com.suneesh.trading.models.WebsocketEvent;
 
-import com.suneesh.trading.models.requests.AccountStatusRequest;
-import com.suneesh.trading.models.requests.TickRequest;
 import com.suneesh.trading.models.responses.*;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -12,13 +10,10 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;

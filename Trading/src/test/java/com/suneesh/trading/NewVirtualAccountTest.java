@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.NewVirtualAccountRequest;
 import com.suneesh.trading.models.responses.NewVirtualAccountResponse;
 import com.suneesh.trading.models.responses.ResponseBase;

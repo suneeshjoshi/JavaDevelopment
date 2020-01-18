@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.AccountLimitsRequest;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.responses.AccountLimitsResponse;
@@ -7,7 +8,6 @@ import com.suneesh.trading.models.responses.ResponseBase;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;

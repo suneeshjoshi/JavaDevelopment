@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.TickHistoryRequest;
 import com.suneesh.trading.models.responses.ResponseBase;

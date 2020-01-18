@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotEquals;
  * @version 1.0.0
  * @since 8/20/2017
  */
-public class ApplicationRegistrationTest extends TestBase {
+public class FrameworkRegistrationTest extends TestBase {
 
     @Test
     public void registerApplicationTest() throws Exception {

@@ -1,5 +1,6 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.requests.AuthorizeRequest;
 import com.suneesh.trading.models.requests.BalanceRequest;
 import com.suneesh.trading.models.responses.AuthorizeResponse;

@@ -1,4 +1,4 @@
-package com.mkyong;
+package com.suneesh.trading.engine;
 
 import lombok.Data;
 

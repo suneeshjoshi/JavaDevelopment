@@ -14,19 +14,19 @@ import java.util.List;
 public class OAuthApplication {
 
     /**
-     * Application name
+     * Framework name
      */
     @SerializedName("name")
     private String name;
 
     /**
-     * Application id
+     * Framework id
      */
     @SerializedName("app_id")
     private Integer applicationId;
 
     /**
-     * Application last used
+     * Framework last used
      */
     @SerializedName("last_used")
     @Nullable
