@@ -10,4 +10,7 @@ public interface DatabaseConnection {
     String getUrl();
     Connection getConnection();
     List executeQuery(String statement);
+    boolean checkTableExists(String tableName);
+    void createDBSchema();
+
 }

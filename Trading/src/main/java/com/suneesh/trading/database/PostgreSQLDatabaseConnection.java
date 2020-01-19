@@ -1,10 +1,10 @@
 package com.suneesh.trading.database;
 
+import com.suneesh.trading.models.responses.*;
+
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.sql.Statement;
+import java.util.*;
 
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
@@ -61,4 +61,36 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         }
         return list;
     }
+
+    @Override
+    public boolean checkTableExists(String tableName){
+        DatabaseMetaData dbm = null;
+        boolean result = false;
+        try {
+            dbm = getConnection().getMetaData();
+            ResultSet tables = dbm.getTables(null, null, tableName, null);
+            if (tables.next()) {
+                result = true;
+            }
+            else {
+                result = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public void createDBSchema() {
+//        protected static Map<Long, TickResponse> tickCache;
+//        protected static Map<Long, TickHistoryResponse> tickHistoryCache;
+//        protected static Map<Long, AuthorizeResponse> authorizeResponseCache;
+//        protected static Map<Long, BalanceResponse> balanceResponseCache;
+//        protected static Map<Long, TransactionsStreamResponse> transactionsStreamResponseCache;
+//        protected static Map<Long, PortfolioResponse> portfolioResponseCache;
+//        protected static Map<Long, AccountStatusResponse> accountStatusResponseCache;
+
+    }
+
 }
