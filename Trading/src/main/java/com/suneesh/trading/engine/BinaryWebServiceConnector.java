@@ -1,10 +1,8 @@
 package com.suneesh.trading.engine;
 
-import com.suneesh.trading.engine.ApiWrapper;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
-import com.suneesh.trading.repository.BookRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

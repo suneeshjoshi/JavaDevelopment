@@ -1,7 +1,7 @@
 package com.suneesh.trading;
 
 import com.suneesh.trading.engine.Framework;
-import com.suneesh.trading.repository.BookRepository;
+import com.suneesh.trading.repository.TickResponseRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class StartApplication implements CommandLineRunner {
     private String applicationAuthorizeCode;
 
     @Autowired
-    protected BookRepository bookRepository;
+    protected TickResponseRepository tickResponseRepository;
 
 
     public static void main(String[] args) {
@@ -37,7 +37,7 @@ public class StartApplication implements CommandLineRunner {
         logger.info("Starting Automated Trading Application...");
         logger.info("{} - {} ",applicationID, applicationAuthorizeCode);
         Framework mainFramework = new Framework();
-        mainFramework.init(bookRepository);
+        mainFramework.init(tickResponseRepository);
 
         mainFramework.threadCreation();
 

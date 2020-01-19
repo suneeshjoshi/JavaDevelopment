@@ -1,6 +1,6 @@
 package com.suneesh.trading.engine;
 
-import com.suneesh.trading.repository.BookRepository;
+import com.suneesh.trading.repository.TickResponseRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,9 +13,9 @@ public class CommandProcessor {
     private static  final Logger LOGGER = LogManager.getLogger();
     private BlockingQueue<Float> inputMessageQueue = new LinkedBlockingQueue<>();
     private float startValue;
-    private BookRepository repository;
+    private TickResponseRepository repository;
 
-    public CommandProcessor(BlockingQueue<Float> inputMessageQueue, BookRepository repository) {
+    public CommandProcessor(BlockingQueue<Float> inputMessageQueue, TickResponseRepository repository) {
         this.inputMessageQueue = inputMessageQueue;
         this.startValue = 0;
         this.repository = repository;
@@ -30,12 +30,12 @@ public class CommandProcessor {
                 if(data!=null){
                     count++;
                     LOGGER.info("data = {}", data);
-                    if(repository!=null) {
-                        repository.save(new Book(String.valueOf(data.floatValue())));
-                    }
-                    else{
-                        LOGGER.info("Repository is null.");
-                    }
+//                    if(repository!=null) {
+//                        repository.save(new Book(String.valueOf(data.floatValue())));
+//                    }
+//                    else{
+//                        LOGGER.info("Repository is null.");
+//                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
