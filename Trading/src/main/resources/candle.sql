@@ -1,8 +1,4 @@
--- Table: public.candle
-
--- DROP TABLE public.candle;
-
-CREATE TABLE public.candle
+CREATE TABLE IF NOT EXISTS public.candle
 (
     identifier bigint NOT NULL,
     close numeric(19,2),

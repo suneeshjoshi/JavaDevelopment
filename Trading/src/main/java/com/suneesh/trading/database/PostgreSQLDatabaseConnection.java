@@ -38,6 +38,19 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
     @Override
+    public void executeCreateTableQuery(String createStatement) {
+        Statement st = null;
+        ArrayList list = new ArrayList(50);
+        try {
+            st = getConnection().createStatement();
+            st.execute(createStatement);
+            st.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+        @Override
     public List executeQuery(String statement) {
         Statement st = null;
         ResultSet rs = null;

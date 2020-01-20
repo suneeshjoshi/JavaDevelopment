@@ -1,8 +1,4 @@
--- Table: public.account_status
-
--- DROP TABLE public.account_status;
-
-CREATE TABLE public.account_status
+CREATE TABLE IF NOT EXISTS public.account_status
 (
     identifier bigint NOT NULL,
     prompt_client_to_authenticate integer NOT NULL,

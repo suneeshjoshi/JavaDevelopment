@@ -1,8 +1,4 @@
--- Table: public.authorize
-
--- DROP TABLE public.authorize;
-
-CREATE TABLE public.authorize
+CREATE TABLE IF NOT EXISTS public.authorize
 (
     identifier bigint NOT NULL,
     allow_omnibus integer NOT NULL,

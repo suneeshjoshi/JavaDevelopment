@@ -9,6 +9,9 @@ public interface DatabaseConnection {
     void createConnection();
     String getUrl();
     Connection getConnection();
+
+    void executeCreateTableQuery(String createStatement);
+
     List executeQuery(String statement);
     boolean checkTableExists(String tableName);
     void createDBSchema();

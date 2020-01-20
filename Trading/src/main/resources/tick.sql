@@ -1,8 +1,4 @@
--- Table: public.tick
-
--- DROP TABLE public.tick;
-
-CREATE TABLE public.tick
+CREATE TABLE IF NOT EXISTS public.tick
 (
     identifier bigint NOT NULL,
     ask numeric(19,4) ,
@@ -13,4 +9,5 @@ CREATE TABLE public.tick
     symbol character varying(255) ,
     CONSTRAINT tick_pkey PRIMARY KEY (identifier)
 )
+
 

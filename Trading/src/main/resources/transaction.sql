@@ -1,8 +1,4 @@
--- Table: public.transaction
-
--- DROP TABLE public.transaction;
-
-CREATE TABLE public.transaction
+CREATE TABLE IF NOT EXISTS public.transaction
 (
     identifier bigint NOT NULL,
     action character varying(255) ,

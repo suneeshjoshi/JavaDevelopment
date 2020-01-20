@@ -1,8 +1,4 @@
--- Table: public.balance
-
--- DROP TABLE public.balance;
-
-CREATE TABLE public.balance
+CREATE TABLE IF NOT EXISTS public.balance
 (
     identifier bigint NOT NULL,
     balance numeric(19,2),

@@ -1,8 +1,4 @@
--- Table: public.portfolio_transaction
-
--- DROP TABLE public.portfolio_transaction;
-
-CREATE TABLE public.portfolio_transaction
+CREATE TABLE IF NOT EXISTS public.portfolio_transaction
 (
     identifier bigint NOT NULL,
     app_id integer,
