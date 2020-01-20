@@ -60,6 +60,7 @@ WebsocketListener extends WebSocketListener {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
                                     logger.info(String.valueOf(tickResponse.getTick()));
                                 }
+                                tickResponse.writeToDatabase();
 
                                 cache.writeToCache(epochTime,tickResponse);
                                 break;

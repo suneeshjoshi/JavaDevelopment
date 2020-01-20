@@ -30,4 +30,17 @@ public class TickResponse extends ResponseBase<TickRequest> {
     public void setTick(Tick tick) {
         this.tick = tick;
     }
+
+    public String writeToDatabase(){
+        return "INSERT INTO public.tick " +
+                "(identifier, ask, bid, epoch, id, quote, symbol) " +
+                " VALUES (" + tick.getIdentifier()+", "
+                            + tick.getAsk()+", "
+                            + tick.getBid()+", "
+                            + tick.getEpoch()+", "
+                            + tick.getId()+", "
+                            + tick.getQuote()+", "
+                            + tick.getSymbol() +");";
+    }
+
 }

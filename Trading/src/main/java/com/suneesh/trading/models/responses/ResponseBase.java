@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by morteza on 7/19/2017.
  */
 
-public abstract class ResponseBase<T> {
+public abstract class ResponseBase<T> implements DatabaseOperation {
     @SerializedName("echo_req")
     @Expose
     T request;
