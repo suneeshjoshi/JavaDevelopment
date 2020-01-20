@@ -1,6 +1,6 @@
 package com.suneesh.trading.engine;
 
-import com.suneesh.trading.repository.TickResponseRepository;
+import com.suneesh.trading.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,9 +13,9 @@ public class CommandProcessor {
     private static  final Logger LOGGER = LogManager.getLogger();
     private BlockingQueue<Float> inputMessageQueue = new LinkedBlockingQueue<>();
     private float startValue;
-    private TickResponseRepository repository;
+    private TickRepository repository;
 
-    public CommandProcessor(BlockingQueue<Float> inputMessageQueue, TickResponseRepository repository) {
+    public CommandProcessor(BlockingQueue<Float> inputMessageQueue, TickRepository repository) {
         this.inputMessageQueue = inputMessageQueue;
         this.startValue = 0;
         this.repository = repository;

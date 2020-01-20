@@ -1,6 +1,6 @@
 package com.suneesh.trading.engine;
 
-import com.suneesh.trading.repository.TickResponseRepository;
+import com.suneesh.trading.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,7 +11,7 @@ public class Framework {
     protected BlockingQueue<Float> inputMessageQueue = new LinkedBlockingQueue<>();
     protected CommandProcessor commandProcessor;
     protected CommandGenerator commandGenerator;
-    protected TickResponseRepository repository;
+    protected TickRepository repository;
 
 
     public void threadCreation(){
@@ -39,8 +39,8 @@ public class Framework {
         },0,3,TimeUnit.SECONDS);
     }
 
-    public void init(TickResponseRepository tickResponseRepository) {
-        this.repository = tickResponseRepository;
+    public void init(TickRepository tickRepository) {
+        this.repository = tickRepository;
         commandProcessor = new CommandProcessor(inputMessageQueue,this.repository);
         commandGenerator = new CommandGenerator(inputMessageQueue);
     }

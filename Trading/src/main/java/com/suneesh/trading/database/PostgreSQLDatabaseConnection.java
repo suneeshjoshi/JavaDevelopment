@@ -91,6 +91,28 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 //        protected static Map<Long, PortfolioResponse> portfolioResponseCache;
 //        protected static Map<Long, AccountStatusResponse> accountStatusResponseCache;
 
+//        if(!checkTableExists("Tick")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("TickHistory")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("Authorize")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("Balance")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("Transaction")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("Portfolio")){
+//            createTickTable();
+//        }
+//        if(!checkTableExists("AccountStatus")){
+//            createTickTable();
+//        }
+
     }
 
 }

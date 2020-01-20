@@ -2,12 +2,28 @@ package com.suneesh.trading.models.responses;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * Created by morteza on 7/19/2017.
  */
 
+@Entity
+@Data
 public class Tick {
+    @SerializedName("id")
+    @Expose
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @SerializedName("ask")
     @Expose
     private
@@ -18,10 +34,10 @@ public class Tick {
     private
     String bid;
 
-    @SerializedName("id")
-    @Expose
-    private
-    String id;
+//    @SerializedName("id")
+//    @Expose
+//    private
+//    String id;
 
     @SerializedName("epoch")
     @Expose
@@ -51,7 +67,7 @@ public class Tick {
     }
 
     public String getId(){
-        return this.id;
+        return String.valueOf(this.id);
     }
 
     public String getQuote(){
@@ -71,7 +87,7 @@ public class Tick {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = Long.valueOf(id);
     }
 
     public void setQuote(String quote) {
