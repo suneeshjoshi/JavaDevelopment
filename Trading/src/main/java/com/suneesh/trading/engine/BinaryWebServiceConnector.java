@@ -14,20 +14,19 @@ import java.util.concurrent.TimeUnit;
 public class BinaryWebServiceConnector {
 
     private static final Logger logger = (Logger) LogManager.getLogger();
-    private static ApiWrapper api;
-    private static String applicationId;
-    private static String applicationAuthorizeToken;
-    private static BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
+    private ApiWrapper api;
+    private String applicationId;
+    private String applicationAuthorizeToken;
+    private BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
 
-
-    public BinaryWebServiceConnector(BlockingQueue<RequestBase> inputMessageQueue, String applicationId, String applicationAuthorizeToken) {
-        inputMessageQueue = inputMessageQueue;
-        applicationId = applicationId;
-        applicationAuthorizeToken = applicationAuthorizeToken;
+    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken) {
+        inputMessageQueue = messageQueue;
+        applicationId = appId;
+        applicationAuthorizeToken = appAuthToken;
         api = ApiWrapper.build(applicationId);
     }
 
-    public static void init() {
+    public void init() {
         logger.info("Creating WebConnection to Binary.com ....");
         logger.info("Application ID = {}", applicationId);
         logger.info("Application Authorize Token = {}", applicationAuthorizeToken);
@@ -39,13 +38,13 @@ public class BinaryWebServiceConnector {
             if (auth.getAuthorize() != null) {
                 api.sendRequest(new BalanceRequest(true));
                 api.sendRequest(new TransactionsStreamRequest());
-                api.sendRequest(new AccountStatusRequest());
+//                api.sendRequest(new AccountStatusRequest());
                 api.sendRequest(new PortfolioRequest());
             }
         });
     }
 
-    public static void getTickDetail(String symbol){
+    public void getTickDetail(String symbol){
         TickRequest request = new TickRequest(symbol);
         api.sendRequest(request);
 

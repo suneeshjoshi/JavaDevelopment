@@ -47,9 +47,9 @@ public class StartApplication implements CommandLineRunner {
         logger.info("Starting Automated Trading Application...");
         logger.info("{} - {} ",applicationID, applicationAuthorizeCode);
 
-        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationID, applicationAuthorizeCode);
-        BinaryWebServiceConnector.init();
-        BinaryWebServiceConnector.getTickDetail("R_10");
+//        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationID, applicationAuthorizeCode);
+//        BinaryWebServiceConnector.init();
+//        BinaryWebServiceConnector.getTickDetail("R_10");
 
         Framework mainFramework = new Framework();
         mainFramework.init(applicationID, applicationAuthorizeCode);

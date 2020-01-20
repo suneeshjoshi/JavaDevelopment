@@ -118,16 +118,16 @@ WebsocketListener extends WebSocketListener {
                                 }
                                 cache.writeToCache(epochTime,transactionsStreamResponse);
                                 break;
-                            case "get_account_status":
-                                AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
-                                JSONObject accountStatusData = (JSONObject) jsonObject.get("get_account_status");
-                                if (accountStatusData != null) {
-                                    accountStatusResponse.setAccountStatus(gson.fromJson(String.valueOf(accountStatusData), AccountStatus.class));
-                                    logger.info(String.valueOf(accountStatusResponse.getAccountStatus()));
-                                }
-
-                                cache.writeToCache(epochTime,accountStatusResponse);
-                                break;
+//                            case "get_account_status":
+//                                AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
+//                                JSONObject accountStatusData = (JSONObject) jsonObject.get("get_account_status");
+//                                if (accountStatusData != null) {
+//                                    accountStatusResponse.setAccountStatus(gson.fromJson(String.valueOf(accountStatusData), AccountStatus.class));
+//                                    logger.info(String.valueOf(accountStatusResponse.getAccountStatus()));
+//                                }
+//
+//                                cache.writeToCache(epochTime,accountStatusResponse);
+//                                break;
                             case "portfolio":
                                 PortfolioResponse portfolioResponse = new PortfolioResponse();
                                 JSONObject portfolioObject = (JSONObject) jsonObject.get("portfolio");

@@ -14,8 +14,9 @@ import io.reactivex.subjects.PublishSubject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -27,7 +28,7 @@ import java.util.Map;
 
 public class ApiWrapper {
 
-    Logger logger = LoggerFactory.getLogger(ApiWrapper.class);
+    Logger logger = LogManager.getLogger();
 
     private static ApiWrapper instance;
 
@@ -51,18 +52,22 @@ public class ApiWrapper {
         }
 
         this.websocketEmitter.subscribe(e -> {
-            final int maxAttemptCount = 100;
-            int attemptCount = 1;
-            while(!e.isOpened() && attemptCount < maxAttemptCount) {
-                logger.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
-                this.connect();
-                Thread.sleep(500);
-                attemptCount++;
-            }
 
-            if(attemptCount >= maxAttemptCount){
-                logger.info("ERROR ! Unable to connect to remote Binary WebSocket. url = {}", websocketUrl);
+            logger.info("Connection status = {}", e.isOpened());
+            if(!e.isOpened()) {
+                final int maxAttemptCount = 100;
+                int attemptCount = 1;
+                while (!e.isOpened() && attemptCount < maxAttemptCount) {
+                    logger.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
+                    this.connect();
+                    Thread.sleep(500);
+                    attemptCount++;
+                }
 
+                if (attemptCount >= maxAttemptCount) {
+                    logger.info("ERROR ! Unable to connect to remote Binary WebSocket. url = {}", websocketUrl);
+
+                }
             }
         });
 
