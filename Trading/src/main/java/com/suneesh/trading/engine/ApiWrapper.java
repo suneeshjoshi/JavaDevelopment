@@ -44,16 +44,28 @@ public class ApiWrapper {
         this.websocketUrl = url + String.format("?app_id=%s&l=%s", applicationId, language);
 
         try {
+            logger.info("Attempting to connect to Binary WebSocket, url = {}", websocketUrl);
             this.connect();
         } catch (IOException e) {
             logger.debug(e.getMessage());
         }
 
         this.websocketEmitter.subscribe(e -> {
-            if(!e.isOpened()) {
+            final int maxAttemptCount = 100;
+            int attemptCount = 1;
+            while(!e.isOpened() && attemptCount < maxAttemptCount) {
+                logger.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
                 this.connect();
+                Thread.sleep(500);
+                attemptCount++;
+            }
+
+            if(attemptCount >= maxAttemptCount){
+                logger.info("ERROR ! Unable to connect to remote Binary WebSocket. url = {}", websocketUrl);
+
             }
         });
+
     }
 
     private void connect() throws IOException {
