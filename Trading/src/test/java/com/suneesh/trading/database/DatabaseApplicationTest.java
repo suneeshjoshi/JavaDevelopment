@@ -2,6 +2,7 @@ package com.suneesh.trading.database;
 
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,9 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-public class DatabaseApplication {
+public class DatabaseApplicationTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void databaseTest() {
 
         PostgreSQLDatabaseConnection postgreSQLDatabaseConnection = new PostgreSQLDatabaseConnection("jdbc:postgresql://localhost/automated_trading");
         postgreSQLDatabaseConnection.createConnection();

@@ -1,6 +1,5 @@
 package com.suneesh.trading.utils;
 
-import com.suneesh.trading.database.DatabaseApplication;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +11,7 @@ public class AutoTradingUtility {
     // get file from classpath, resources folder
     public static File getFileFromResources(String fileName) {
 
-        ClassLoader classLoader = DatabaseApplication.class.getClassLoader();
+        ClassLoader classLoader = AutoTradingUtility.class.getClassLoader();
 
         URL resource = classLoader.getResource(fileName);
         if (resource == null) {
