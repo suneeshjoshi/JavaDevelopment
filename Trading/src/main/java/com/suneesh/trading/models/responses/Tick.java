@@ -18,11 +18,9 @@ import javax.persistence.Id;
 @Entity
 @Data
 public class Tick {
-    @SerializedName("id")
-    @Expose
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long identifier;
 
     @SerializedName("ask")
     @Expose
@@ -34,10 +32,10 @@ public class Tick {
     private
     String bid;
 
-//    @SerializedName("id")
-//    @Expose
-//    private
-//    String id;
+    @SerializedName("id")
+    @Expose
+    private
+    String id;
 
     @SerializedName("epoch")
     @Expose
@@ -67,7 +65,7 @@ public class Tick {
     }
 
     public String getId(){
-        return String.valueOf(this.id);
+        return this.id;
     }
 
     public String getQuote(){
@@ -87,7 +85,7 @@ public class Tick {
     }
 
     public void setId(String id) {
-        this.id = Long.valueOf(id);
+        this.id = id;
     }
 
     public void setQuote(String quote) {

@@ -1,13 +1,24 @@
 package com.suneesh.trading.models.responses;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
 /**
  * Created by morteza on 7/28/2017.
  */
+@Entity
+@Data
 public class Authorize {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long identifier;
+
     @SerializedName("email")
     private String email;
 

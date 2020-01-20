@@ -2,7 +2,12 @@ package com.suneesh.trading.models.responses;
 
 import com.google.gson.annotations.SerializedName;
 import io.reactivex.annotations.Nullable;
+import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
 /**
@@ -10,7 +15,12 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 8/4/2017
  */
+@Entity
+@Data
 public class Balance {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long identifier;
 
     /**
      * Balance amount

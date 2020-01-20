@@ -1,28 +1,29 @@
 package com.suneesh.trading.repository;
 
 import com.suneesh.trading.models.responses.PortfolioResponse;
+import com.suneesh.trading.models.responses.PortfolioTransaction;
 
 import java.util.List;
 import java.util.Optional;
 
 public class PortfolioResponseRepositoryImpl implements PortfolioResponseRepository {
     @Override
-    public List<PortfolioResponse> findByName(String name) {
+    public List<PortfolioTransaction> findByName(String name) {
         return null;
     }
 
     @Override
-    public <S extends PortfolioResponse> S save(S entity) {
+    public <S extends PortfolioTransaction> S save(S entity) {
         return null;
     }
 
     @Override
-    public <S extends PortfolioResponse> Iterable<S> saveAll(Iterable<S> entities) {
+    public <S extends PortfolioTransaction> Iterable<S> saveAll(Iterable<S> entities) {
         return null;
     }
 
     @Override
-    public Optional<PortfolioResponse> findById(Long aLong) {
+    public Optional<PortfolioTransaction> findById(Long aLong) {
         return Optional.empty();
     }
 
@@ -32,12 +33,12 @@ public class PortfolioResponseRepositoryImpl implements PortfolioResponseReposit
     }
 
     @Override
-    public Iterable<PortfolioResponse> findAll() {
+    public Iterable<PortfolioTransaction> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<PortfolioResponse> findAllById(Iterable<Long> longs) {
+    public Iterable<PortfolioTransaction> findAllById(Iterable<Long> longs) {
         return null;
     }
 
@@ -52,12 +53,12 @@ public class PortfolioResponseRepositoryImpl implements PortfolioResponseReposit
     }
 
     @Override
-    public void delete(PortfolioResponse entity) {
+    public void delete(PortfolioTransaction entity) {
 
     }
 
     @Override
-    public void deleteAll(Iterable<? extends PortfolioResponse> entities) {
+    public void deleteAll(Iterable<? extends PortfolioTransaction> entities) {
 
     }
 

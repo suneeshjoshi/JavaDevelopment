@@ -1,5 +1,6 @@
 package com.suneesh.trading.repository;
 
+import com.suneesh.trading.models.responses.AccountStatus;
 import com.suneesh.trading.models.responses.AccountStatusResponse;
 
 import java.util.List;
@@ -7,22 +8,22 @@ import java.util.Optional;
 
 public class AccountStatusResponseRepositoryImpl implements AccountStatusResponseRepository {
     @Override
-    public List<AccountStatusResponse> findByName(String name) {
+    public List<AccountStatus> findByName(String name) {
         return null;
     }
 
     @Override
-    public <S extends AccountStatusResponse> S save(S entity) {
+    public <S extends AccountStatus> S save(S entity) {
         return null;
     }
 
     @Override
-    public <S extends AccountStatusResponse> Iterable<S> saveAll(Iterable<S> entities) {
+    public <S extends AccountStatus> Iterable<S> saveAll(Iterable<S> entities) {
         return null;
     }
 
     @Override
-    public Optional<AccountStatusResponse> findById(Long aLong) {
+    public Optional<AccountStatus> findById(Long aLong) {
         return Optional.empty();
     }
 
@@ -32,12 +33,12 @@ public class AccountStatusResponseRepositoryImpl implements AccountStatusRespons
     }
 
     @Override
-    public Iterable<AccountStatusResponse> findAll() {
+    public Iterable<AccountStatus> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<AccountStatusResponse> findAllById(Iterable<Long> longs) {
+    public Iterable<AccountStatus> findAllById(Iterable<Long> longs) {
         return null;
     }
 
@@ -52,12 +53,12 @@ public class AccountStatusResponseRepositoryImpl implements AccountStatusRespons
     }
 
     @Override
-    public void delete(AccountStatusResponse entity) {
+    public void delete(AccountStatus entity) {
 
     }
 
     @Override
-    public void deleteAll(Iterable<? extends AccountStatusResponse> entities) {
+    public void deleteAll(Iterable<? extends AccountStatus> entities) {
 
     }
 

@@ -1,5 +1,6 @@
 package com.suneesh.trading.repository;
 
+import com.suneesh.trading.models.responses.Transaction;
 import com.suneesh.trading.models.responses.TransactionsStreamResponse;
 
 import java.util.List;
@@ -7,22 +8,22 @@ import java.util.Optional;
 
 public class TransactionStreamResponseRepositoryImpl implements TransactionStreamResponseRepository{
     @Override
-    public List<TransactionsStreamResponse> findByName(String name) {
+    public List<Transaction> findByName(String name) {
         return null;
     }
 
     @Override
-    public <S extends TransactionsStreamResponse> S save(S entity) {
+    public <S extends Transaction> S save(S entity) {
         return null;
     }
 
     @Override
-    public <S extends TransactionsStreamResponse> Iterable<S> saveAll(Iterable<S> entities) {
+    public <S extends Transaction> Iterable<S> saveAll(Iterable<S> entities) {
         return null;
     }
 
     @Override
-    public Optional<TransactionsStreamResponse> findById(Long aLong) {
+    public Optional<Transaction> findById(Long aLong) {
         return Optional.empty();
     }
 
@@ -32,12 +33,12 @@ public class TransactionStreamResponseRepositoryImpl implements TransactionStrea
     }
 
     @Override
-    public Iterable<TransactionsStreamResponse> findAll() {
+    public Iterable<Transaction> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<TransactionsStreamResponse> findAllById(Iterable<Long> longs) {
+    public Iterable<Transaction> findAllById(Iterable<Long> longs) {
         return null;
     }
 
@@ -52,12 +53,12 @@ public class TransactionStreamResponseRepositoryImpl implements TransactionStrea
     }
 
     @Override
-    public void delete(TransactionsStreamResponse entity) {
+    public void delete(Transaction entity) {
 
     }
 
     @Override
-    public void deleteAll(Iterable<? extends TransactionsStreamResponse> entities) {
+    public void deleteAll(Iterable<? extends Transaction> entities) {
 
     }
 

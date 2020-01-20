@@ -12,6 +12,7 @@ public class Framework {
     protected CommandProcessor commandProcessor;
     protected CommandGenerator commandGenerator;
     protected TickRepository repository;
+    protected static ApiWrapper api;
 
 
     public void threadCreation(){
@@ -39,8 +40,10 @@ public class Framework {
         },0,3,TimeUnit.SECONDS);
     }
 
-    public void init(TickRepository tickRepository) {
-        this.repository = tickRepository;
+    public void init(String applicationID, String applicationAuthorizeCode) {
+//        public void init(TickRepository tickRepository) {
+//        this.repository = tickRepository;
+
         commandProcessor = new CommandProcessor(inputMessageQueue,this.repository);
         commandGenerator = new CommandGenerator(inputMessageQueue);
     }

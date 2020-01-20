@@ -1,6 +1,8 @@
 package com.suneesh.trading;
 
+import com.suneesh.trading.engine.BinaryWebServiceConnector;
 import com.suneesh.trading.engine.Framework;
+import com.suneesh.trading.models.requests.RequestBase;
 import com.suneesh.trading.models.responses.Tick;
 import com.suneesh.trading.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +15,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 
 @SpringBootApplication(scanBasePackages = {"com.suneesh.trading"})
 @EnableJpaRepositories("com.suneesh.trading.repository")
@@ -20,6 +25,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class StartApplication implements CommandLineRunner {
 
     private static final Logger logger = LogManager.getLogger();
+    private static BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
 
     @Value("${Application.id}")
     private String applicationID;
@@ -27,8 +33,8 @@ public class StartApplication implements CommandLineRunner {
     @Value("${Application.authorizeCode}")
     private String applicationAuthorizeCode;
 
-    @Autowired
-    protected TickRepository tickRepository;
+//    @Autowired
+//    protected TickRepository tickRepository;
 
 
     public static void main(String[] args) {
@@ -40,8 +46,13 @@ public class StartApplication implements CommandLineRunner {
 
         logger.info("Starting Automated Trading Application...");
         logger.info("{} - {} ",applicationID, applicationAuthorizeCode);
+
+        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationID, applicationAuthorizeCode);
+        BinaryWebServiceConnector.init();
+        BinaryWebServiceConnector.getTickDetail("R_10");
+
         Framework mainFramework = new Framework();
-        mainFramework.init(tickRepository);
+        mainFramework.init(applicationID, applicationAuthorizeCode);
 
         mainFramework.threadCreation();
 

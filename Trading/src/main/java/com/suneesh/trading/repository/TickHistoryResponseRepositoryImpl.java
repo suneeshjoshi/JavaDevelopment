@@ -1,5 +1,6 @@
 package com.suneesh.trading.repository;
 
+import com.suneesh.trading.models.responses.Candle;
 import com.suneesh.trading.models.responses.TickHistoryResponse;
 
 import java.util.List;
@@ -7,22 +8,22 @@ import java.util.Optional;
 
 public class TickHistoryResponseRepositoryImpl implements TickHistoryResponseRepository{
     @Override
-    public List<TickHistoryResponse> findByName(String name) {
+    public List<Candle> findByName(String name) {
         return null;
     }
 
     @Override
-    public <S extends TickHistoryResponse> S save(S entity) {
+    public <S extends Candle> S save(S entity) {
         return null;
     }
 
     @Override
-    public <S extends TickHistoryResponse> Iterable<S> saveAll(Iterable<S> entities) {
+    public <S extends Candle> Iterable<S> saveAll(Iterable<S> entities) {
         return null;
     }
 
     @Override
-    public Optional<TickHistoryResponse> findById(Long aLong) {
+    public Optional<Candle> findById(Long aLong) {
         return Optional.empty();
     }
 
@@ -32,12 +33,12 @@ public class TickHistoryResponseRepositoryImpl implements TickHistoryResponseRep
     }
 
     @Override
-    public Iterable<TickHistoryResponse> findAll() {
+    public Iterable<Candle> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<TickHistoryResponse> findAllById(Iterable<Long> longs) {
+    public Iterable<Candle> findAllById(Iterable<Long> longs) {
         return null;
     }
 
@@ -52,12 +53,12 @@ public class TickHistoryResponseRepositoryImpl implements TickHistoryResponseRep
     }
 
     @Override
-    public void delete(TickHistoryResponse entity) {
+    public void delete(Candle entity) {
 
     }
 
     @Override
-    public void deleteAll(Iterable<? extends TickHistoryResponse> entities) {
+    public void deleteAll(Iterable<? extends Candle> entities) {
 
     }
 
