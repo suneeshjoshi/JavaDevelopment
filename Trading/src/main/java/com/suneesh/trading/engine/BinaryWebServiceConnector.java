@@ -1,5 +1,7 @@
 package com.suneesh.trading.engine;
 
+import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
@@ -18,12 +20,26 @@ public class BinaryWebServiceConnector {
     private String applicationId;
     private String applicationAuthorizeToken;
     private BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
+    private DatabaseConnection databaseConnection;
+    private String databaseServer;
 
-    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken) {
+    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken, String dbServer ) {
         inputMessageQueue = messageQueue;
         applicationId = appId;
         applicationAuthorizeToken = appAuthToken;
+        databaseServer = dbServer;
+        databaseConnection = getDatabaseConnection(databaseServer);
         api = ApiWrapper.build(applicationId);
+    }
+
+    private DatabaseConnection getDatabaseConnection(String databaseServer) {
+        DatabaseConnection result = null;
+        switch(databaseServer.toLowerCase()){
+            case "postgres" : result =  new PostgreSQLDatabaseConnection("jdbc:postgresql://localhost/automated_trading");
+                                break;
+            default: logger.error("Database Server not supported.");
+        }
+        return result;
     }
 
     private void checkDatabaseTables(){
@@ -34,6 +50,8 @@ public class BinaryWebServiceConnector {
         logger.info("Creating WebConnection to Binary.com ....");
         logger.info("Application ID = {}", applicationId);
         logger.info("Application Authorize Token = {}", applicationAuthorizeToken);
+        logger.info("Checking Database Schema, if not present creating schema...");
+        databaseConnection.createDBSchema();
 
         AuthorizeRequest authorizeRequest = new AuthorizeRequest(applicationAuthorizeToken);
         api.sendRequest(authorizeRequest).subscribe(response -> {

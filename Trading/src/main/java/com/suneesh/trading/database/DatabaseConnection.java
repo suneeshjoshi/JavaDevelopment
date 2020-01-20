@@ -6,7 +6,7 @@ import java.util.List;
 public interface DatabaseConnection {
     String URL = null;
     Connection connection = null;
-    void createConnection();
+    Connection createConnection();
     String getUrl();
     Connection getConnection();
 

@@ -1,5 +1,6 @@
 package com.suneesh.trading.database;
 
+import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -12,35 +13,6 @@ import java.util.List;
 
 @Slf4j
 public class DatabaseApplication {
-
-    // get file from classpath, resources folder
-    private static File getFileFromResources(String fileName) {
-
-        ClassLoader classLoader = DatabaseApplication.class.getClassLoader();
-
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("file is not found!");
-        } else {
-            return new File(resource.getFile());
-        }
-
-    }
-
-    private static String readFile(File file) throws IOException {
-        StringBuilder result = new StringBuilder();
-        if (file == null) return null;
-
-        try (FileReader reader = new FileReader(file);
-             BufferedReader br = new BufferedReader(reader)) {
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-        }
-        return String.valueOf(result);
-    }
 
     public static void main(String[] args) {
 
@@ -61,9 +33,9 @@ public class DatabaseApplication {
             }
             else{
                 log.info("Table {} does not Exist.", table);
-                File file = getFileFromResources(table+".sql");
+                File file = AutoTradingUtility.getFileFromResources(table+".sql");
                 try {
-                    postgreSQLDatabaseConnection.executeCreateTableQuery(readFile(file));
+                    postgreSQLDatabaseConnection.executeCreateTableQuery(AutoTradingUtility.readFile(file));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

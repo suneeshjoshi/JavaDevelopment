@@ -1,30 +1,40 @@
 package com.suneesh.trading.database;
 
-import com.suneesh.trading.models.responses.*;
+import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.Data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.*;
 
+@Data
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
+    private static Logger logger = LogManager.getLogger();
 
     String URL;
     Connection connection;
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
+        this.connection = createConnection();
     }
 
     @Override
-    public void createConnection() {
+    public Connection createConnection() {
+        Connection conn = null;
         Properties props = new Properties();
         props.setProperty("user", "suneesh");
         props.setProperty("password", "suneesh");
         try {
-            this.connection = DriverManager.getConnection(getUrl(), props);
+            conn = DriverManager.getConnection(getUrl(), props);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return conn;
     }
 
     @Override
@@ -96,35 +106,36 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void createDBSchema() {
-//        protected static Map<Long, TickResponse> tickCache;
-//        protected static Map<Long, TickHistoryResponse> tickHistoryCache;
-//        protected static Map<Long, AuthorizeResponse> authorizeResponseCache;
-//        protected static Map<Long, BalanceResponse> balanceResponseCache;
-//        protected static Map<Long, TransactionsStreamResponse> transactionsStreamResponseCache;
-//        protected static Map<Long, PortfolioResponse> portfolioResponseCache;
-//        protected static Map<Long, AccountStatusResponse> accountStatusResponseCache;
+        List<String> tableNameList = Arrays.asList("account_status",
+                "authorize",
+                "balance",
+                "candle",
+                "portfolio_transaction",
+                "tick",
+                "transaction");
 
-//        if(!checkTableExists("Tick")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("TickHistory")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("Authorize")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("Balance")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("Transaction")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("Portfolio")){
-//            createTickTable();
-//        }
-//        if(!checkTableExists("AccountStatus")){
-//            createTickTable();
-//        }
+        tableNameList.stream().forEach(table -> {
+            if(checkTableExists(table)){
+                logger.info("Table {} Exists.", table);
+            }
+            else{
+                logger.info("Table {} does not Exist.", table);
+                File file = AutoTradingUtility.getFileFromResources(table+".sql");
+                try {
+                    executeCreateTableQuery(AutoTradingUtility.readFile(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                logger.info("Checking after Create table query...");
+                if(checkTableExists(table)){
+                    logger.info("Table {} Exists.", table);
+                }
+                else {
+                    logger.info("Table {} still does not Exists.", table);
+                }
+            }
+        });
 
     }
 
