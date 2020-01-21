@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 /**
  * Created by morteza on 7/28/2017.
  */
-@Entity
-@Data
 public class Authorize {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

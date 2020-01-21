@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.account_status
 (
-    identifier bigint NOT NULL,
+    identifier  BIGSERIAL,
     prompt_client_to_authenticate integer NOT NULL,
     risk_classification character varying(255) ,
     status character varying(255) ,

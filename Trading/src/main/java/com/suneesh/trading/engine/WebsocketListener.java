@@ -35,8 +35,6 @@ WebsocketListener extends WebSocketListener {
     private PublishSubject<String> requestEmitter;
     protected DatabaseConnection databaseConnection;
 
-    protected static Cache cache;
-
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
                              PublishSubject<String> requestEmitter,
@@ -45,8 +43,6 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
         this.databaseConnection = dbConnection;
-
-        cache.initialize();
 
         this.responseEmitter.subscribe(
                 o -> {
@@ -79,7 +75,11 @@ WebsocketListener extends WebSocketListener {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
                                     logger.info(String.valueOf(authorizeResponse.getAuthorize()));
                                 }
-                                cache.writeToCache(epochTime,authorizeResponse);
+                                responseBase = authorizeResponse;
+                                List<String> authorizeInsertList = responseBase.databaseInsertStringList();
+                                authorizeInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+
+
                                 break;
                             case "balance":
                                 BalanceResponse balanceResponse = new BalanceResponse();
@@ -88,7 +88,11 @@ WebsocketListener extends WebSocketListener {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
                                     logger.info(String.valueOf(balanceResponse.getBalance()));
                                 }
-                                cache.writeToCache(epochTime,balanceResponse);
+
+                                responseBase = balanceResponse;
+                                List<String> balanceInsertList = responseBase.databaseInsertStringList();
+                                balanceInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+
                                 break;
                             case "candles":
                                 JSONArray candleArray = (JSONArray) jsonObject.get("candles");
@@ -105,7 +109,6 @@ WebsocketListener extends WebSocketListener {
                                 responseBase = tickHistoryResponse;
                                 List<String> tickHistoryInsertList = responseBase.databaseInsertStringList();
                                 tickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
-
 
                                 break;
                             case "ohlc":
@@ -125,9 +128,6 @@ WebsocketListener extends WebSocketListener {
                                 List<String> ohlcTickHistoryInsertList = responseBase.databaseInsertStringList();
                                 ohlcTickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
 
-
-                                cache.writeToCache(epochTime,ohlcTickHistoryResponse);
-
                                 break;
                             case "transaction":
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
@@ -136,7 +136,8 @@ WebsocketListener extends WebSocketListener {
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
                                 }
-                                cache.writeToCache(epochTime,transactionsStreamResponse);
+
+
                                 break;
 //                            case "get_account_status":
 //                                AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
@@ -169,7 +170,7 @@ WebsocketListener extends WebSocketListener {
 
                                 portfolioResponse.setPortfolio(portfolio);
                                 logger.info(String.valueOf(portfolioResponse.getPortfolio()));
-                                cache.writeToCache(epochTime,portfolioResponse);
+
                                 break;
 
                             default:

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.balance
 (
-    identifier bigint NOT NULL,
+    identifier BIGSERIAL,
     balance numeric(19,2),
     currency character varying(255) ,
     id character varying(255) ,

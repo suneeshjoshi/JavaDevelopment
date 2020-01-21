@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.authorize
 (
-    identifier bigint NOT NULL,
+    identifier BIGSERIAL,
     allow_omnibus integer NOT NULL,
     balance numeric(19,2),
     country character varying(255) ,

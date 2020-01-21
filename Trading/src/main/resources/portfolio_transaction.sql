@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.portfolio_transaction
 (
-    identifier bigint NOT NULL,
+    identifier  BIGSERIAL,
     app_id integer,
     buy_price numeric(19,2),
     contract_id bigint,

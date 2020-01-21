@@ -14,13 +14,7 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 8/8/2017
  */
-@Entity
-@Data
 public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
-
     /**
      * Balance amount
      *

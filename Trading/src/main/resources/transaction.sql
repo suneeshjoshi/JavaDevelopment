@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.transaction
 (
-    identifier bigint NOT NULL,
+    identifier BIGSERIAL,
     action character varying(255) ,
     amount numeric(19,2),
     balance numeric(19,2),

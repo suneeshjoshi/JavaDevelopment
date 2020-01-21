@@ -2,6 +2,11 @@ package com.suneesh.trading.models.responses;
 
 import com.suneesh.trading.models.requests.BalanceRequest;
 import com.google.gson.annotations.SerializedName;
+import com.suneesh.trading.utils.AutoTradingUtility;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <h1>BalanceResponse</h1>
@@ -29,4 +34,17 @@ public class BalanceResponse extends ResponseBase<BalanceRequest> {
         this.balance = balance;
     }
 
+    @Override
+    public List<String> databaseInsertStringList(){
+        return Arrays.asList(
+                    "INSERT INTO public.balance " +
+                            "(balance , currency , id , login_id) " +
+                            " VALUES ("
+                            + AutoTradingUtility.quotedString(balance.getBalance()) + ", "
+                            + AutoTradingUtility.quotedString(balance.getCurrency()) + ", "
+                            + AutoTradingUtility.quotedString(balance.getId()) + ", "
+                            + AutoTradingUtility.quotedString(balance.getLoginId()) + ");"
+                        );
+
+    }
 }
