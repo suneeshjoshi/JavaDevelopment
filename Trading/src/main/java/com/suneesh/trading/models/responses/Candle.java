@@ -15,13 +15,8 @@ import java.math.BigDecimal;
  * @since 8/3/2017
  */
 
-@Entity
 @Data
 public class Candle {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
-
     /**
      * It is an epoch value
      */

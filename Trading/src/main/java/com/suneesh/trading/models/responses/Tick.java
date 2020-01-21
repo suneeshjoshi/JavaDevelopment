@@ -17,8 +17,6 @@ import javax.persistence.Id;
 
 @Data
 public class Tick {
-    static private Long identifier=0L;
-
     @SerializedName("ask")
     @Expose
     private
@@ -95,10 +93,6 @@ public class Tick {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
-    }
-
-    public Long getIdentifier(){
-        return identifier++;
     }
 
 }

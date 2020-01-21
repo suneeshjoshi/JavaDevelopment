@@ -32,9 +32,8 @@ public class TickResponse extends ResponseBase<TickRequest> {
     @Override
     public List<String> databaseInsertStringList(){
         return Arrays.asList("INSERT INTO public.tick " +
-                "(identifier, ask, bid, epoch, id, quote, symbol) " +
-                " VALUES (" + tick.getIdentifier()+", "
-                            + qoutedString(tick.getAsk())+", "
+                "(ask, bid, epoch, id, quote, symbol) " +
+                " VALUES (" + qoutedString(tick.getAsk())+", "
                             + qoutedString(tick.getBid())+", "
                             + qoutedString(tick.getEpoch())+", "
                             + qoutedString(tick.getId())+", "

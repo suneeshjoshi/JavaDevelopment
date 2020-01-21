@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.tick
 (
-    identifier bigint NOT NULL,
+    identifier BIGSERIAL ,
     ask numeric(19,4) ,
     bid numeric(19,4) ,
     epoch bigint ,
