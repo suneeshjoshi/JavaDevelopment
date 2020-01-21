@@ -2,6 +2,7 @@ package com.suneesh.trading.engine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.WebsocketEvent;
 import com.suneesh.trading.models.requests.RequestBase;
 import com.suneesh.trading.models.responses.AssetIndex;
@@ -39,9 +40,12 @@ public class ApiWrapper {
     public BehaviorSubject<WebsocketEvent> websocketEmitter = BehaviorSubject.create();
     private PublishSubject<String> responseEmitter = PublishSubject.create();
     private PublishSubject<String> requestEmitter = PublishSubject.create();
-    protected static Map<Long, ResponseBase> cache = new LinkedHashMap<>();
+//    protected static Map<Long, ResponseBase> cache = new LinkedHashMap<>();
+    protected DatabaseConnection databaseConnection;
 
-    private ApiWrapper(String applicationId, String language, String url){
+
+    private ApiWrapper(String applicationId, String language, String url, DatabaseConnection dbConnection){
+        this.databaseConnection = dbConnection;
         this.websocketUrl = url + String.format("?app_id=%s&l=%s", applicationId, language);
 
         try {
@@ -73,6 +77,11 @@ public class ApiWrapper {
 
     }
 
+    public static ApiWrapper build(String applicationId, DatabaseConnection databaseConnection) {
+        return build(applicationId, "en", "wss://ws.binaryws.com/websockets/v3", databaseConnection);
+    }
+
+
     private void connect() throws IOException {
         if (this.client != null) {
             client.connectionPool().evictAll();
@@ -86,13 +95,13 @@ public class ApiWrapper {
                 .build();
 
         this.websocketListener = new WebsocketListener(this.websocketEmitter,
-                this.responseEmitter, this.requestEmitter);
+                this.responseEmitter, this.requestEmitter, this.databaseConnection);
 
         this.webSocket = this.client.newWebSocket(request, websocketListener);
     }
 
     public static ApiWrapper build(String applicationId){
-        return build(applicationId, "en", "wss://ws.binaryws.com/websockets/v3");
+        return build(applicationId, "en", "wss://ws.binaryws.com/websockets/v3",null);
     }
 
     /**
@@ -102,9 +111,9 @@ public class ApiWrapper {
      * @param url
      * @return An Instance of ApiWrapper class
      */
-    public static ApiWrapper build(String applicationId, String language, String url){
+    public static ApiWrapper build(String applicationId, String language, String url, DatabaseConnection dbConnection){
         if (instance == null) {
-            instance = new ApiWrapper(applicationId, language, url);
+            instance = new ApiWrapper(applicationId, language, url, dbConnection);
         }
         return instance;
     }

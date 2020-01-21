@@ -1,11 +1,13 @@
 package com.suneesh.trading.engine;
 
 import com.google.gson.Gson;
+import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.WebsocketEvent;
 
 import com.suneesh.trading.models.responses.*;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+import lombok.Data;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -22,6 +24,7 @@ import java.util.*;
  * Created by morteza on 7/18/2017.
  */
 
+@Data
 public class
 WebsocketListener extends WebSocketListener {
 
@@ -30,15 +33,19 @@ WebsocketListener extends WebSocketListener {
     private BehaviorSubject<WebsocketEvent> websocketEmitter;
     private PublishSubject<String> responseEmitter;
     private PublishSubject<String> requestEmitter;
+    protected DatabaseConnection databaseConnection;
 
     protected static Cache cache;
 
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
-                             PublishSubject<String> requestEmitter){
+                             PublishSubject<String> requestEmitter,
+                             DatabaseConnection dbConnection){
         this.websocketEmitter = wsEmitter;
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
+        this.databaseConnection = dbConnection;
+
         cache.initialize();
 
         this.responseEmitter.subscribe(
@@ -46,7 +53,7 @@ WebsocketListener extends WebSocketListener {
                     logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
-
+                    ResponseBase responseBase = null;
                     long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
                     if(!jsonObject.has("error") ){
@@ -60,7 +67,10 @@ WebsocketListener extends WebSocketListener {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
                                     logger.info(String.valueOf(tickResponse.getTick()));
                                 }
-                                tickResponse.writeToDatabase();
+                                responseBase = tickResponse;
+                                List<String> tickInsertList = responseBase.databaseInsertStringList();
+
+                                tickInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
 
                                 cache.writeToCache(epochTime,tickResponse);
                                 break;

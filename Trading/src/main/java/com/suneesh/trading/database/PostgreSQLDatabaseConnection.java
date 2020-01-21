@@ -48,7 +48,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
     @Override
-    public void executeCreateTableQuery(String createStatement) {
+    public void executeNoResultSet(String createStatement) {
         Statement st = null;
         ArrayList list = new ArrayList(50);
         try {
@@ -67,15 +67,18 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         ArrayList list = new ArrayList(50);
         try {
             st = getConnection().createStatement();
+            logger.info("Statement = {}", statement);
             rs = st.executeQuery(statement);
-            ResultSetMetaData md = rs.getMetaData();
-            int columns = md.getColumnCount();
-            while (rs.next()){
-                HashMap row = new HashMap(columns);
-                for(int i=1; i<=columns; ++i){
-                    row.put(md.getColumnName(i),rs.getObject(i));
+            if (rs != null) {
+                ResultSetMetaData md = rs.getMetaData();
+                int columns = md.getColumnCount();
+                while (rs.next()){
+                    HashMap row = new HashMap(columns);
+                    for(int i=1; i<=columns; ++i){
+                        row.put(md.getColumnName(i),rs.getObject(i));
+                    }
+                    list.add(row);
                 }
-                list.add(row);
             }
             rs.close();
             st.close();
@@ -122,7 +125,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
                 logger.info("Table {} does not Exist.", table);
                 File file = AutoTradingUtility.getFileFromResources(table+".sql");
                 try {
-                    executeCreateTableQuery(AutoTradingUtility.readFile(file));
+                    executeNoResultSet(AutoTradingUtility.readFile(file));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

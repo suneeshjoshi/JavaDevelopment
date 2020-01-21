@@ -33,7 +33,7 @@ public class BinaryWebServiceConnector {
         databaseServer = dbServer;
         databaseURL = dbURL;
         databaseConnection = getDatabaseConnection(databaseServer);
-        api = ApiWrapper.build(applicationId);
+        api = ApiWrapper.build(applicationId, databaseConnection);
     }
 
     private DatabaseConnection getDatabaseConnection(String databaseServer) {

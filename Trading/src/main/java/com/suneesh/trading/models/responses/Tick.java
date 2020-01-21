@@ -15,12 +15,9 @@ import javax.persistence.Id;
  * Created by morteza on 7/19/2017.
  */
 
-@Entity
 @Data
 public class Tick {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
+    static private Long identifier=0L;
 
     @SerializedName("ask")
     @Expose
@@ -99,4 +96,9 @@ public class Tick {
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
+
+    public Long getIdentifier(){
+        return identifier++;
+    }
+
 }

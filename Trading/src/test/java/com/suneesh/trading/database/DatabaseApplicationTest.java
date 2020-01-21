@@ -4,11 +4,8 @@ import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class DatabaseApplicationTest {
                 log.info("Table {} does not Exist.", table);
                 File file = AutoTradingUtility.getFileFromResources(table+".sql");
                 try {
-                    postgreSQLDatabaseConnection.executeCreateTableQuery(AutoTradingUtility.readFile(file));
+                    postgreSQLDatabaseConnection.executeNoResultSet(AutoTradingUtility.readFile(file));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
