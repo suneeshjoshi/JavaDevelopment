@@ -46,10 +46,6 @@ public class BinaryWebServiceConnector {
         return result;
     }
 
-    private void checkDatabaseTables(){
-
-    }
-
     public void init() {
         logger.info("Creating WebConnection to Binary.com ....");
         logger.info("Application ID = {}", applicationId);
