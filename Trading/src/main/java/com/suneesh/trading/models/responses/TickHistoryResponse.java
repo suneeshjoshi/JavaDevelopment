@@ -2,9 +2,12 @@ package com.suneesh.trading.models.responses;
 
 import com.suneesh.trading.models.requests.TickHistoryRequest;
 import com.google.gson.annotations.SerializedName;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import io.reactivex.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <h1>TickHistoryResponse</h1>
@@ -43,4 +46,22 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
     public List<Candle> getCandles() {
         return candles;
     }
+
+    @Override
+    public List<String> databaseInsertStringList(){
+
+        return candles.stream().map(candle->{
+                    return "INSERT INTO public.candle " +
+                            "(close, epoch, high, low, open) " +
+                            " VALUES ("
+                            + AutoTradingUtility.quotedString(candle.getClose()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getEpoch()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getHigh()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getLow()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getOpen()) + ");";
+        }
+        ).collect(Collectors.toList());
+
+    }
+
 }

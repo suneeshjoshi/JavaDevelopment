@@ -3,6 +3,7 @@ package com.suneesh.trading.models.responses;
 import com.suneesh.trading.models.requests.TickRequest;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.suneesh.trading.utils.AutoTradingUtility;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,20 +26,16 @@ public class TickResponse extends ResponseBase<TickRequest> {
         this.tick = tick;
     }
 
-    private String qoutedString(Object str){
-        return "'"+String.valueOf(str)+"'";
-    }
-
     @Override
     public List<String> databaseInsertStringList(){
         return Arrays.asList("INSERT INTO public.tick " +
                 "(ask, bid, epoch, id, quote, symbol) " +
-                " VALUES (" + qoutedString(tick.getAsk())+", "
-                            + qoutedString(tick.getBid())+", "
-                            + qoutedString(tick.getEpoch())+", "
-                            + qoutedString(tick.getId())+", "
-                            + qoutedString(tick.getQuote())+", "
-                            + qoutedString(tick.getSymbol()) +");");
+                " VALUES (" + AutoTradingUtility.quotedString(tick.getAsk())+", "
+                            + AutoTradingUtility.quotedString(tick.getBid())+", "
+                            + AutoTradingUtility.quotedString(tick.getEpoch())+", "
+                            + AutoTradingUtility.quotedString(tick.getId())+", "
+                            + AutoTradingUtility.quotedString(tick.getQuote())+", "
+                            + AutoTradingUtility.quotedString(tick.getSymbol()) +");");
 
     }
 

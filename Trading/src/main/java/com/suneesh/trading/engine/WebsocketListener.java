@@ -69,10 +69,8 @@ WebsocketListener extends WebSocketListener {
                                 }
                                 responseBase = tickResponse;
                                 List<String> tickInsertList = responseBase.databaseInsertStringList();
-
                                 tickInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
 
-                                cache.writeToCache(epochTime,tickResponse);
                                 break;
                             case "authorize":
                                 AuthorizeResponse authorizeResponse = new AuthorizeResponse();
@@ -103,7 +101,12 @@ WebsocketListener extends WebSocketListener {
                                 }
                                 tickHistoryResponse.setCandles(candleArrayList);
                                 logger.info(String.valueOf(tickHistoryResponse.getCandles()));
-                                cache.writeToCache(epochTime,tickHistoryResponse);
+
+                                responseBase = tickHistoryResponse;
+                                List<String> tickHistoryInsertList = responseBase.databaseInsertStringList();
+                                tickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+
+
                                 break;
                             case "ohlc":
                                 TickHistoryResponse ohlcTickHistoryResponse = new TickHistoryResponse();
@@ -117,6 +120,12 @@ WebsocketListener extends WebSocketListener {
                                 candles.add(OHLCObject);
                                 ohlcTickHistoryResponse.setCandles(candles);
                                 logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+
+                                responseBase = ohlcTickHistoryResponse;
+                                List<String> ohlcTickHistoryInsertList = responseBase.databaseInsertStringList();
+                                ohlcTickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+
+
                                 cache.writeToCache(epochTime,ohlcTickHistoryResponse);
 
                                 break;

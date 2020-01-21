@@ -37,4 +37,9 @@ public class AutoTradingUtility {
         return String.valueOf(result);
     }
 
+    public static String quotedString(Object str){
+        return "'"+String.valueOf(str)+"'";
+    }
+
+
 }

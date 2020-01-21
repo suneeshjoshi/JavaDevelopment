@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.candle
 (
-    identifier bigint NOT NULL,
+    identifier BIGSERIAL,
     close numeric(19,2),
     epoch bigint,
     high numeric(19,2),
