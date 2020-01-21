@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
-public class BinaryWebServiceApplication {
+public class BinaryMainApplication {
     Logger logger = LogManager.getLogger();
 
     private static ApiWrapper api;
