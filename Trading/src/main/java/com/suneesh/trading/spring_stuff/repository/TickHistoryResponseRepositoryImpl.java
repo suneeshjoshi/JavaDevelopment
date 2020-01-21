@@ -1,28 +1,28 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
-import com.suneesh.trading.models.responses.Tick;
+import com.suneesh.trading.models.responses.Candle;
 
 import java.util.List;
 import java.util.Optional;
 
-public class TickRepositoryImpl implements  TickRepository{
+public class TickHistoryResponseRepositoryImpl implements TickHistoryResponseRepository{
     @Override
-    public List<Tick> findByName(String name) {
+    public List<Candle> findByName(String name) {
         return null;
     }
 
     @Override
-    public <S extends Tick> S save(S entity) {
+    public <S extends Candle> S save(S entity) {
         return null;
     }
 
     @Override
-    public <S extends Tick> Iterable<S> saveAll(Iterable<S> entities) {
+    public <S extends Candle> Iterable<S> saveAll(Iterable<S> entities) {
         return null;
     }
 
     @Override
-    public Optional<Tick> findById(Long aLong) {
+    public Optional<Candle> findById(Long aLong) {
         return Optional.empty();
     }
 
@@ -32,12 +32,12 @@ public class TickRepositoryImpl implements  TickRepository{
     }
 
     @Override
-    public Iterable<Tick> findAll() {
+    public Iterable<Candle> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<Tick> findAllById(Iterable<Long> longs) {
+    public Iterable<Candle> findAllById(Iterable<Long> longs) {
         return null;
     }
 
@@ -52,12 +52,12 @@ public class TickRepositoryImpl implements  TickRepository{
     }
 
     @Override
-    public void delete(Tick entity) {
+    public void delete(Candle entity) {
 
     }
 
     @Override
-    public void deleteAll(Iterable<? extends Tick> entities) {
+    public void deleteAll(Iterable<? extends Candle> entities) {
 
     }
 

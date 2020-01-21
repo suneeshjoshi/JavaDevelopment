@@ -1,7 +1,6 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
 import com.suneesh.trading.models.responses.AccountStatus;
-import com.suneesh.trading.models.responses.AccountStatusResponse;
 
 import java.util.List;
 import java.util.Optional;

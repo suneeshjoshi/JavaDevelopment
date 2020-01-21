@@ -1,6 +1,5 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
-import com.suneesh.trading.models.responses.PortfolioResponse;
 import com.suneesh.trading.models.responses.PortfolioTransaction;
 
 import java.util.List;

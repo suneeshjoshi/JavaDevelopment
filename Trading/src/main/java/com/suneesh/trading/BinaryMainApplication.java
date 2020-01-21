@@ -1,5 +1,7 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading;
 
+import com.suneesh.trading.engine.ApiWrapper;
+import com.suneesh.trading.engine.BinaryWebServiceConnector;
 import com.suneesh.trading.models.requests.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;

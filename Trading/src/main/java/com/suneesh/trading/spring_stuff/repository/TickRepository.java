@@ -1,9 +1,6 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
-import com.suneesh.trading.engine.Book;
 import com.suneesh.trading.models.responses.Tick;
-import com.suneesh.trading.models.responses.TickResponse;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

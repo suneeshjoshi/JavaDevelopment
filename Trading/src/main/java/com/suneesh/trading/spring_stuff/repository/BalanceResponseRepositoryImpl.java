@@ -1,7 +1,6 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
 import com.suneesh.trading.models.responses.Balance;
-import com.suneesh.trading.models.responses.BalanceResponse;
 
 import java.util.List;
 import java.util.Optional;

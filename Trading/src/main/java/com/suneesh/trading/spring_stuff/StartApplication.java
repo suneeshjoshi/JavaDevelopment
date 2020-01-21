@@ -1,13 +1,9 @@
-package com.suneesh.trading;
+package com.suneesh.trading.spring_stuff;
 
-import com.suneesh.trading.engine.BinaryWebServiceConnector;
 import com.suneesh.trading.engine.Framework;
 import com.suneesh.trading.models.requests.RequestBase;
-import com.suneesh.trading.models.responses.Tick;
-import com.suneesh.trading.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 @SpringBootApplication(scanBasePackages = {"com.suneesh.trading"})
-@EnableJpaRepositories("com.suneesh.trading.repository")
+@EnableJpaRepositories("com.suneesh.trading.spring_stuff.repository")
 @Configuration
 public class StartApplication implements CommandLineRunner {
 

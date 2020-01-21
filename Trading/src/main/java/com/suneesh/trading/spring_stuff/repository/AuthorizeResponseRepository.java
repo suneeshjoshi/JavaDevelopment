@@ -1,8 +1,6 @@
-package com.suneesh.trading.repository;
+package com.suneesh.trading.spring_stuff.repository;
 
 import com.suneesh.trading.models.responses.Authorize;
-import com.suneesh.trading.models.responses.AuthorizeResponse;
-import com.suneesh.trading.models.responses.BalanceResponse;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

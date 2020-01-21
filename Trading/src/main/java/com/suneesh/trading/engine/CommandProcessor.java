@@ -1,6 +1,6 @@
 package com.suneesh.trading.engine;
 
-import com.suneesh.trading.repository.TickRepository;
+import com.suneesh.trading.spring_stuff.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
