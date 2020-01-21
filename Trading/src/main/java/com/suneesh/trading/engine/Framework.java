@@ -1,5 +1,6 @@
 package com.suneesh.trading.engine;
 
+import com.suneesh.trading.models.requests.RequestBase;
 import com.suneesh.trading.spring_stuff.repository.TickRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,10 +9,9 @@ import java.util.concurrent.*;
 
 public class Framework {
     private static final Logger LOGGER = LogManager.getLogger();
-    protected BlockingQueue<Float> inputMessageQueue = new LinkedBlockingQueue<>();
+    protected BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
     protected CommandProcessor commandProcessor;
     protected CommandGenerator commandGenerator;
-    protected TickRepository repository;
     protected static ApiWrapper api;
 
 
@@ -41,10 +41,7 @@ public class Framework {
     }
 
     public void init(String applicationID, String applicationAuthorizeCode) {
-//        public void init(TickRepository tickRepository) {
-//        this.repository = tickRepository;
-
-        commandProcessor = new CommandProcessor(inputMessageQueue,this.repository);
+        commandProcessor = new CommandProcessor(inputMessageQueue,api);
         commandGenerator = new CommandGenerator(inputMessageQueue);
     }
 }

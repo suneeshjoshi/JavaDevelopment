@@ -5,14 +5,10 @@ import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
-import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
+import java.util.concurrent.*;
 
 
 public class BinaryWebServiceConnector {
@@ -21,13 +17,16 @@ public class BinaryWebServiceConnector {
     private ApiWrapper api;
     private String applicationId;
     private String applicationAuthorizeToken;
-    private BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<RequestBase> commandQueue = new LinkedBlockingQueue<>();
     private DatabaseConnection databaseConnection;
     private String databaseServer;
     private String databaseURL;
+    protected CommandProcessor commandProcessor;
+    protected CommandGenerator commandGenerator;
 
-    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken, String dbServer, String dbURL) {
-        inputMessageQueue = messageQueue;
+
+    public BinaryWebServiceConnector(BlockingQueue<RequestBase> inputCommandQueue, String appId, String appAuthToken, String dbServer, String dbURL) {
+        commandQueue = inputCommandQueue;
         applicationId = appId;
         applicationAuthorizeToken = appAuthToken;
         databaseServer = dbServer;
@@ -52,7 +51,13 @@ public class BinaryWebServiceConnector {
         logger.info("Application Authorize Token = {}", applicationAuthorizeToken);
         logger.info("Checking Database Schema, if not present creating schema...");
         databaseConnection.createDBSchema();
+        commandProcessor = new CommandProcessor(commandQueue,api);
+        commandGenerator = new CommandGenerator(commandQueue);
 
+        threadCreation();
+    }
+
+    public void sendInitialSetupRequest(){
         AuthorizeRequest authorizeRequest = new AuthorizeRequest(applicationAuthorizeToken);
         api.sendRequest(authorizeRequest).subscribe(response -> {
             AuthorizeResponse auth = (AuthorizeResponse) response;
@@ -65,35 +70,29 @@ public class BinaryWebServiceConnector {
         });
     }
 
-    public void getTickDetail(String symbol){
-        TickRequest request = new TickRequest(symbol);
-        api.sendRequest(request);
+    //-------------
+    public void threadCreation(){
+        logger.info("Timed threads...");
 
-        TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
-        tickHistoryRequest.setStyle(TickStyles.CANDLES);
-        tickHistoryRequest.setSubscribe(1);
-        tickHistoryRequest.setCount(100);
-        tickHistoryRequest.setGranularity(60);
-        api.sendRequest(tickHistoryRequest);
+        ExecutorService publisherThread = Executors.newFixedThreadPool(1);
+        publisherThread.submit(()->{
+            Thread.currentThread().setName("BinaryWebServiceConnector");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            commandProcessor.threadWork();
+        });
 
+        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        ses.scheduleAtFixedRate(()->{
+            Thread.currentThread().setName("CommandGenerator Thread 1");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            commandGenerator.sendRequest();
+        },0,1,TimeUnit.SECONDS);
+
+        ScheduledExecutorService ses2 = Executors.newSingleThreadScheduledExecutor();
+        ses.scheduleAtFixedRate(()->{
+            Thread.currentThread().setName("CommandGenerator Thread 2 ");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            commandGenerator.sendRequest();
+        },0,3,TimeUnit.SECONDS);
     }
-
-    public void threadWork(){
-        logger.info("Thread work ... ");
-        Long count = 0L;
-        while(true){
-            try {
-                RequestBase request = inputMessageQueue.poll(100, TimeUnit.MILLISECONDS);
-                if(request!=null){
-                    logger.info("Sending message to Binary.com ... {}");
-                    api.sendRequest(request);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-
 }

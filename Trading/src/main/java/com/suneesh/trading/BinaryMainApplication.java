@@ -18,6 +18,8 @@ public class BinaryMainApplication {
     private static String applicationId="21829";
     private static String applicationAuthorizeToken="9s5aGYbnsUQr3Fv";
     private static String databaseServer="Postgres";
+    private static final String symbolToTrade ="R_10";
+
     // Docker URL
     //    private static String dbURL = "jdbc:postgresql://192.168.99.100:5432/automated_trading";
 
@@ -28,7 +30,9 @@ public class BinaryMainApplication {
     public static void main(String[] args) {
         BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationId, applicationAuthorizeToken, databaseServer, dbURL);
         binaryWebServiceConnector.init();
-        binaryWebServiceConnector.getTickDetail("R_10");
+        binaryWebServiceConnector.sendInitialSetupRequest();
+//        binaryWebServiceConnector.getTickDetail(symbolToTrade);
+//        binaryWebServiceConnector.getCandleDetails(symbolToTrade);
         binaryWebServiceConnector.threadWork();
 
     }
