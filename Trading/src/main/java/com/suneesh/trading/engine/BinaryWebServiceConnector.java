@@ -5,12 +5,14 @@ import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
+import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
 
 
 public class BinaryWebServiceConnector {
@@ -22,12 +24,14 @@ public class BinaryWebServiceConnector {
     private BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
     private DatabaseConnection databaseConnection;
     private String databaseServer;
+    private String databaseURL;
 
-    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken, String dbServer ) {
+    public BinaryWebServiceConnector(BlockingQueue<RequestBase> messageQueue, String appId, String appAuthToken, String dbServer, String dbURL) {
         inputMessageQueue = messageQueue;
         applicationId = appId;
         applicationAuthorizeToken = appAuthToken;
         databaseServer = dbServer;
+        databaseURL = dbURL;
         databaseConnection = getDatabaseConnection(databaseServer);
         api = ApiWrapper.build(applicationId);
     }
@@ -35,7 +39,7 @@ public class BinaryWebServiceConnector {
     private DatabaseConnection getDatabaseConnection(String databaseServer) {
         DatabaseConnection result = null;
         switch(databaseServer.toLowerCase()){
-            case "postgres" : result =  new PostgreSQLDatabaseConnection("jdbc:postgresql://localhost/automated_trading");
+            case "postgres" : result =  new PostgreSQLDatabaseConnection(databaseURL);
                                 break;
             default: logger.error("Database Server not supported.");
         }

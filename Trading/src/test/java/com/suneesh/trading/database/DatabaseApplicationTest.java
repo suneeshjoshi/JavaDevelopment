@@ -18,7 +18,7 @@ public class DatabaseApplicationTest {
     @Test
     public void databaseTest() {
 
-        PostgreSQLDatabaseConnection postgreSQLDatabaseConnection = new PostgreSQLDatabaseConnection("jdbc:postgresql://localhost/automated_trading");
+        PostgreSQLDatabaseConnection postgreSQLDatabaseConnection = new PostgreSQLDatabaseConnection("jdbc:postgresql://192.168.99.100:5432/automated_trading");
         postgreSQLDatabaseConnection.createConnection();
 
         List<String> tableNameList = Arrays.asList("account_status",
@@ -55,10 +55,7 @@ public class DatabaseApplicationTest {
 
         });
 
-
-
-
-            List list = postgreSQLDatabaseConnection.executeQuery("select * from book");
+        List list = postgreSQLDatabaseConnection.executeQuery("select * from tick");
 
         list.forEach(f->log.info(String.valueOf(f)));
 
