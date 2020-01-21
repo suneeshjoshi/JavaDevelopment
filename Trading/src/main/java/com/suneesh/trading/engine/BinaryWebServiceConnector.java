@@ -64,7 +64,6 @@ public class BinaryWebServiceConnector {
             if (auth.getAuthorize() != null) {
                 api.sendRequest(new BalanceRequest(true));
                 api.sendRequest(new TransactionsStreamRequest());
-//                api.sendRequest(new AccountStatusRequest());
                 api.sendRequest(new PortfolioRequest());
             }
         });

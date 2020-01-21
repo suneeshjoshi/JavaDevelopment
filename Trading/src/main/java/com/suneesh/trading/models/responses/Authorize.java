@@ -13,10 +13,6 @@ import java.math.BigDecimal;
  * Created by morteza on 7/28/2017.
  */
 public class Authorize {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
-
     @SerializedName("email")
     private String email;
 

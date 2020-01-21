@@ -109,7 +109,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void createDBSchema() {
-        List<String> tableNameList = Arrays.asList("account_status",
+        List<String> tableNameList = Arrays.asList(
                 "authorize",
                 "balance",
                 "candle",

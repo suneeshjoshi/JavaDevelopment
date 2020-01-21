@@ -69,9 +69,8 @@ WebsocketListener extends WebSocketListener {
                                 if (tickData != null) {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
                                     logger.info(String.valueOf(tickResponse.getTick()));
+                                    writeToDatabase(tickResponse);
                                 }
-
-                                writeToDatabase(tickResponse);
 
                                 break;
                             case "authorize":
@@ -80,8 +79,8 @@ WebsocketListener extends WebSocketListener {
                                 if (authorizeData != null) {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
                                     logger.info(String.valueOf(authorizeResponse.getAuthorize()));
+                                    writeToDatabase(authorizeResponse);
                                 }
-                                writeToDatabase(authorizeResponse);
 
                                 break;
                             case "balance":
@@ -90,9 +89,9 @@ WebsocketListener extends WebSocketListener {
                                 if (balanceData != null) {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
                                     logger.info(String.valueOf(balanceResponse.getBalance()));
+                                    writeToDatabase(balanceResponse);
                                 }
 
-                                writeToDatabase(balanceResponse);
 
                                 break;
                             case "candles":
@@ -103,11 +102,11 @@ WebsocketListener extends WebSocketListener {
                                     candleArray.forEach(f -> {
                                         candleArrayList.add(gson.fromJson(String.valueOf(f), Candle.class));
                                     });
-                                }
-                                tickHistoryResponse.setCandles(candleArrayList);
-                                logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+                                    tickHistoryResponse.setCandles(candleArrayList);
+                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
 
-                                writeToDatabase(tickHistoryResponse);
+                                    writeToDatabase(tickHistoryResponse);
+                                }
 
                                 break;
                             case "ohlc":
@@ -116,14 +115,14 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
                                 if (OHLCData != null) {
                                     OHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
+                                    ArrayList<Candle> candles = new ArrayList<>();
+                                    candles.add(OHLCObject);
+                                    ohlcTickHistoryResponse.setCandles(candles);
+                                    logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+
+                                    writeToDatabase(ohlcTickHistoryResponse);
                                 }
 
-                                ArrayList<Candle> candles = new ArrayList<>();
-                                candles.add(OHLCObject);
-                                ohlcTickHistoryResponse.setCandles(candles);
-                                logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
-
-                                writeToDatabase(ohlcTickHistoryResponse);
 
                                 break;
                             case "transaction":
@@ -135,19 +134,7 @@ WebsocketListener extends WebSocketListener {
                                     writeToDatabase(transactionsStreamResponse);
                                 }
 
-
-
                                 break;
-//                            case "get_account_status":
-//                                AccountStatusResponse accountStatusResponse = new AccountStatusResponse();
-//                                JSONObject accountStatusData = (JSONObject) jsonObject.get("get_account_status");
-//                                if (accountStatusData != null) {
-//                                    accountStatusResponse.setAccountStatus(gson.fromJson(String.valueOf(accountStatusData), AccountStatus.class));
-//                                    logger.info(String.valueOf(accountStatusResponse.getAccountStatus()));
-//                                }
-//
-//                                cache.writeToCache(epochTime,accountStatusResponse);
-//                                break;
                             case "portfolio":
                                 PortfolioResponse portfolioResponse = new PortfolioResponse();
                                 JSONObject portfolioObject = (JSONObject) jsonObject.get("portfolio");
@@ -162,14 +149,14 @@ WebsocketListener extends WebSocketListener {
                                         contractArrayList.add(gson.fromJson(String.valueOf(f), Contract.class));
                                         portfolioTransactionList.add(gson.fromJson(String.valueOf(f), PortfolioTransaction.class));
                                     });
+
+                                    Portfolio portfolio = new Portfolio();
+                                    portfolio.setContracts(portfolioTransactionList);
+                                    portfolioResponse.setPortfolio(portfolio);
+                                    logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+
+                                    writeToDatabase(portfolioResponse);
                                 }
-
-                                Portfolio portfolio = new Portfolio();
-                                portfolio.setContracts(portfolioTransactionList);
-                                portfolioResponse.setPortfolio(portfolio);
-//                                logger.info(String.valueOf(portfolioResponse.getPortfolio()));
-
-                                writeToDatabase(portfolioResponse);
 
                                 break;
 
