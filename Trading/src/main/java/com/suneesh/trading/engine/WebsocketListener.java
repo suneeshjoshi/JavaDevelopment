@@ -35,6 +35,11 @@ WebsocketListener extends WebSocketListener {
     private PublishSubject<String> requestEmitter;
     protected DatabaseConnection databaseConnection;
 
+    private void writeToDatabase(ResponseBase objectToWrite){
+        objectToWrite.databaseInsertStringList().forEach(f->databaseConnection.executeNoResultSet(f));
+    }
+
+
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
                              PublishSubject<String> requestEmitter,
@@ -52,6 +57,8 @@ WebsocketListener extends WebSocketListener {
                     ResponseBase responseBase = null;
                     long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
+                    JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
+
                     if(!jsonObject.has("error") ){
                         String msg_type = jsonObject.getString("msg_type");
 
@@ -63,9 +70,8 @@ WebsocketListener extends WebSocketListener {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
                                     logger.info(String.valueOf(tickResponse.getTick()));
                                 }
-                                responseBase = tickResponse;
-                                List<String> tickInsertList = responseBase.databaseInsertStringList();
-                                tickInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+
+                                writeToDatabase(tickResponse);
 
                                 break;
                             case "authorize":
@@ -75,10 +81,7 @@ WebsocketListener extends WebSocketListener {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
                                     logger.info(String.valueOf(authorizeResponse.getAuthorize()));
                                 }
-                                responseBase = authorizeResponse;
-                                List<String> authorizeInsertList = responseBase.databaseInsertStringList();
-                                authorizeInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
-
+                                writeToDatabase(authorizeResponse);
 
                                 break;
                             case "balance":
@@ -89,9 +92,7 @@ WebsocketListener extends WebSocketListener {
                                     logger.info(String.valueOf(balanceResponse.getBalance()));
                                 }
 
-                                responseBase = balanceResponse;
-                                List<String> balanceInsertList = responseBase.databaseInsertStringList();
-                                balanceInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+                                writeToDatabase(balanceResponse);
 
                                 break;
                             case "candles":
@@ -106,9 +107,7 @@ WebsocketListener extends WebSocketListener {
                                 tickHistoryResponse.setCandles(candleArrayList);
                                 logger.info(String.valueOf(tickHistoryResponse.getCandles()));
 
-                                responseBase = tickHistoryResponse;
-                                List<String> tickHistoryInsertList = responseBase.databaseInsertStringList();
-                                tickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+                                writeToDatabase(tickHistoryResponse);
 
                                 break;
                             case "ohlc":
@@ -124,18 +123,18 @@ WebsocketListener extends WebSocketListener {
                                 ohlcTickHistoryResponse.setCandles(candles);
                                 logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
-                                responseBase = ohlcTickHistoryResponse;
-                                List<String> ohlcTickHistoryInsertList = responseBase.databaseInsertStringList();
-                                ohlcTickHistoryInsertList.forEach(f->databaseConnection.executeNoResultSet(f));
+                                writeToDatabase(ohlcTickHistoryResponse);
 
                                 break;
                             case "transaction":
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject transactionData = (JSONObject) jsonObject.get("transaction");
-                                if (transactionData != null) {
+                                if( (transactionData != null) && ( transactionData.has("transaction_id")) ) {
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
+                                    writeToDatabase(transactionsStreamResponse);
                                 }
+
 
 
                                 break;
@@ -167,9 +166,10 @@ WebsocketListener extends WebSocketListener {
 
                                 Portfolio portfolio = new Portfolio();
                                 portfolio.setContracts(portfolioTransactionList);
-
                                 portfolioResponse.setPortfolio(portfolio);
-                                logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+//                                logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+
+                                writeToDatabase(portfolioResponse);
 
                                 break;
 

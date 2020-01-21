@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public.portfolio_transaction
     date_start bigint NOT NULL,
     expiry_time bigint NOT NULL,
     long_code character varying(255) ,
+    short_code character varying(255) ,
     payout numeric(19,2),
     symbol character varying(255) ,
     purchase_time bigint NOT NULL,

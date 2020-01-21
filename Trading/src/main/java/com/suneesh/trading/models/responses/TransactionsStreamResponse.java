@@ -37,22 +37,29 @@ public class TransactionsStreamResponse extends ResponseBase<TransactionsStreamR
 
     @Override
     public List<String> databaseInsertStringList() {
-        return null;
-//        Arrays.asList(
-//                "INSERT INTO public.authorize " +
-//                        "( action ,amount ,balance ,barrier ,contract_id ,currency ,date_expiry ,display_name ,high_barrier ," +
-//                        "id ,long_code ,low_barrier ,purchase_time ,symbol ,transaction_id ,transaction_time )" +
-//                        " VALUES ("
-//                        + AutoTradingUtility.quotedString(authorize.getAllowOmnibus()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getBalance()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getCountry()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getCurrency()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getEmail()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getFullName()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getIsVirtual()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getLandingCompanyFullName()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getLandingCompanyName()) + ", "
-//                        + AutoTradingUtility.quotedString(authorize.getLoginId()) + ");"
-//        );
-    }
+        return
+        Arrays.asList(
+                "INSERT INTO public.transaction " +
+                        "( action ,amount ,balance ,barrier ,contract_id ,currency ,date_expiry ,display_name ,high_barrier ," +
+                        "id ,long_code ,low_barrier ,purchase_time ,symbol ,transaction_id ,transaction_time )" +
+                        " VALUES ("
+                        + AutoTradingUtility.quotedString(transaction.getAction()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getAmount()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getBalance()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getBarrier()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getContractId()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getCurrency()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getDateExpiry()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getDisplayName()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getHighBarrier()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getId()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getLongCode()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getLowBarrier()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getPurchaseTime()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getSymbol()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getTransactionId()) + ", "
+                        + AutoTradingUtility.quotedString(transaction.getTransactionTime()) + ");"
+        );
+
+        }
     }

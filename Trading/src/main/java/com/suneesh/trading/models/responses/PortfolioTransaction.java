@@ -15,13 +15,8 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 8/7/2017
  */
-@Entity
 @Data
 public class PortfolioTransaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
-
     /**
      * Binary.com internal contract identifier number (to be used in a Price Proposal - Open Contract API call)
      */
@@ -37,8 +32,8 @@ public class PortfolioTransaction {
     /**
      * Epoch of purchase time
      */
-    @SerializedName("time")
-    private long time;
+    @SerializedName("purchase_time")
+    private long purchaseTime;
 
     /**
      * Symbol code
@@ -79,7 +74,7 @@ public class PortfolioTransaction {
     /**
      * Contract currency
      */
-    @SerializedName("contract_currency")
+    @SerializedName("currency")
     private String currency;
 
     /**
@@ -87,6 +82,12 @@ public class PortfolioTransaction {
      */
     @SerializedName("longcode")
     private String longCode;
+
+    /**
+     * Contract description
+     */
+    @SerializedName("shortcode")
+    private String shortCode;
 
     /**
      * Id of an app from where this contract was purchased. For example, it's 1 for binary.com.
@@ -103,8 +104,8 @@ public class PortfolioTransaction {
         return transactionId;
     }
 
-    public long getTime() {
-        return time;
+    public long getPurchaseTime() {
+        return purchaseTime;
     }
 
     public String getSymbol() {
