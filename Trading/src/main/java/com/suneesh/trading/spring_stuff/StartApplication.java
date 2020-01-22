@@ -1,6 +1,5 @@
 package com.suneesh.trading.spring_stuff;
 
-import com.suneesh.trading.engine.Framework;
 import com.suneesh.trading.models.requests.RequestBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,10 +46,6 @@ public class StartApplication implements CommandLineRunner {
 //        BinaryWebServiceConnector.init();
 //        BinaryWebServiceConnector.getTickDetail("R_10");
 
-        Framework mainFramework = new Framework();
-        mainFramework.init(applicationID, applicationAuthorizeCode);
-
-        mainFramework.threadCreation();
 
 //        bookRepository.save(new Book("Python 2"));
 

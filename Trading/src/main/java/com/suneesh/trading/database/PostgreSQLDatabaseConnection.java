@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
@@ -17,27 +18,25 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     String URL;
     Connection connection;
-    private List<String> listOfTables = Arrays.asList(
-            "authorize",
-            "balance",
-            "candle",
-            "portfolio_transaction",
-            "tick",
-            "transaction");
-
-    private boolean dropAllTables = true;
+    private List<String> listOfTables;
+    private boolean dropAllTables;
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
         this.connection = createConnection();
+
+        String listOfDatabaseTables = AutoTradingUtility.getPropertyFromPropertyFile("ListOfDatabaseTables");
+        List<String> tempListOfTables=Arrays.asList(listOfDatabaseTables.split(","));
+        listOfTables = tempListOfTables.stream().map(m -> m.trim()).collect(Collectors.toList());
+        dropAllTables= Boolean.valueOf(AutoTradingUtility.getPropertyFromPropertyFile("DropAllTables"));
     }
 
     @Override
     public Connection createConnection() {
         Connection conn = null;
         Properties props = new Properties();
-        props.setProperty("user", "suneesh");
-        props.setProperty("password", "suneesh");
+        props.setProperty("user", AutoTradingUtility.getPropertyFromPropertyFile("DatabaseUsername"));
+        props.setProperty("password", AutoTradingUtility.getPropertyFromPropertyFile("DatabasePassword"));
         try {
             conn = DriverManager.getConnection(getUrl(), props);
         } catch (SQLException e) {

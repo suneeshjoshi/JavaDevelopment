@@ -1,13 +1,14 @@
 package com.suneesh.trading.utils;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Properties;
 
 public class AutoTradingUtility {
+
+    protected static Properties applicationProperties;
+
     // get file from classpath, resources folder
     public static File getFileFromResources(String fileName) {
 
@@ -39,6 +40,32 @@ public class AutoTradingUtility {
 
     public static String quotedString(Object str){
         return "'"+String.valueOf(str)+"'";
+    }
+
+    public static Properties readProperties(){
+        File applicationPropertiesFile = getFileFromResources("application.properties");
+        Properties appProps = new Properties();
+        try(FileInputStream fileInputStream = new FileInputStream(applicationPropertiesFile)){
+            appProps.load(fileInputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return appProps;
+    }
+
+    public static String getPropertyFromPropertyFile(String property){
+        if(applicationProperties==null){
+            applicationProperties = readProperties();
+        }
+        return applicationProperties.getProperty(property).trim();
+//        applicationProperties = AutoTradingUtility.readProperties();
+//        applicationId = applicationProperties.getProperty("ApplicationId");
+//        applicationAuthorizeToken = applicationProperties.getProperty("ApplicationAuthorizeToken");
+//        databaseServer=applicationProperties.getProperty("DatabaseServer");
+//        dbURL=applicationProperties.getProperty("DatabaseURL");
     }
 
 
