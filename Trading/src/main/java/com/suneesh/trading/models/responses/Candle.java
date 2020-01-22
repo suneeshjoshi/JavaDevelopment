@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.math.BigDecimal;
 
+import static java.math.BigDecimal.*;
+
 /**
  * @author Morteza Tavanarad
  * @version 1.0.0
@@ -52,6 +54,16 @@ public class Candle {
 
     @SerializedName("symbol")
     private String symbol;
+
+    public String getDirection() {
+        return direction;
+    }
+
+    private String direction;
+
+    public void setDirection() {
+        this.direction = (close.compareTo(open)>0) ? "UP" : "DOWN";;
+    }
 
     public Integer getEpoch() {
         return epoch;

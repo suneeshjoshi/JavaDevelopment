@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS public.candle
     open numeric(19,2),
     granularity int,
     symbol character varying(255) ,
+    direction character varying(10) ,
     CONSTRAINT candle_pkey PRIMARY KEY (identifier)
 )
