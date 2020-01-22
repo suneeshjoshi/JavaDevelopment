@@ -51,12 +51,9 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-                    logger.info("Received Message: {}", o);
+//                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
-                    ResponseBase responseBase = null;
-//                    long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
 
                     if(!jsonObject.has("error") ){
@@ -160,7 +157,6 @@ WebsocketListener extends WebSocketListener {
                                     portfolio.setContracts(portfolioTransactionList);
                                     portfolioResponse.setPortfolio(portfolio);
                                     logger.info(String.valueOf(portfolioResponse.getPortfolio()));
-
                                     writeToDatabase(portfolioResponse);
                                 }
 

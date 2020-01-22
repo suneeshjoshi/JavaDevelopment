@@ -49,25 +49,27 @@ public class CalculationEngine extends AbstractCommandGenerator {
         return (Map<String, String>) (databaseConnection.executeQuery("select * from candle order by identifier desc limit 1")).get(0);
     }
 
-    public void process(){
-        getTickDetail(symbol);
-        getCandleDetails(symbol);
-
-        AutoTradingUtility.sleep(1000);
-
-
+    private void sleepTillStartOfNextMinute(){
         int secondsToNextMinute = 60- Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)%60);
         logger.info("************Going to sleep {} milliseconds for next minute to start...", secondsToNextMinute);
         AutoTradingUtility.sleep(secondsToNextMinute*1000);
         logger.info("************Woken Up from sleep.");
+    }
+
+    public void process(){
+        getTickDetail(symbol);
+        getCandleDetails(symbol);
+
+        sleepTillStartOfNextMinute();
 
         Map<String,String> result = getLastCandle();
         String previousCandleDirection = result.get("direction");
-        logger.info("************ : {}", previousCandleDirection);
+        logger.debug("************ : {}", previousCandleDirection);
 
         for(Map.Entry<String,String> entry : result.entrySet()){
-            logger.info("{} - {} ", entry.getKey(),entry.getValue());
+            logger.debug("{} - {} ", entry.getKey(),entry.getValue());
         }
+
     }
 
 
