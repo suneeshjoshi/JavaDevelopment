@@ -2,9 +2,9 @@ package com.suneesh.trading.engine;
 
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
-import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,9 +22,8 @@ public class BinaryWebServiceConnector {
     private String databaseServer;
     private String databaseURL;
     protected CommandProcessor commandProcessor;
-    protected CommandGenerator commandGenerator;
+    protected CalculationEngine calculationEngine;
     protected String symbolToTrade;
-
 
     public BinaryWebServiceConnector(BlockingQueue<RequestBase> inputCommandQueue, String appId, String appAuthToken, String dbServer, String dbURL, String symbolToTrade) {
         this.commandQueue = inputCommandQueue;
@@ -54,7 +53,8 @@ public class BinaryWebServiceConnector {
         logger.info("Checking Database Schema, if not present creating schema...");
         databaseConnection.createDBSchema();
         commandProcessor = new CommandProcessor(commandQueue,api);
-        commandGenerator = new CommandGenerator(commandQueue,symbolToTrade);
+//        commandGenerator = new AbstractCommandGenerator(commandQueue,symbolToTrade);
+        calculationEngine = new CalculationEngine(commandQueue,symbolToTrade);
 
         threadCreation();
 
@@ -85,18 +85,18 @@ public class BinaryWebServiceConnector {
             commandProcessor.threadWork();
         });
 
-        ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
-        commandGeneratorThread.submit(()->{
-            Thread.currentThread().setName("CommandGeneratorThread_1");
-            logger.info("{} started ... ", Thread.currentThread().getName());
-            commandGenerator.process();
-        });
-
-//        ScheduledExecutorService pingServiceThread = Executors.newSingleThreadScheduledExecutor();
-//        ses.scheduleAtFixedRate(()->{
-//            Thread.currentThread().setName("CommandGenerator Thread 2 ");
+//        ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
+//        commandGeneratorThread.submit(()->{
+//            Thread.currentThread().setName("CommandGeneratorThread_1");
 //            logger.info("{} started ... ", Thread.currentThread().getName());
-//            commandGenerator.sendRequest();
-//        },0,3,TimeUnit.SECONDS);
+//            calculationEngine.process();
+//        });
+
+        ScheduledExecutorService pingServiceThread = Executors.newSingleThreadScheduledExecutor();
+        pingServiceThread.scheduleAtFixedRate(()->{
+            Thread.currentThread().setName("PingServiceThread");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            new ConnectionMonitor(commandQueue).process();
+        },0, Integer.valueOf(AutoTradingUtility.getPropertyFromPropertyFile("PingIntervalInSeconds")),TimeUnit.SECONDS);
     }
 }

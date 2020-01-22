@@ -166,6 +166,10 @@ WebsocketListener extends WebSocketListener {
 
                                 break;
 
+                            case "ping":
+                                logger.info("PING Response received from Binary Websocket.");
+                                break;
+
                             default:
                                 logger.info("Case not implemented.");
                                 for (Map.Entry<String, Object> entry : jsonObject.toMap().entrySet()) {

@@ -8,15 +8,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-public class CommandGenerator {
-    private static  final Logger LOGGER = LogManager.getLogger();
-    private BlockingQueue<RequestBase> commandQueue = new LinkedBlockingQueue<>();
+public class CalculationEngine extends AbstractCommandGenerator {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private String symbol;
 
-    public CommandGenerator(BlockingQueue<RequestBase> inputMessageQueue, String symbol) {
-        this.commandQueue = inputMessageQueue;
+    public CalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, String symbol) {
+        super(inputMessageQueue);
         this.symbol = symbol;
     }
 
@@ -31,15 +30,6 @@ public class CommandGenerator {
         tickHistoryRequest.setCount(100);
         tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
-    }
-
-    public void sendRequest(RequestBase requestObject){
-        try {
-            LOGGER.info("Sending message on Command Queue ... {}", String.valueOf(requestObject));
-            commandQueue.put(requestObject);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public void process(){
