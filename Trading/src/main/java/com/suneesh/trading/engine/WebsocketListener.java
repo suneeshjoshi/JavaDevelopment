@@ -35,8 +35,13 @@ WebsocketListener extends WebSocketListener {
     private PublishSubject<String> requestEmitter;
     protected DatabaseConnection databaseConnection;
 
-    private void writeToDatabase(ResponseBase objectToWrite){
-        objectToWrite.databaseInsertStringList().forEach(f->databaseConnection.executeNoResultSet(f));
+    private void writeToDatabase(ResponseBase objectToWrite, boolean debug){
+        objectToWrite.databaseInsertStringList().forEach(f->{
+            if(debug) {
+                logger.debug(f);
+            }
+            databaseConnection.executeNoResultSet(f);
+        });
     }
 
 
@@ -51,7 +56,7 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-//                    logger.info("Received Message: {}", o);
+                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
@@ -65,8 +70,8 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject tickData = (JSONObject) jsonObject.get("tick");
                                 if (tickData != null) {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
-                                    logger.info(String.valueOf(tickResponse.getTick()));
-                                    writeToDatabase(tickResponse);
+//                                    logger.info(String.valueOf(tickResponse.getTick()));
+                                    writeToDatabase(tickResponse, false);
                                 }
 
                                 break;
@@ -75,8 +80,8 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject authorizeData = (JSONObject) jsonObject.get("authorize");
                                 if (authorizeData != null) {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
-                                    logger.info(String.valueOf(authorizeResponse.getAuthorize()));
-                                    writeToDatabase(authorizeResponse);
+//                                    logger.info(String.valueOf(authorizeResponse.getAuthorize()));
+                                    writeToDatabase(authorizeResponse, true);
                                 }
 
                                 break;
@@ -85,8 +90,8 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject balanceData = (JSONObject) jsonObject.get("balance");
                                 if (balanceData != null) {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
-                                    logger.info(String.valueOf(balanceResponse.getBalance()));
-                                    writeToDatabase(balanceResponse);
+//                                    logger.info(String.valueOf(balanceResponse.getBalance()));
+                                    writeToDatabase(balanceResponse, true);
                                 }
 
 
@@ -103,9 +108,9 @@ WebsocketListener extends WebSocketListener {
                                         candleArrayList.add(candle);
                                     });
                                     tickHistoryResponse.setCandles(candleArrayList);
-                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+//                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
 
-                                    writeToDatabase(tickHistoryResponse);
+                                    writeToDatabase(tickHistoryResponse, false);
                                 }
 
                                 break;
@@ -120,9 +125,9 @@ WebsocketListener extends WebSocketListener {
                                         ArrayList<Candle> candles = new ArrayList<>();
                                         candles.add(OHLCObject);
                                         ohlcTickHistoryResponse.setCandles(candles);
-                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+//                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
-                                        writeToDatabase(ohlcTickHistoryResponse);
+                                        writeToDatabase(ohlcTickHistoryResponse, false);
                                     }
                                 }
 
@@ -134,7 +139,7 @@ WebsocketListener extends WebSocketListener {
                                 if( (transactionData != null) && ( transactionData.has("transaction_id")) ) {
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
-                                    writeToDatabase(transactionsStreamResponse);
+                                    writeToDatabase(transactionsStreamResponse, true);
                                 }
 
                                 break;
@@ -157,7 +162,7 @@ WebsocketListener extends WebSocketListener {
                                     portfolio.setContracts(portfolioTransactionList);
                                     portfolioResponse.setPortfolio(portfolio);
                                     logger.info(String.valueOf(portfolioResponse.getPortfolio()));
-                                    writeToDatabase(portfolioResponse);
+                                    writeToDatabase(portfolioResponse, true);
                                 }
 
                                 break;

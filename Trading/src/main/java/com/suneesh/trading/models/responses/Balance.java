@@ -15,13 +15,8 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 8/4/2017
  */
-@Entity
 @Data
 public class Balance {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long identifier;
-
     /**
      * Balance amount
      */

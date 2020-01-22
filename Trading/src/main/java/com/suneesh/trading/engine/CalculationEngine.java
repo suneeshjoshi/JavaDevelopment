@@ -99,7 +99,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
     }
 
     private double getBidAmount() {
-        return 0;
+        return 0.35D;
     }
 
     private BuyContractParameters getParameters(String symbol, double bidAmount, String callOrPut, long contractDuration, String currency) {
