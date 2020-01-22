@@ -21,19 +21,19 @@ public class BinaryMainApplication {
     private static final String symbolToTrade ="R_10";
 
     // Docker URL
-    //    private static String dbURL = "jdbc:postgresql://192.168.99.100:5432/automated_trading";
+        private static String dbURL = "jdbc:postgresql://192.168.99.100:5432/automated_trading";
 
     // Localhost
-    private static String dbURL = "jdbc:postgresql://localhost:5432/automated_trading";
+//    private static String dbURL = "jdbc:postgresql://localhost:5432/automated_trading";
     private static BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) {
-        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationId, applicationAuthorizeToken, databaseServer, dbURL);
+        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationId, applicationAuthorizeToken, databaseServer, dbURL, symbolToTrade);
         binaryWebServiceConnector.init();
         binaryWebServiceConnector.sendInitialSetupRequest();
 //        binaryWebServiceConnector.getTickDetail(symbolToTrade);
 //        binaryWebServiceConnector.getCandleDetails(symbolToTrade);
-        binaryWebServiceConnector.threadWork();
+//        binaryWebServiceConnector.threadWork();
 
     }
 }

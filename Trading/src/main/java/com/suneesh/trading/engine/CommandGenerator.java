@@ -13,11 +13,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class CommandGenerator {
     private static  final Logger LOGGER = LogManager.getLogger();
     private BlockingQueue<RequestBase> commandQueue = new LinkedBlockingQueue<>();
-    private float startValue;
+    private String symbol;
 
-    public CommandGenerator(BlockingQueue<RequestBase> inputMessageQueue) {
+    public CommandGenerator(BlockingQueue<RequestBase> inputMessageQueue, String symbol) {
         this.commandQueue = inputMessageQueue;
-        this.startValue = 0;
+        this.symbol = symbol;
     }
 
     public void getTickDetail(String symbol) {
@@ -35,13 +35,14 @@ public class CommandGenerator {
 
     public void sendRequest(RequestBase requestObject){
         try {
+            LOGGER.info("Sending message on Command Queue ... {}", String.valueOf(requestObject));
             commandQueue.put(requestObject);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void process(String symbol){
+    public void process(){
         getTickDetail(symbol);
         getCandleDetails(symbol);
     }

@@ -23,16 +23,18 @@ public class BinaryWebServiceConnector {
     private String databaseURL;
     protected CommandProcessor commandProcessor;
     protected CommandGenerator commandGenerator;
+    protected String symbolToTrade;
 
 
-    public BinaryWebServiceConnector(BlockingQueue<RequestBase> inputCommandQueue, String appId, String appAuthToken, String dbServer, String dbURL) {
-        commandQueue = inputCommandQueue;
-        applicationId = appId;
-        applicationAuthorizeToken = appAuthToken;
-        databaseServer = dbServer;
-        databaseURL = dbURL;
-        databaseConnection = getDatabaseConnection(databaseServer);
-        api = ApiWrapper.build(applicationId, databaseConnection);
+    public BinaryWebServiceConnector(BlockingQueue<RequestBase> inputCommandQueue, String appId, String appAuthToken, String dbServer, String dbURL, String symbolToTrade) {
+        this.commandQueue = inputCommandQueue;
+        this.applicationId = appId;
+        this.applicationAuthorizeToken = appAuthToken;
+        this.symbolToTrade = symbolToTrade;
+        this.databaseServer = dbServer;
+        this.databaseURL = dbURL;
+        this.databaseConnection = getDatabaseConnection(databaseServer);
+        this.api = ApiWrapper.build(applicationId, databaseConnection);
     }
 
     private DatabaseConnection getDatabaseConnection(String databaseServer) {
@@ -52,9 +54,11 @@ public class BinaryWebServiceConnector {
         logger.info("Checking Database Schema, if not present creating schema...");
         databaseConnection.createDBSchema();
         commandProcessor = new CommandProcessor(commandQueue,api);
-        commandGenerator = new CommandGenerator(commandQueue);
+        commandGenerator = new CommandGenerator(commandQueue,symbolToTrade);
 
         threadCreation();
+
+        sendInitialSetupRequest();
     }
 
     public void sendInitialSetupRequest(){
@@ -74,25 +78,25 @@ public class BinaryWebServiceConnector {
     public void threadCreation(){
         logger.info("Timed threads...");
 
-        ExecutorService publisherThread = Executors.newFixedThreadPool(1);
-        publisherThread.submit(()->{
-            Thread.currentThread().setName("BinaryWebServiceConnector");
+        ExecutorService commandProcessorThread = Executors.newFixedThreadPool(1);
+        commandProcessorThread.submit(()->{
+            Thread.currentThread().setName("CommandProcessorThread");
             logger.info("{} started ... ", Thread.currentThread().getName());
             commandProcessor.threadWork();
         });
 
-        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-        ses.scheduleAtFixedRate(()->{
-            Thread.currentThread().setName("CommandGenerator Thread 1");
+        ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
+        commandGeneratorThread.submit(()->{
+            Thread.currentThread().setName("CommandGeneratorThread_1");
             logger.info("{} started ... ", Thread.currentThread().getName());
-            commandGenerator.sendRequest();
-        },0,1,TimeUnit.SECONDS);
+            commandGenerator.process();
+        });
 
-        ScheduledExecutorService ses2 = Executors.newSingleThreadScheduledExecutor();
-        ses.scheduleAtFixedRate(()->{
-            Thread.currentThread().setName("CommandGenerator Thread 2 ");
-            logger.info("{} started ... ", Thread.currentThread().getName());
-            commandGenerator.sendRequest();
-        },0,3,TimeUnit.SECONDS);
+//        ScheduledExecutorService pingServiceThread = Executors.newSingleThreadScheduledExecutor();
+//        ses.scheduleAtFixedRate(()->{
+//            Thread.currentThread().setName("CommandGenerator Thread 2 ");
+//            logger.info("{} started ... ", Thread.currentThread().getName());
+//            commandGenerator.sendRequest();
+//        },0,3,TimeUnit.SECONDS);
     }
 }
