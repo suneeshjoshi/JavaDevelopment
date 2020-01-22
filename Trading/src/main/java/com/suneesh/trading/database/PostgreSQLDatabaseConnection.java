@@ -17,6 +17,15 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     String URL;
     Connection connection;
+    private List<String> listOfTables = Arrays.asList(
+            "authorize",
+            "balance",
+            "candle",
+            "portfolio_transaction",
+            "tick",
+            "transaction");
+
+    private boolean dropAllTables = true;
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
@@ -108,16 +117,20 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
     @Override
-    public void createDBSchema() {
-        List<String> tableNameList = Arrays.asList(
-                "authorize",
-                "balance",
-                "candle",
-                "portfolio_transaction",
-                "tick",
-                "transaction");
+    public void dropTables(){
+        if(dropAllTables){
+            listOfTables.stream().forEach(table -> {
+                logger.info("Dropping table, {}", table);
+                executeNoResultSet("DROP TABLE "+table);
+            });
+        }
+    }
 
-        tableNameList.stream().forEach(table -> {
+    @Override
+    public void createDBSchema() {
+        dropTables();
+
+        listOfTables.stream().forEach(table -> {
             if(checkTableExists(table)){
                 logger.info("Table {} Exists.", table);
             }

@@ -14,6 +14,9 @@ public interface DatabaseConnection {
 
     List executeQuery(String statement);
     boolean checkTableExists(String tableName);
+
+    void dropTables();
+
     void createDBSchema();
 
 }
