@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS public.trade
     symbol character varying(255) ,
     step_count integer NOT NULL,
     result character varying(30) ,
+    strategy_id int NOT NULL,
     CONSTRAINT trade_pkey PRIMARY KEY (identifier)
 )

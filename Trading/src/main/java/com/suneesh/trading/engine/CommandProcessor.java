@@ -21,12 +21,26 @@ public class CommandProcessor {
         this.api = apiWrapper;
     }
 
+    private boolean checkIfAuthorisationNeeded(String requestName){
+        // 1. check if in authorisation list of class
+        // 2. is authorisation valid
+        // 3. Return status. or if not then get authorisation.
+        return false;
+    }
+
     public void threadWork(){
         logger.info("Thread work ... ");
         while(true){
             try {
+                boolean allowedToSendRequest = false;
                 RequestBase request = commandQueue.poll(100, TimeUnit.MILLISECONDS);
                 if(request!=null){
+                    if(checkIfAuthorisationNeeded(request.getClass().getSimpleName())){
+
+                    }
+                    else{
+                        allowedToSendRequest=true;
+                    }
                     logger.info("Sending message to Binary.com ... {}",String.valueOf(request));
                     api.sendRequest(request);
                 }

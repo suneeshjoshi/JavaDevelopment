@@ -38,10 +38,12 @@ public class BinaryMainApplication {
 
     public static void main(String[] args) {
         init();
-
-        logger.info("{} - {} - {} - {}", applicationId, applicationAuthorizeToken, databaseServer, dbURL);
-
-        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationId, applicationAuthorizeToken, databaseServer, dbURL, symbolToTrade);
+        BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,
+                                                                                            applicationId,
+                                                                                            applicationAuthorizeToken,
+                                                                                            databaseServer,
+                                                                                            dbURL,
+                                                                                            symbolToTrade);
         binaryWebServiceConnector.init();
         binaryWebServiceConnector.sendInitialSetupRequest();
     }
