@@ -31,9 +31,5 @@ public class BinaryMainApplication {
         BinaryWebServiceConnector binaryWebServiceConnector = new BinaryWebServiceConnector(inputMessageQueue,applicationId, applicationAuthorizeToken, databaseServer, dbURL, symbolToTrade);
         binaryWebServiceConnector.init();
         binaryWebServiceConnector.sendInitialSetupRequest();
-//        binaryWebServiceConnector.getTickDetail(symbolToTrade);
-//        binaryWebServiceConnector.getCandleDetails(symbolToTrade);
-//        binaryWebServiceConnector.threadWork();
-
     }
 }

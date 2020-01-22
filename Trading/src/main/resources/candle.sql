@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS public.candle
     high numeric(19,2),
     low numeric(19,2),
     open numeric(19,2),
+    granularity int,
+    symbol character varying(255) ,
     CONSTRAINT candle_pkey PRIMARY KEY (identifier)
 )

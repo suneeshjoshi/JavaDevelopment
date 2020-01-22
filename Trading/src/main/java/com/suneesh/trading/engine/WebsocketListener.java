@@ -55,7 +55,7 @@ WebsocketListener extends WebSocketListener {
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     ResponseBase responseBase = null;
-                    long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+//                    long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
 
@@ -100,7 +100,10 @@ WebsocketListener extends WebSocketListener {
                                 TickHistoryResponse tickHistoryResponse = new TickHistoryResponse();
                                 if (candleArray != null) {
                                     candleArray.forEach(f -> {
-                                        candleArrayList.add(gson.fromJson(String.valueOf(f), Candle.class));
+                                        Candle candle = gson.fromJson(String.valueOf(f), Candle.class);
+                                        candle.setGranularity(echo_req.getInt("granularity"));
+                                        candle.setSymbol(echo_req.getString("ticks_history"));
+                                        candleArrayList.add(candle);
                                     });
                                     tickHistoryResponse.setCandles(candleArrayList);
                                     logger.info(String.valueOf(tickHistoryResponse.getCandles()));
@@ -115,12 +118,15 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
                                 if (OHLCData != null) {
                                     OHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
-                                    ArrayList<Candle> candles = new ArrayList<>();
-                                    candles.add(OHLCObject);
-                                    ohlcTickHistoryResponse.setCandles(candles);
-                                    logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+                                    // Write only at the start of second
+                                    if(OHLCObject.getEpoch()%OHLCObject.getGranularity()==0) {
+                                        ArrayList<Candle> candles = new ArrayList<>();
+                                        candles.add(OHLCObject);
+                                        ohlcTickHistoryResponse.setCandles(candles);
+                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
-                                    writeToDatabase(ohlcTickHistoryResponse);
+                                        writeToDatabase(ohlcTickHistoryResponse);
+                                    }
                                 }
 
 

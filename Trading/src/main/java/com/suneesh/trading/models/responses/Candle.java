@@ -47,6 +47,12 @@ public class Candle {
     @SerializedName("close")
     private BigDecimal close;
 
+    @SerializedName("granularity")
+    private Integer granularity;
+
+    @SerializedName("symbol")
+    private String symbol;
+
     public Integer getEpoch() {
         return epoch;
     }

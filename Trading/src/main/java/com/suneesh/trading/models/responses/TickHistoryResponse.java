@@ -49,16 +49,17 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
 
     @Override
     public List<String> databaseInsertStringList(){
-
         return candles.stream().map(candle->{
                     return "INSERT INTO public.candle " +
-                            "(close, epoch, high, low, open) " +
+                            "(close, epoch, high, low, open, granularity, symbol) " +
                             " VALUES ("
                             + AutoTradingUtility.quotedString(candle.getClose()) + ", "
                             + AutoTradingUtility.quotedString(candle.getEpoch()) + ", "
                             + AutoTradingUtility.quotedString(candle.getHigh()) + ", "
                             + AutoTradingUtility.quotedString(candle.getLow()) + ", "
-                            + AutoTradingUtility.quotedString(candle.getOpen()) + ");";
+                            + AutoTradingUtility.quotedString(candle.getOpen()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getGranularity()) + ", "
+                            + AutoTradingUtility.quotedString(candle.getSymbol()) + ");";
         }
         ).collect(Collectors.toList());
 
