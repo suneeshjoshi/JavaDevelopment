@@ -27,7 +27,7 @@ public class CommandProcessor {
             try {
                 RequestBase request = commandQueue.poll(100, TimeUnit.MILLISECONDS);
                 if(request!=null){
-                    logger.info("Sending message to Binary.com ... {}");
+                    logger.info("Sending message to Binary.com ... {}",String.valueOf(request));
                     api.sendRequest(request);
                 }
             } catch (Exception e) {

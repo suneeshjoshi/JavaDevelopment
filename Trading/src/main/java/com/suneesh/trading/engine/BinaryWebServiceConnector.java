@@ -54,7 +54,7 @@ public class BinaryWebServiceConnector {
         databaseConnection.createDBSchema();
         commandProcessor = new CommandProcessor(commandQueue,api);
 //        commandGenerator = new AbstractCommandGenerator(commandQueue,symbolToTrade);
-        calculationEngine = new CalculationEngine(commandQueue,symbolToTrade);
+        calculationEngine = new CalculationEngine(commandQueue, databaseConnection, symbolToTrade);
 
         threadCreation();
 
@@ -85,12 +85,12 @@ public class BinaryWebServiceConnector {
             commandProcessor.threadWork();
         });
 
-//        ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
-//        commandGeneratorThread.submit(()->{
-//            Thread.currentThread().setName("CommandGeneratorThread_1");
-//            logger.info("{} started ... ", Thread.currentThread().getName());
-//            calculationEngine.process();
-//        });
+        ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
+        commandGeneratorThread.submit(()->{
+            Thread.currentThread().setName("CalculationEngine");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            calculationEngine.process();
+        });
 
         ScheduledExecutorService pingServiceThread = Executors.newSingleThreadScheduledExecutor();
         pingServiceThread.scheduleAtFixedRate(()->{

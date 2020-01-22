@@ -69,10 +69,10 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
         @Override
-    public List executeQuery(String statement) {
+    public List<HashMap<String,String>> executeQuery(String statement) {
         Statement st = null;
         ResultSet rs = null;
-        ArrayList list = new ArrayList(50);
+        ArrayList<HashMap<String,String>> list = new ArrayList<>(50);
         try {
             st = getConnection().createStatement();
             logger.info("Statement = {}", statement);
@@ -81,9 +81,9 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
                 ResultSetMetaData md = rs.getMetaData();
                 int columns = md.getColumnCount();
                 while (rs.next()){
-                    HashMap row = new HashMap(columns);
+                    HashMap<String,String> row = new HashMap<>(columns);
                     for(int i=1; i<=columns; ++i){
-                        row.put(md.getColumnName(i),rs.getObject(i));
+                        row.put(md.getColumnName(i),String.valueOf(rs.getObject(i)));
                     }
                     list.add(row);
                 }

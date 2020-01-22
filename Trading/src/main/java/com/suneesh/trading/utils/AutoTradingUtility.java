@@ -61,12 +61,15 @@ public class AutoTradingUtility {
             applicationProperties = readProperties();
         }
         return applicationProperties.getProperty(property).trim();
-//        applicationProperties = AutoTradingUtility.readProperties();
-//        applicationId = applicationProperties.getProperty("ApplicationId");
-//        applicationAuthorizeToken = applicationProperties.getProperty("ApplicationAuthorizeToken");
-//        databaseServer=applicationProperties.getProperty("DatabaseServer");
-//        dbURL=applicationProperties.getProperty("DatabaseURL");
     }
 
+
+    public static void sleep(int milliSeconds){
+        try {
+            Thread.sleep(milliSeconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
