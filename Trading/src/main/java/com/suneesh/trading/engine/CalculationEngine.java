@@ -52,7 +52,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
         String currency = calculationEngineUtility.getCurrency();
 
         if(currency.isEmpty()){
-            logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting aoplication.");
+            logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");
             System.exit(-1);
         }
         else {
