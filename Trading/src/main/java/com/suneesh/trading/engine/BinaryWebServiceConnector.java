@@ -98,5 +98,6 @@ public class BinaryWebServiceConnector {
             logger.info("{} started ... ", Thread.currentThread().getName());
             new ConnectionMonitor(commandQueue).process();
         },0, Integer.valueOf(AutoTradingUtility.getPropertyFromPropertyFile("PingIntervalInSeconds")),TimeUnit.SECONDS);
+
     }
 }

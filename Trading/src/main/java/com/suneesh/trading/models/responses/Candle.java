@@ -3,13 +3,7 @@ package com.suneesh.trading.models.responses;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.math.BigDecimal;
-
-import static java.math.BigDecimal.*;
 
 /**
  * @author Morteza Tavanarad
@@ -25,6 +19,8 @@ public class Candle {
     @SerializedName("epoch")
     private Integer epoch;
 
+    @SerializedName("open_time")
+    private Integer open_time;
     /**
      * It is the open price value for the given time
      */
@@ -55,14 +51,35 @@ public class Candle {
     @SerializedName("symbol")
     private String symbol;
 
+    @SerializedName("direction")
+    private String direction;
+
+    private BigDecimal openCloseDiff;
+
+    public String getWriteTimeEpoch() {
+        return writeTimeEpoch;
+    }
+
+    public void setWriteTimeEpoch() {
+        this.writeTimeEpoch = "extract(epoch from now() )";
+    }
+
+    private String writeTimeEpoch;
+
+    public void setDirection() {
+        this.direction = (close.compareTo(open)>=0) ? "UP" : "DOWN";;
+    }
+
     public String getDirection() {
         return direction;
     }
 
-    private String direction;
+    public BigDecimal getOpenCloseDiff() {
+        return openCloseDiff;
+    }
 
-    public void setDirection() {
-        this.direction = (close.compareTo(open)>0) ? "UP" : "DOWN";;
+    public void setOpenCloseDiff() {
+        this.openCloseDiff = close.subtract(open);
     }
 
     public Integer getEpoch() {

@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS public.candle
     granularity int,
     symbol character varying(255) ,
     direction character varying(10) ,
+    open_close_diff numeric(19,2),
+    open_time bigint,
     CONSTRAINT candle_pkey PRIMARY KEY (identifier)
 )

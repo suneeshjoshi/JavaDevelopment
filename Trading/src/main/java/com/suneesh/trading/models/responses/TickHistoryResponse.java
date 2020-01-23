@@ -51,8 +51,11 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
     public List<String> databaseInsertStringList(){
         return candles.stream().map(candle->{
                     candle.setDirection();
+                    candle.setOpenCloseDiff();
+                    candle.setWriteTimeEpoch();
+
                     return "INSERT INTO public.candle " +
-                            "(close, epoch, high, low, open, granularity, symbol, direction) " +
+                            "(close, epoch, high, low, open, granularity, symbol, direction, open_close_diff, open_time) " +
                             " VALUES ("
                             + AutoTradingUtility.quotedString(candle.getClose()) + ", "
                             + AutoTradingUtility.quotedString(candle.getEpoch()) + ", "
@@ -61,7 +64,9 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
                             + AutoTradingUtility.quotedString(candle.getOpen()) + ", "
                             + AutoTradingUtility.quotedString(candle.getGranularity()) + ", "
                             + AutoTradingUtility.quotedString(candle.getSymbol()) + ", "
-                            + AutoTradingUtility.quotedString(candle.getDirection()) + ");";
+                            + AutoTradingUtility.quotedString(candle.getDirection()) + ","
+                            + AutoTradingUtility.quotedString(candle.getOpenCloseDiff()) + ","
+                            + candle.getOpen_time()+ ");";
         }
         ).collect(Collectors.toList());
 

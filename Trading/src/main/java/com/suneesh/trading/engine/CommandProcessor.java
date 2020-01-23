@@ -41,8 +41,13 @@ public class CommandProcessor {
                     else{
                         allowedToSendRequest=true;
                     }
-                    logger.info("Sending message to Binary.com ... {}",String.valueOf(request));
-                    api.sendRequest(request);
+
+                    if(allowedToSendRequest) {
+                        logger.info("Sending message to Binary.com ... {}", String.valueOf(request));
+
+
+                        api.sendRequest(request);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

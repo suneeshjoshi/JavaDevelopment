@@ -11,14 +11,15 @@ import lombok.Data;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by morteza on 7/18/2017.
@@ -53,10 +54,12 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
         this.databaseConnection = dbConnection;
+        final AtomicInteger[] OHLC_count = {new AtomicInteger(1)};
+        final Candle[] previousCandle = {new Candle()};
 
         this.responseEmitter.subscribe(
                 o -> {
-                    logger.info("Received Message: {}", o);
+//                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
@@ -110,27 +113,45 @@ WebsocketListener extends WebSocketListener {
                                     tickHistoryResponse.setCandles(candleArrayList);
 //                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
 
-                                    writeToDatabase(tickHistoryResponse, false);
+                                    writeToDatabase(tickHistoryResponse, true);
                                 }
 
                                 break;
                             case "ohlc":
+
                                 TickHistoryResponse ohlcTickHistoryResponse = new TickHistoryResponse();
-                                Candle OHLCObject = new Candle();
+                                Candle newOHLCObject = new Candle();
                                 JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
-                                if (OHLCData != null) {
-                                    OHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
+                                Candle prevCandle = previousCandle[0];
+
+                                if (OHLCData != null &&  prevCandle.getOpen()!=null ) {
+                                    newOHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
                                     // Write only at the start of second
-                                    if(OHLCObject.getEpoch()%OHLCObject.getGranularity()==0) {
+//                                    Integer epoch = newOHLCObject.getEpoch();
+//                                    Integer granularity = newOHLCObject.getGranularity();
+
+                                    logger.info("{} == Received Message: {}", OHLC_count[0].get(), o);
+
+                                    BigDecimal prevOpen = previousCandle[0].getOpen();
+                                    BigDecimal newOpen = newOHLCObject.getOpen();
+                                    if(newOpen.compareTo(prevOpen)!=0){
+//                                    if(OHLC_count[0].get()%(granularity/2)==0) {
+                                        logger.info("GOING TO WRITE OHLC CANDLE", o);
+                                        Candle updatedPreviousCandle = calculateLastTickforCandle(prevCandle);
+
+                                        logger.info("GOING TO WRITE OHLC CANDLE", updatedPreviousCandle.toString());
+
                                         ArrayList<Candle> candles = new ArrayList<>();
-                                        candles.add(OHLCObject);
+                                        candles.add(updatedPreviousCandle);
                                         ohlcTickHistoryResponse.setCandles(candles);
 //                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
-                                        writeToDatabase(ohlcTickHistoryResponse, false);
+                                        writeToDatabase(ohlcTickHistoryResponse, true);
                                     }
                                 }
 
+                                previousCandle[0] = gson.fromJson(String.valueOf(OHLCData), Candle.class);
+                                OHLC_count[0].incrementAndGet();
 
                                 break;
                             case "transaction":
@@ -161,7 +182,7 @@ WebsocketListener extends WebSocketListener {
                                     Portfolio portfolio = new Portfolio();
                                     portfolio.setContracts(portfolioTransactionList);
                                     portfolioResponse.setPortfolio(portfolio);
-                                    logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+//                                    logger.info(String.valueOf(portfolioResponse.getPortfolio()));
                                     writeToDatabase(portfolioResponse, true);
                                 }
 
@@ -184,6 +205,42 @@ WebsocketListener extends WebSocketListener {
                     }
                 }
         );
+    }
+
+    private BigDecimal getTickForEpochTime(long epochTime){
+        BigDecimal quote= new BigDecimal(-1);
+        List<Map<String,String>>  tickResult = databaseConnection.executeQuery(
+                "select * from tick t where t.epoch = " + String.valueOf(epochTime));
+        if(!CollectionUtils.isEmpty(tickResult)){
+            Map<String, String> tickRow = tickResult.get(0);
+            quote = new BigDecimal(tickRow.get("quote"));
+        }
+        return quote;
+    }
+
+
+    private Candle calculateLastTickforCandle(Candle prevCandle) {
+        long previousCandleEpochTime;
+
+        List<Map<String,String>> result = (List<Map<String, String>>) databaseConnection.executeQuery(
+                "select epoch from candle order by identifier desc limit 1");
+        if(!CollectionUtils.isEmpty(result)){
+            Map<String,String> firstRow = result.get(0);
+            previousCandleEpochTime = Long.valueOf(firstRow.get("epoch"));
+
+            BigDecimal tickQuote = getTickForEpochTime(previousCandleEpochTime);
+
+            if(prevCandle.getHigh().compareTo(tickQuote)>0){
+                prevCandle.setHigh(tickQuote);
+            }
+
+            if(prevCandle.getLow().compareTo(tickQuote)<0){
+                prevCandle.setLow(tickQuote);
+            }
+
+            prevCandle.setClose(tickQuote);
+        }
+        return prevCandle;
     }
 
     @Override
