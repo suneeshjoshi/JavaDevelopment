@@ -42,6 +42,10 @@ public class AutoTradingUtility {
         return "'"+String.valueOf(str)+"'";
     }
 
+    public static String getTimeStampString(long epochTime){
+        return "TIMESTAMP  'epoch' + "+epochTime+"  * INTERVAL '1 second' " ;
+    }
+
     public static Properties readProperties(){
         File applicationPropertiesFile = getFileFromResources("application.properties");
         Properties appProps = new Properties();

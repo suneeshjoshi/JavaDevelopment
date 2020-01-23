@@ -41,7 +41,8 @@ public class PortfolioResponse extends ResponseBase<PortfolioRequest> {
         return portfolio.getContracts().stream().map(portfolioTransaction -> {
             return "INSERT INTO public.portfolio_transaction " +
                     "( app_id ,buy_price ,contract_id ,contract_type ,currency ,date_start ," +
-                    " expiry_time ,long_code ,short_code , payout ,symbol ,purchase_time ,transaction_id)" +
+                    " expiry_time ,long_code ,short_code , payout ,symbol ,purchase_time ,transaction_id, " +
+                    " date_start_string , expiry_time_string, purchase_time_string )" +
                     " VALUES ("
                     + AutoTradingUtility.quotedString(portfolioTransaction.getAppId()) + ", "
                     + AutoTradingUtility.quotedString(portfolioTransaction.getBuyPrice()) + ", "
@@ -55,7 +56,10 @@ public class PortfolioResponse extends ResponseBase<PortfolioRequest> {
                     + AutoTradingUtility.quotedString(portfolioTransaction.getPayout()) + ", "
                     + AutoTradingUtility.quotedString(portfolioTransaction.getSymbol()) + ", "
                     + AutoTradingUtility.quotedString(portfolioTransaction.getPurchaseTime()) + ", "
-                    + AutoTradingUtility.quotedString(portfolioTransaction.getTransactionId()) + "); ";
+                    + AutoTradingUtility.quotedString(portfolioTransaction.getTransactionId()) + ", "
+                    + AutoTradingUtility.getTimeStampString(portfolioTransaction.getDateStart()) + ", "
+                    + AutoTradingUtility.getTimeStampString(portfolioTransaction.getExpiryTime()) + ", "
+                    + AutoTradingUtility.getTimeStampString(portfolioTransaction.getPurchaseTime()) + "); ";
         }).collect(Collectors.toList());
     }
 }

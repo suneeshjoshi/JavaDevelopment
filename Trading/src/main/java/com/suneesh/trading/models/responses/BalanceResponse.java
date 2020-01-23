@@ -38,12 +38,13 @@ public class BalanceResponse extends ResponseBase<BalanceRequest> {
     public List<String> databaseInsertStringList(){
         return Arrays.asList(
                     "INSERT INTO public.balance " +
-                            "(balance , currency , login_id , time) " +
+                            "(balance , currency , login_id , time, time_string) " +
                             " VALUES ("
                             + AutoTradingUtility.quotedString(balance.getBalance()) + ", "
                             + AutoTradingUtility.quotedString(balance.getCurrency()) + ", "
                             + AutoTradingUtility.quotedString(balance.getLoginId()) + ", "
-                            + " extract(epoch from now()));"
+                            + " extract(epoch from now()), "
+                            + " now()::timestamp );"
                         );
 
     }

@@ -53,12 +53,13 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
                     candle.setDirection();
                     candle.setOpenCloseDiff();
                     candle.setWriteTimeEpoch();
+                    String candleStartEpochTime = candle.getOpen_time() == null ? String.valueOf(candle.getEpoch()) : String.valueOf(candle.getOpen_time());
 
-                    return "INSERT INTO public.candle " +
-                            "(close, epoch, high, low, open, granularity, symbol, direction, open_close_diff, open_time) " +
+                    String result = "INSERT INTO public.candle " +
+                            "(close, epoch, high, low, open, granularity, symbol, direction, open_close_diff, epoch_string) " +
                             " VALUES ("
                             + AutoTradingUtility.quotedString(candle.getClose()) + ", "
-                            + AutoTradingUtility.quotedString(candle.getEpoch()) + ", "
+                            + AutoTradingUtility.quotedString(candleStartEpochTime) + ", "
                             + AutoTradingUtility.quotedString(candle.getHigh()) + ", "
                             + AutoTradingUtility.quotedString(candle.getLow()) + ", "
                             + AutoTradingUtility.quotedString(candle.getOpen()) + ", "
@@ -66,7 +67,8 @@ public class TickHistoryResponse extends ResponseBase<TickHistoryRequest> {
                             + AutoTradingUtility.quotedString(candle.getSymbol()) + ", "
                             + AutoTradingUtility.quotedString(candle.getDirection()) + ","
                             + AutoTradingUtility.quotedString(candle.getOpenCloseDiff()) + ","
-                            + candle.getOpen_time()+ ");";
+                            + AutoTradingUtility.getTimeStampString(Long.valueOf(candleStartEpochTime)) + ");";
+                    return result;
         }
         ).collect(Collectors.toList());
 

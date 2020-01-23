@@ -37,11 +37,14 @@ public class TransactionsStreamResponse extends ResponseBase<TransactionsStreamR
 
     @Override
     public List<String> databaseInsertStringList() {
+
+        Long purchaseTime =transaction.getPurchaseTime()==null?transaction.getTransactionTime():transaction.getPurchaseTime();
         return
         Arrays.asList(
                 "INSERT INTO public.transaction " +
                         "( action ,amount ,balance ,barrier ,contract_id ,currency ,date_expiry ,display_name ," +
-                        "long_code ,purchase_time ,symbol ,transaction_id ,transaction_time )" +
+                        " long_code ,purchase_time ,symbol ,transaction_id ,transaction_time, date_expiry_string ," +
+                        " purchase_time_string , transaction_time_string )" +
                         " VALUES ("
                         + AutoTradingUtility.quotedString(transaction.getAction()) + ", "
                         + AutoTradingUtility.quotedString(transaction.getAmount()) + ", "
@@ -52,10 +55,13 @@ public class TransactionsStreamResponse extends ResponseBase<TransactionsStreamR
                         + AutoTradingUtility.quotedString(transaction.getDateExpiry()) + ", "
                         + AutoTradingUtility.quotedString(transaction.getDisplayName()) + ", "
                         + AutoTradingUtility.quotedString(transaction.getLongCode()) + ", "
-                        + AutoTradingUtility.quotedString(transaction.getPurchaseTime()==null?transaction.getTransactionTime():transaction.getPurchaseTime() )  + ", "
+                        + AutoTradingUtility.quotedString(purchaseTime )  + ", "
                         + AutoTradingUtility.quotedString(transaction.getSymbol()) + ", "
                         + AutoTradingUtility.quotedString(transaction.getTransactionId()) + ", "
-                        + AutoTradingUtility.quotedString(transaction.getTransactionTime()) + ");"
+                        + AutoTradingUtility.quotedString(transaction.getTransactionTime()) + ","
+                        + AutoTradingUtility.getTimeStampString(transaction.getDateExpiry()) + ","
+                        + AutoTradingUtility.getTimeStampString(purchaseTime) + ","
+                        + AutoTradingUtility.getTimeStampString(transaction.getTransactionTime()) + ");"
         );
 
         }

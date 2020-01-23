@@ -29,12 +29,13 @@ public class TickResponse extends ResponseBase<TickRequest> {
     @Override
     public List<String> databaseInsertStringList(){
         return Arrays.asList("INSERT INTO public.tick " +
-                "(ask, bid, epoch, quote, symbol) " +
+                "(ask, bid, epoch, quote, symbol,epoch_string) " +
                 " VALUES (" + AutoTradingUtility.quotedString(tick.getAsk())+", "
                             + AutoTradingUtility.quotedString(tick.getBid())+", "
                             + AutoTradingUtility.quotedString(tick.getEpoch())+", "
                             + AutoTradingUtility.quotedString(tick.getQuote())+", "
-                            + AutoTradingUtility.quotedString(tick.getSymbol()) +");");
+                            + AutoTradingUtility.quotedString(tick.getSymbol()) +","
+                            + AutoTradingUtility.getTimeStampString(Long.valueOf(tick.getEpoch())) +");");
 
     }
 

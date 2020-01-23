@@ -74,7 +74,7 @@ WebsocketListener extends WebSocketListener {
                                 if (tickData != null) {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
 //                                    logger.info(String.valueOf(tickResponse.getTick()));
-                                    writeToDatabase(tickResponse, false);
+                                    writeToDatabase(tickResponse, true);
                                 }
 
                                 break;
@@ -136,10 +136,11 @@ WebsocketListener extends WebSocketListener {
                                     BigDecimal newOpen = newOHLCObject.getOpen();
                                     if(newOpen.compareTo(prevOpen)!=0){
 //                                    if(OHLC_count[0].get()%(granularity/2)==0) {
-                                        logger.info("GOING TO WRITE OHLC CANDLE", o);
-                                        Candle updatedPreviousCandle = calculateLastTickforCandle(prevCandle);
+                                        logger.info("GOING TO WRITE OHLC CANDLE - {}", o);
+//                                        Candle updatedPreviousCandle = calculateLastTickforCandle(prevCandle);
+                                        Candle updatedPreviousCandle = prevCandle;
 
-                                        logger.info("GOING TO WRITE OHLC CANDLE", updatedPreviousCandle.toString());
+                                        logger.info("GOING TO WRITE OHLC CANDLE - {}", updatedPreviousCandle.toString());
 
                                         ArrayList<Candle> candles = new ArrayList<>();
                                         candles.add(updatedPreviousCandle);
@@ -230,15 +231,17 @@ WebsocketListener extends WebSocketListener {
 
             BigDecimal tickQuote = getTickForEpochTime(previousCandleEpochTime);
 
-            if(prevCandle.getHigh().compareTo(tickQuote)>0){
-                prevCandle.setHigh(tickQuote);
-            }
+            if (tickQuote.doubleValue()!=-1) {
+                if(tickQuote.doubleValue() > prevCandle.getHigh().doubleValue()) {
+                    prevCandle.setHigh(tickQuote);
+                }
 
-            if(prevCandle.getLow().compareTo(tickQuote)<0){
-                prevCandle.setLow(tickQuote);
-            }
+                if(tickQuote.doubleValue() < prevCandle.getLow().doubleValue()){
+                    prevCandle.setLow(tickQuote);
+                }
 
-            prevCandle.setClose(tickQuote);
+                prevCandle.setClose(tickQuote);
+            }
         }
         return prevCandle;
     }

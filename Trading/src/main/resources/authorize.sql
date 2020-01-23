@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.authorize
 (
     identifier BIGSERIAL,
     allow_omnibus integer NOT NULL,
-    balance numeric(19,2),
+    balance numeric(19,4),
     country character varying(255) ,
     currency character varying(255) ,
     email character varying(255) ,

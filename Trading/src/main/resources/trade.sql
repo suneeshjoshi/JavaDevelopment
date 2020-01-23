@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS public.trade
 (
     identifier BIGSERIAL,
-    amount numeric(19,2) NOT NULL,
+    amount numeric(19,4) NOT NULL,
     call_or_put character varying(30) ,
     symbol character varying(255) ,
     step_count integer NOT NULL,
@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS public.trade
     result character varying(30) ,
     contract_id bigint,
     trade_time bigint,
+    trade_time_string timestamp,
     CONSTRAINT trade_pkey PRIMARY KEY (identifier)
 )

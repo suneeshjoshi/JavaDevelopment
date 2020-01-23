@@ -51,13 +51,14 @@ public class CalculationEngineUtility {
     String getTradeDatabaseInsertString(BuyContractParameters parameters, int stepCount) {
         return
                 "INSERT INTO public.trade " +
-                        "(amount, call_or_put, symbol, step_count, strategy_id, trade_time) " +
+                        "(amount, call_or_put, symbol, step_count, strategy_id, trade_time, trade_time_string) " +
                         " VALUES (" + AutoTradingUtility.quotedString(parameters.getAmount())+", "
                         + AutoTradingUtility.quotedString(parameters.getContractType())+", "
                         + AutoTradingUtility.quotedString(parameters.getSymbol())+", "
                         + AutoTradingUtility.quotedString(stepCount)+", "
                         + AutoTradingUtility.quotedString("1")+","
-                        + "extract(epoch from now()) );";
+                        + "extract(epoch from now()) ,"
+                        + "now()::timestamp );";
     }
 
 
