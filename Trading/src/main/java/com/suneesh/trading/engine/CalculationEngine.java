@@ -41,7 +41,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setSubscribe(1);
-        tickHistoryRequest.setCount(10);
+        tickHistoryRequest.setCount(1);
         tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
     }
@@ -56,6 +56,10 @@ public class CalculationEngine extends AbstractCommandGenerator {
             System.exit(-1);
         }
         else {
+            logger.info("Sleeping for the start of next minute.");
+            calculationEngineUtility.sleepTillStartOfNextMinute();
+
+            logger.info("*** Sleeping for another minute to stablise last candle values, and to ensure its recorded completely and accurately for trading. ***");
             calculationEngineUtility.sleepTillStartOfNextMinute();
 
             Map<String, String> result = calculationEngineUtility.getLastCandle();
