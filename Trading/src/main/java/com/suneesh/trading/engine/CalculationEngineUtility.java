@@ -80,6 +80,10 @@ public class CalculationEngineUtility {
         return gson.fromJson(json, BuyContractParameters.class);
     }
 
+    public long getContractDuration() {
+        return CONTRACT_DURATION_IN_SECONDS;
+    }
+
     double getBidAmount() {
         return 0.35D;
     }
