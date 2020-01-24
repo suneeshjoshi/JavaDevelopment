@@ -2,6 +2,7 @@ package com.suneesh.trading.database;
 
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +20,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     String URL;
     Connection connection;
     private List<String> listOfTables;
+    private List<String> tablesToPopulate;
     private boolean dropAllTables;
 
     public PostgreSQLDatabaseConnection(String url) {
@@ -28,6 +30,11 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         String listOfDatabaseTables = AutoTradingUtility.getPropertyFromPropertyFile("ListOfDatabaseTables");
         List<String> tempListOfTables=Arrays.asList(listOfDatabaseTables.split(","));
         listOfTables = tempListOfTables.stream().map(m -> m.trim()).collect(Collectors.toList());
+
+        String tablesToPopulateString = AutoTradingUtility.getPropertyFromPropertyFile("DatabaseTablesToPopulate");
+        List<String> tempTablesToPopulate=Arrays.asList(tablesToPopulateString.split(","));
+        tablesToPopulate = tempTablesToPopulate.stream().map(m -> m.trim()).collect(Collectors.toList());
+
         dropAllTables= Boolean.valueOf(AutoTradingUtility.getPropertyFromPropertyFile("DropAllTables"));
     }
 
@@ -152,6 +159,33 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
             }
         });
 
+    }
+
+    @Override
+    public void checkAndPopulateTables(){
+        tablesToPopulate.forEach(table->{
+            List<HashMap<String, String>> result = (List<HashMap<String,String>>)executeQuery("select * from "+table);
+
+            if(CollectionUtils.isEmpty(result)){
+                logger.info("{} Table not populated.", table);
+                File file = AutoTradingUtility.getFileFromResources("populate_"+table+".sql");
+                try {
+                    executeNoResultSet(AutoTradingUtility.readFile(file));
+                    if( !CollectionUtils.isEmpty(executeQuery("select * from "+table) ))
+                    {
+                        logger.info("{} tables populated.", table);
+                    }
+                    else{
+                        logger.error("ERROR! {} tables NOT populated.",table);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                logger.info("{} table already populated.",table);
+            }
+        });
     }
 
 }

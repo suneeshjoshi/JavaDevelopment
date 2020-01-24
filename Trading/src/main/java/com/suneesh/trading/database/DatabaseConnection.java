@@ -25,4 +25,5 @@ public interface DatabaseConnection {
 
     void createDBSchema();
 
+    void checkAndPopulateTables();
 }

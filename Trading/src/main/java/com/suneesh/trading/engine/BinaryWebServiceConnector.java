@@ -52,6 +52,8 @@ public class BinaryWebServiceConnector {
         logger.info("Application Authorize Token = {}", applicationAuthorizeToken);
         logger.info("Checking Database Schema, if not present creating schema...");
         databaseConnection.createDBSchema();
+        databaseConnection.checkAndPopulateTables();
+
         commandProcessor = new CommandProcessor(commandQueue,api);
 //        commandGenerator = new AbstractCommandGenerator(commandQueue,symbolToTrade);
         calculationEngine = new CalculationEngine(commandQueue, databaseConnection, symbolToTrade);
