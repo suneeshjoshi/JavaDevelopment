@@ -74,7 +74,7 @@ WebsocketListener extends WebSocketListener {
                                 if (tickData != null) {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
 //                                    logger.info(String.valueOf(tickResponse.getTick()));
-                                    writeToDatabase(tickResponse, true);
+                                    writeToDatabase(tickResponse, false);
                                 }
 
                                 break;
@@ -84,7 +84,7 @@ WebsocketListener extends WebSocketListener {
                                 if (authorizeData != null) {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
 //                                    logger.info(String.valueOf(authorizeResponse.getAuthorize()));
-                                    writeToDatabase(authorizeResponse, true);
+                                    writeToDatabase(authorizeResponse, false);
                                 }
 
                                 break;
@@ -94,7 +94,7 @@ WebsocketListener extends WebSocketListener {
                                 if (balanceData != null) {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
 //                                    logger.info(String.valueOf(balanceResponse.getBalance()));
-                                    writeToDatabase(balanceResponse, true);
+                                    writeToDatabase(balanceResponse, false);
                                 }
 
 
@@ -113,7 +113,7 @@ WebsocketListener extends WebSocketListener {
                                     tickHistoryResponse.setCandles(candleArrayList);
 //                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
 
-                                    writeToDatabase(tickHistoryResponse, true);
+                                    writeToDatabase(tickHistoryResponse, false);
                                 }
 
                                 break;
@@ -126,28 +126,16 @@ WebsocketListener extends WebSocketListener {
 
                                 if (OHLCData != null &&  prevCandle.getOpen()!=null ) {
                                     newOHLCObject = gson.fromJson(String.valueOf(OHLCData), Candle.class);
-                                    // Write only at the start of second
-//                                    Integer epoch = newOHLCObject.getEpoch();
-//                                    Integer granularity = newOHLCObject.getGranularity();
-
-                                    logger.info("{} == Received Message: {}", OHLC_count[0].get(), o);
-
                                     BigDecimal prevOpen = previousCandle[0].getOpen();
                                     BigDecimal newOpen = newOHLCObject.getOpen();
                                     if(newOpen.compareTo(prevOpen)!=0){
-//                                    if(OHLC_count[0].get()%(granularity/2)==0) {
-                                        logger.info("GOING TO WRITE OHLC CANDLE - {}", o);
-//                                        Candle updatedPreviousCandle = calculateLastTickforCandle(prevCandle);
                                         Candle updatedPreviousCandle = prevCandle;
-
-                                        logger.info("GOING TO WRITE OHLC CANDLE - {}", updatedPreviousCandle.toString());
-
                                         ArrayList<Candle> candles = new ArrayList<>();
                                         candles.add(updatedPreviousCandle);
                                         ohlcTickHistoryResponse.setCandles(candles);
 //                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
-                                        writeToDatabase(ohlcTickHistoryResponse, true);
+                                        writeToDatabase(ohlcTickHistoryResponse, false);
                                     }
                                 }
 
@@ -159,6 +147,9 @@ WebsocketListener extends WebSocketListener {
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject transactionData = (JSONObject) jsonObject.get("transaction");
                                 if( (transactionData != null) && ( transactionData.has("transaction_id")) ) {
+
+                                    processTransaction(transactionData);
+
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
                                     writeToDatabase(transactionsStreamResponse, true);
@@ -184,7 +175,7 @@ WebsocketListener extends WebSocketListener {
                                     portfolio.setContracts(portfolioTransactionList);
                                     portfolioResponse.setPortfolio(portfolio);
 //                                    logger.info(String.valueOf(portfolioResponse.getPortfolio()));
-                                    writeToDatabase(portfolioResponse, true);
+                                    writeToDatabase(portfolioResponse, false);
                                 }
 
                                 break;
@@ -206,6 +197,34 @@ WebsocketListener extends WebSocketListener {
                     }
                 }
         );
+    }
+
+    private void processTransaction(JSONObject transactionData) {
+        String action = transactionData.getString("action");
+
+        if(!action.isEmpty()){
+            String updateString = null;
+            long contract_id = transactionData.getLong("contract_id");
+            switch(action){
+                case "buy":
+                    updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE contract_id is null AND result is null";
+                    break;
+                case "sell":
+                    BigDecimal amount = transactionData.getBigDecimal("amount");
+                    String tradeResult= amount.doubleValue()>0?"SUCCESS":"FAIL";
+                    updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE contract_id ='"+String.valueOf(contract_id)+"' AND result ='OPEN'";
+                    break;
+                default : logger.info("Unhandled action . action = {}",action);
+            }
+
+            if(!updateString.isEmpty()){
+                logger.info("action / Command = {} / {}", action, updateString);
+                databaseConnection.executeNoResultSet(updateString);
+            }
+        }
+        else{
+            logger.info("WARNING! 'action' element missing from Transaction Response.");
+        }
     }
 
     private BigDecimal getTickForEpochTime(long epochTime){

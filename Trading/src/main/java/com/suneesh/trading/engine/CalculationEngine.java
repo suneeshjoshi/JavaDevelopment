@@ -1,26 +1,13 @@
 package com.suneesh.trading.engine;
 
-import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
-import com.suneesh.trading.models.responses.AuthorizeResponse;
-import com.suneesh.trading.utils.AutoTradingUtility;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.*;
 import java.util.concurrent.BlockingQueue;
-
-import static com.suneesh.trading.utils.AutoTradingUtility.sleep;
 
 public class CalculationEngine extends AbstractCommandGenerator {
     private static final Logger logger = LogManager.getLogger();
@@ -66,7 +53,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
             calculationEngineUtility.sleepTillStartOfNextMinute();
 
             String callOrPut = calculationEngineUtility.getCallOrPut();
-            long contractDuration = CalculationEngineUtility.CONTRACT_DURATION_IN_SECONDS;
+            long contractDuration = calculationEngineUtility.getContractDuration();
             double bidAmount = calculationEngineUtility.getBidAmount();
             int stepCount = calculationEngineUtility.getStepCount();
 
