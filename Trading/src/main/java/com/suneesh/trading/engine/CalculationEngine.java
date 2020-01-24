@@ -3,6 +3,7 @@ package com.suneesh.trading.engine;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,48 +35,60 @@ public class CalculationEngine extends AbstractCommandGenerator {
     }
 
     public void process(){
+        int tradeCount =1;
         getTickDetail(symbol);
         getCandleDetails(symbol);
-        String currency = calculationEngineUtility.getCurrency();
+        logger.info("Sleeping for the start of next minute.");
+        calculationEngineUtility.sleepTillStartOfNextMinute();
 
-        if(currency.isEmpty()){
-            logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");
-            System.exit(-1);
-        }
-        else {
-            logger.info("Sleeping for the start of next minute.");
-            calculationEngineUtility.sleepTillStartOfNextMinute();
+        logger.info("\n\n");
+        logger.info("*************************************************************************************************************************************");
+        logger.info("*** Sleeping for another minute to stablise last candle values, and to ensure its recorded completely and accurately for trading. ***");
+        logger.info("*************************************************************************************************************************************\n\n");
+//        calculationEngineUtility.sleepTillStartOfNextMinute();
 
-            logger.info("\n\n");
-            logger.info("*************************************************************************************************************************************");
-            logger.info("*** Sleeping for another minute to stablise last candle values, and to ensure its recorded completely and accurately for trading. ***");
-            logger.info("*************************************************************************************************************************************\n\n");
-            calculationEngineUtility.sleepTillStartOfNextMinute();
+        // Keep booking trades
+        while(true) {
+            logger.info("Going to send trade {}...",tradeCount++);
+            createAndSendTrade();
+            logger.info("Trade sent. sleeping for 60 seconds");
 
-            try {
-                String callOrPut = calculationEngineUtility.getCallOrPut();
-                long contractDuration = calculationEngineUtility.getContractDuration();
-                int stepCount = calculationEngineUtility.getLastStepCount();
-                int nextStepCount = stepCount + 1;
-                double bidAmount = calculationEngineUtility.getBidAmount(nextStepCount);
-
-                BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
-                BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
-
-                String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextStepCount);
-                logger.debug(tradeInsertStatement);
-                calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
-
-                logger.info("Sending buy Contract Request ... ");
-                sendRequest(buyContractRequest);
+            /// waiting till last trade is completed.
+            while(calculationEngineUtility.waitToBookNextTrade()){
+                AutoTradingUtility.sleep(1000);
             }
-            catch (Exception e ){
-                logger.info("Exception caught while create new trade. {}",e.getMessage());
-                e.printStackTrace();
-            }
-
         }
+
     }
 
+    private void createAndSendTrade(){
+        try {
+            String currency = calculationEngineUtility.getCurrency();
+            if(currency.isEmpty()){
+                logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");
+                System.exit(-1);
+            }
+
+            String callOrPut = calculationEngineUtility.getCallOrPut();
+            long contractDuration = calculationEngineUtility.getContractDuration();
+            int stepCount = calculationEngineUtility.getLastStepCount();
+            int nextStepCount = stepCount + 1;
+            double bidAmount = calculationEngineUtility.getBidAmount(nextStepCount);
+
+            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
+            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
+
+            String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextStepCount);
+            logger.debug(tradeInsertStatement);
+            calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
+
+            logger.info("Sending buy Contract Request ... ");
+            sendRequest(buyContractRequest);
+        }
+        catch (Exception e ){
+            logger.info("Exception caught while create new trade. {}",e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
 }

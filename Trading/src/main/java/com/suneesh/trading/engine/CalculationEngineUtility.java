@@ -53,12 +53,17 @@ public class CalculationEngineUtility {
     }
 
     int getLastStepCount() {
-        int stepCount=1;
-        List<Map<String,String>> result = (List<Map<String, String>>) databaseConnection.executeQuery(
-                "select step_count from trade order by identifier desc limit 1");
-        if(!CollectionUtils.isEmpty(result)){
-            Map<String,String> firstRow = result.get(0);
-            stepCount = Integer.valueOf(firstRow.get("step_count"));
+        int stepCount = 0;
+        Map<String, String> lastTrade = getLastTrade();
+        if(!MapUtils.isEmpty(lastTrade)){
+            String previousTradeResult = String.valueOf(lastTrade.get("result"));
+            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
+                stepCount =1;
+            }
+
+            if(previousTradeResult.equalsIgnoreCase("FAIL")){
+                stepCount = Integer.valueOf(lastTrade.get("step_count"));
+            }
         }
         return stepCount;
     }
@@ -127,7 +132,7 @@ public class CalculationEngineUtility {
             strategyToUse = Integer.valueOf(strategy.get("next_strategy_id_link"));
         }
 
-        log.info("strategy to Ust = {}",strategyToUse);
+        log.info("Strategy to Use = {}",strategyToUse);
         Map<String, String> nextStrategySteps = getStrategySteps(strategyToUse);
 
         nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
@@ -168,5 +173,21 @@ public class CalculationEngineUtility {
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
         return callOrPutResult;
+    }
+
+
+    boolean waitToBookNextTrade(){
+        boolean result = true;
+        Map<String, String> lastTrade = getLastTrade();
+        if(!MapUtils.isEmpty(lastTrade)){
+            String tradeResult = lastTrade.get("result");
+
+            if(!tradeResult.isEmpty() && tradeResult!=null )
+                if( tradeResult.equalsIgnoreCase("SUCCESS") ||
+                        tradeResult.equalsIgnoreCase("FAIL") ){
+                result=false;
+            }
+        }
+        return result;
     }
 }
