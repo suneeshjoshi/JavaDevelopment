@@ -52,21 +52,28 @@ public class CalculationEngine extends AbstractCommandGenerator {
             logger.info("*************************************************************************************************************************************\n\n");
             calculationEngineUtility.sleepTillStartOfNextMinute();
 
-            String callOrPut = calculationEngineUtility.getCallOrPut();
-            long contractDuration = calculationEngineUtility.getContractDuration();
-            double bidAmount = calculationEngineUtility.getBidAmount();
-            int stepCount = calculationEngineUtility.getStepCount();
+            try {
+                String callOrPut = calculationEngineUtility.getCallOrPut();
+                long contractDuration = calculationEngineUtility.getContractDuration();
+                int stepCount = calculationEngineUtility.getLastStepCount();
+                int nextStepCount = stepCount + 1;
+                double bidAmount = calculationEngineUtility.getBidAmount(nextStepCount);
 
-//        AuthorizeRequest authRequest = new AuthorizeRequest(properties.getProperty("VRTC_TRADE"));
-            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
-            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
+                BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
+                BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
 
-            String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, stepCount);
-            logger.debug(tradeInsertStatement);
-            calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
+                String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextStepCount);
+                logger.debug(tradeInsertStatement);
+                calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
 
-            logger.info("Sending buy Contract Request ... ");
-            sendRequest(buyContractRequest);
+                logger.info("Sending buy Contract Request ... ");
+                sendRequest(buyContractRequest);
+            }
+            catch (Exception e ){
+                logger.info("Exception caught while create new trade. {}",e.getMessage());
+                e.printStackTrace();
+            }
+
         }
     }
 

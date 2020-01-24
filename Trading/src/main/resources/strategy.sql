@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.strategy
     creation_date timestamp NOT NULL,
     max_steps INTEGER NOT NULL,
     next_strategy_id_link INTEGER,
+    is_default_strategy boolean,
     CONSTRAINT strategy_pkey PRIMARY KEY (identifier)
 )
 

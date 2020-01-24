@@ -9,16 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 @Data
 @Slf4j
 public class CalculationEngineUtility {
     private DatabaseConnection databaseConnection;
-    final static long CONTRACT_DURATION_IN_SECONDS = 60;
+    final static long CONTRACT_DURATION_IN_SECONDS = 60L;
+    final static double LOWEST_VALID_BID_AMOUNT = 0.35D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
 
     public CalculationEngineUtility(DatabaseConnection databaseConnection) {
@@ -40,14 +43,22 @@ public class CalculationEngineUtility {
         return (Map<String, String>) (databaseConnection.executeQuery("select * from candle order by identifier desc limit 1")).get(0);
     }
 
-    int getStepCount() {
+    Map<String,String> getLastTrade(){
+        Map<String,String> result = null;
+        List<Map<String,String>> list = databaseConnection.executeQuery("select * from trade order by identifier desc limit 1");
+        if(!CollectionUtils.isEmpty(list)){
+            result = list.get(0);
+        }
+        return result;
+    }
+
+    int getLastStepCount() {
         int stepCount=1;
         List<Map<String,String>> result = (List<Map<String, String>>) databaseConnection.executeQuery(
                 "select step_count from trade order by identifier desc limit 1");
         if(!CollectionUtils.isEmpty(result)){
             Map<String,String> firstRow = result.get(0);
             stepCount = Integer.valueOf(firstRow.get("step_count"));
-            stepCount++;
         }
         return stepCount;
     }
@@ -85,8 +96,62 @@ public class CalculationEngineUtility {
         return CONTRACT_DURATION_IN_SECONDS;
     }
 
-    double getBidAmount() {
-        return 0.35D;
+    private double getInitialTradeAmount(){
+        // Lowest amount possible.
+        double amount = LOWEST_VALID_BID_AMOUNT;
+        List<Map<String,String>> result = databaseConnection.executeQuery(
+                "select ss.value from strategy_steps ss join strategy s on ( ss.strategy_id = s.identifier ) WHERE s.is_default_strategy=true and ss.step_count=1");
+        if(!CollectionUtils.isEmpty(result)){
+            Map<String,String> firstRow = result.get(0);
+            amount = Double.valueOf(firstRow.get("value"));
+        }
+        return amount;
+    }
+
+    private Map<String,String> getStrategy(int strategy_id){
+        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy WHERE identifier = "+strategy_id)).get(0);
+    }
+
+    private Map<String,String> getStrategySteps(int strategy_id){
+        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy_steps WHERE strategy_id = "+strategy_id)).get(0);
+    }
+
+    private double getStrategyAmount( int strategyId, int stepCount){
+        // Lowest amount possible.
+        double amount = LOWEST_VALID_BID_AMOUNT;
+        int strategyToUse = strategyId;
+
+        Map<String, String> strategy = getStrategy(strategyId);
+        int maxSteps = Integer.valueOf(strategy.get("max_steps"));
+        if(stepCount > maxSteps){
+            strategyToUse = Integer.valueOf(strategy.get("next_strategy_id_link"));
+        }
+
+        log.info("strategy to Ust = {}",strategyToUse);
+        Map<String, String> nextStrategySteps = getStrategySteps(strategyToUse);
+
+        nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
+
+        amount = Double.valueOf(nextStrategySteps.get("value"));
+
+        return amount;
+    }
+
+    double getBidAmount(int nextStepCount) {
+        double amount = LOWEST_VALID_BID_AMOUNT;
+        Map<String, String> lastTrade = getLastTrade();
+        if(MapUtils.isEmpty(lastTrade)){
+            getInitialTradeAmount();
+        }
+        else{
+            int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
+            String previousTradeResult = String.valueOf(lastTrade.get("result"));
+            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
+                nextStepCount =1;
+            }
+            amount = getStrategyAmount(previousStrategy,nextStepCount);
+        }
+        return amount;
     }
 
     String getCallOrPut(){
