@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.strategy_steps
     strategy_id INTEGER ,
     step_count integer NOT NULL,
     value numeric(19,4) NOT NULL,
-    CONSTRAINT strategy_steps_pkey PRIMARY KEY (identifier),
+    CONSTRAINT strategy_steps_pkey PRIMARY KEY (identifier)
 );
 
 
