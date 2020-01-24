@@ -1,10 +1,13 @@
 package com.suneesh.trading.engine;
 
+import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@Slf4j
 public class CalculationEngineUtility {
     private DatabaseConnection databaseConnection;
     final static long CONTRACT_DURATION_IN_SECONDS = 60;
@@ -61,5 +65,38 @@ public class CalculationEngineUtility {
                         + "now()::timestamp );";
     }
 
+    BuyContractParameters getParameters(String symbol, double bidAmount, String callOrPut, long contractDuration, String currency) {
+        String json = "{\n" +
+                "  \"amount\": \""+ bidAmount +"\",\n" +
+                "  \"basis\": \"stake\",\n" +
+                "  \"contract_type\": \""+callOrPut+"\",\n" +
+                "  \"currency\": \""+currency+"\",\n" +
+                "  \"duration\": \""+contractDuration+"\",\n" +
+                "  \"duration_unit\": \"s\",\n" +
+                "  \"symbol\": \""+symbol+"\"\n" +
+                "}";
 
+        Gson gson = new Gson();
+        return gson.fromJson(json, BuyContractParameters.class);
+    }
+
+    double getBidAmount() {
+        return 0.35D;
+    }
+
+    String getCallOrPut(){
+        String callOrPutResult = "CALL";
+        Map<String, String> lastCandle = getLastCandle();
+        if(!MapUtils.isEmpty(lastCandle)) {
+            String previousCandleDirection = lastCandle.get("direction");
+
+            log.debug("************ : {}", previousCandleDirection);
+            for (Map.Entry<String, String> entry : lastCandle.entrySet()) {
+                log.debug("{} - {} ", entry.getKey(), entry.getValue());
+            }
+
+            callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
+        }
+        return callOrPutResult;
+    }
 }

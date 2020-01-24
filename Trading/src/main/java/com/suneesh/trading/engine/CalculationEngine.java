@@ -59,25 +59,19 @@ public class CalculationEngine extends AbstractCommandGenerator {
             logger.info("Sleeping for the start of next minute.");
             calculationEngineUtility.sleepTillStartOfNextMinute();
 
+            logger.info("\n\n");
+            logger.info("*************************************************************************************************************************************");
             logger.info("*** Sleeping for another minute to stablise last candle values, and to ensure its recorded completely and accurately for trading. ***");
+            logger.info("*************************************************************************************************************************************\n\n");
             calculationEngineUtility.sleepTillStartOfNextMinute();
 
-            Map<String, String> result = calculationEngineUtility.getLastCandle();
-            String previousCandleDirection = result.get("direction");
-
-            logger.debug("************ : {}", previousCandleDirection);
-            for (Map.Entry<String, String> entry : result.entrySet()) {
-                logger.debug("{} - {} ", entry.getKey(), entry.getValue());
-            }
-
-
-            double bidAmount = getBidAmount();
-            int stepCount = calculationEngineUtility.getStepCount();
-            String callOrPut = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
+            String callOrPut = calculationEngineUtility.getCallOrPut();
             long contractDuration = CalculationEngineUtility.CONTRACT_DURATION_IN_SECONDS;
+            double bidAmount = calculationEngineUtility.getBidAmount();
+            int stepCount = calculationEngineUtility.getStepCount();
 
 //        AuthorizeRequest authRequest = new AuthorizeRequest(properties.getProperty("VRTC_TRADE"));
-            BuyContractParameters parameters = getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
+            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
 
             String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, stepCount);
@@ -90,22 +84,4 @@ public class CalculationEngine extends AbstractCommandGenerator {
     }
 
 
-    private double getBidAmount() {
-        return 0.35D;
-    }
-
-    private BuyContractParameters getParameters(String symbol, double bidAmount, String callOrPut, long contractDuration, String currency) {
-        String json = "{\n" +
-                "  \"amount\": \""+ bidAmount +"\",\n" +
-                "  \"basis\": \"stake\",\n" +
-                "  \"contract_type\": \""+callOrPut+"\",\n" +
-                "  \"currency\": \""+currency+"\",\n" +
-                "  \"duration\": \""+contractDuration+"\",\n" +
-                "  \"duration_unit\": \"s\",\n" +
-                "  \"symbol\": \""+symbol+"\"\n" +
-                "}";
-
-        Gson gson = new Gson();
-        return gson.fromJson(json, BuyContractParameters.class);
-    }
 }
