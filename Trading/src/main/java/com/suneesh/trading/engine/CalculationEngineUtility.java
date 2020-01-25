@@ -40,7 +40,13 @@ public class CalculationEngineUtility {
     }
 
     Map<String,String> getLastCandle(){
-        return (Map<String, String>) (databaseConnection.executeQuery("select * from candle order by identifier desc limit 1")).get(0);
+        List<Map<String, String>> lastCandleList = null;
+        Map<String,String> lastCandle = null;
+        lastCandleList = (databaseConnection.executeQuery("select * from candle order by identifier desc limit 1"));
+        if(!CollectionUtils.isEmpty(lastCandleList)){
+            lastCandle = lastCandleList.get(0);
+        }
+        return lastCandle;
     }
 
     Map<String,String> getLastTrade(){
@@ -52,17 +58,25 @@ public class CalculationEngineUtility {
         return result;
     }
 
-    int getLastStepCount() {
-        int stepCount = 0;
+    int getNextStepCount() {
+        int stepCount = 1;
         Map<String, String> lastTrade = getLastTrade();
         if(!MapUtils.isEmpty(lastTrade)){
             String previousTradeResult = String.valueOf(lastTrade.get("result"));
-            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
-                stepCount =1;
+            int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
+
+            if(previousTradeResult.equalsIgnoreCase("SUCCESS") ){
+                if(previousStrategy==1) {
+                    stepCount = 1;
+                }
+                else{
+                    stepCount++;
+                }
             }
 
             if(previousTradeResult.equalsIgnoreCase("FAIL")){
                 stepCount = Integer.valueOf(lastTrade.get("step_count"));
+                stepCount++;
             }
         }
         return stepCount;
@@ -117,8 +131,8 @@ public class CalculationEngineUtility {
         return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy WHERE identifier = "+strategy_id)).get(0);
     }
 
-    private Map<String,String> getStrategySteps(int strategy_id){
-        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy_steps WHERE strategy_id = "+strategy_id)).get(0);
+    private Map<String,String> getStrategySteps(int strategyId, int stepCount){
+        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy_steps WHERE strategy_id = "+strategyId+" AND step_count = "+stepCount)).get(0);
     }
 
     private double getStrategyAmount( int strategyId, int stepCount){
@@ -130,10 +144,12 @@ public class CalculationEngineUtility {
         int maxSteps = Integer.valueOf(strategy.get("max_steps"));
         if(stepCount > maxSteps){
             strategyToUse = Integer.valueOf(strategy.get("next_strategy_id_link"));
+            // Reset step count for next strategy
+            stepCount=1;
         }
 
         log.info("Strategy to Use = {}",strategyToUse);
-        Map<String, String> nextStrategySteps = getStrategySteps(strategyToUse);
+        Map<String, String> nextStrategySteps = getStrategySteps(strategyToUse, stepCount);
 
         nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
 
@@ -149,11 +165,12 @@ public class CalculationEngineUtility {
             getInitialTradeAmount();
         }
         else{
+//            String previousTradeResult = String.valueOf(lastTrade.get("result"));
+//            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
+//                nextStepCount =1;
+//            }
+
             int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
-            String previousTradeResult = String.valueOf(lastTrade.get("result"));
-            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
-                nextStepCount =1;
-            }
             amount = getStrategyAmount(previousStrategy,nextStepCount);
         }
         return amount;

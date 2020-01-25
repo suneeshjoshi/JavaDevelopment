@@ -82,7 +82,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         ArrayList<HashMap<String,String>> list = new ArrayList<>(50);
         try {
             st = getConnection().createStatement();
-            logger.info("Statement = {}", statement);
+//            logger.info("Statement = {}", statement);
             rs = st.executeQuery(statement);
             if (rs != null) {
                 ResultSetMetaData md = rs.getMetaData();

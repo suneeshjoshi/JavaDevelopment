@@ -71,8 +71,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
 
             String callOrPut = calculationEngineUtility.getCallOrPut();
             long contractDuration = calculationEngineUtility.getContractDuration();
-            int stepCount = calculationEngineUtility.getLastStepCount();
-            int nextStepCount = stepCount + 1;
+            int nextStepCount = calculationEngineUtility.getNextStepCount();
             double bidAmount = calculationEngineUtility.getBidAmount(nextStepCount);
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
