@@ -82,7 +82,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
 
 
 
-            NextTradeDetails nextTradeDetails = new NextTradeDetails();
+            NextTradeDetails nextTradeDetails = new NextTradeDetails(Long.valueOf(lastTrade.get("identifier")));
 
             calculationEngineUtility.getCallOrPut(nextTradeDetails);
             calculationEngineUtility.getContractDuration(nextTradeDetails);
@@ -91,9 +91,8 @@ public class CalculationEngine extends AbstractCommandGenerator {
             calculationEngineUtility.getBidAmount(nextTradeDetails);
 
 
-
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
-            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters);
+            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
 
             String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
             logger.debug(tradeInsertStatement);

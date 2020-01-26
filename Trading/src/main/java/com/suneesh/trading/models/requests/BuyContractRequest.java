@@ -3,6 +3,7 @@ package com.suneesh.trading.models.requests;
 import com.suneesh.trading.models.responses.BuyContractResponse;
 import com.suneesh.trading.utils.Validator;
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 8/8/2017
  */
+@Data
 public class BuyContractRequest extends RequestBase {
 
     /**
@@ -38,8 +40,17 @@ public class BuyContractRequest extends RequestBase {
     @SerializedName("parameters")
     private BuyContractParameters parameters;
 
+
     private BuyContractRequest() {
         this.responseType = BuyContractResponse.class;
+    }
+
+    public BuyContractRequest(BigDecimal price , BuyContractParameters parameters, Long req_id) {
+        this();
+        this.proposalId = "1";
+        this.setPrice(price);
+        this.setParameters(parameters);
+        id = Integer.valueOf(Math.toIntExact(req_id));
     }
 
     public BuyContractRequest(BigDecimal price , BuyContractParameters parameters) {
