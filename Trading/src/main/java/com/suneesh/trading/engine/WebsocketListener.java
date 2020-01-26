@@ -163,9 +163,9 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject buyData = (JSONObject) jsonObject.get("buy");
 
                                 if( (buyData != null) && ( buyData.has("contract_id")) ) {
-                                    JSONObject req_id = (JSONObject) jsonObject.get("req_id");
+                                    Integer req_id = (Integer) jsonObject.get("req_id");
 
-                                    processTransaction(buyData, req_id);
+                                    processTransaction(msg_type, buyData, req_id);
 
                                     BuyContractResponse buyContractResponse1 = gson.fromJson(String.valueOf(buyData), BuyContractResponse.class);
 
@@ -181,9 +181,9 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject sellData = (JSONObject) jsonObject.get("buy");
 
                                 if( (sellData != null) && ( sellData.has("contract_id")) ) {
-                                    JSONObject req_id = (JSONObject) jsonObject.get("req_id");
+                                    Integer req_id = (Integer) jsonObject.get("req_id");
 
-                                    processTransaction(sellData, req_id);
+                                    processTransaction(msg_type, sellData, req_id);
 
                                     SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
 
@@ -236,53 +236,46 @@ WebsocketListener extends WebSocketListener {
         );
     }
 
-    private void processTransaction(JSONObject buyDataSellData, JSONObject req_id) {
-        String action = buyDataSellData.getString("action");
+    private void processTransaction(String msg_type, JSONObject buyDataSellData, Integer req_id) {
+        String tradeIdentifier = null;
+        String updateString = null;
+        long contract_id = buyDataSellData.getLong("contract_id");
 
-        if(!action.isEmpty()){
-            String tradeIdentifier = null;
-            String updateString = null;
-            long contract_id = buyDataSellData.getLong("contract_id");
-
-            if(req_id!=null){
-                tradeIdentifier = req_id.getString("req_id");
-                if (tradeIdentifier != null) {
-                    updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE identifier = "+tradeIdentifier;
-                }
-                else{
-                    logger.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
-                }
+        if(req_id!=null){
+            tradeIdentifier = String.valueOf(req_id);
+            if (tradeIdentifier != null) {
+                updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE identifier = "+tradeIdentifier;
             }
-
-            switch(action){
-                case "buy":
-                    if(updateString==null){
-                        updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE contract_id is null AND result is null";
-                    }
-                    else {
-                        updateString = "UPDATE trade SET contract_id = '" + String.valueOf(contract_id) + "', result='OPEN' WHERE identifier = " + tradeIdentifier;
-                    }
-                    break;
-                case "sell":
-                    BigDecimal amount = buyDataSellData.getBigDecimal("amount");
-                    String tradeResult= amount.doubleValue()>0?"SUCCESS":"FAIL";
-                    if(updateString==null){
-                        updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE contract_id ='"+String.valueOf(contract_id)+"' AND result ='OPEN'";
-                    }
-                    else {
-                        updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE identifier = "+tradeIdentifier;
-                    }
-                    break;
-                default : logger.info("Unhandled action . action = {}",action);
-            }
-
-            if(!updateString.isEmpty()){
-                logger.info("action / Command = {} / {}", action, updateString);
-                databaseConnection.executeNoResultSet(updateString);
+            else{
+                logger.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
             }
         }
-        else{
-            logger.info("WARNING! 'action' element missing from Transaction Response.");
+
+        switch(msg_type){
+            case "buy":
+                if(updateString==null){
+                    updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE contract_id is null AND result is null";
+                }
+                else {
+                    updateString = "UPDATE trade SET contract_id = '" + String.valueOf(contract_id) + "', result='OPEN' WHERE identifier = " + tradeIdentifier;
+                }
+                break;
+            case "sell":
+                BigDecimal amount = buyDataSellData.getBigDecimal("amount");
+                String tradeResult= amount.doubleValue()>0?"SUCCESS":"FAIL";
+                if(updateString==null){
+                    updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE contract_id ='"+String.valueOf(contract_id)+"' AND result ='OPEN'";
+                }
+                else {
+                    updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE identifier = "+tradeIdentifier;
+                }
+                break;
+            default : logger.info("Unhandled action . action = {}",msg_type);
+        }
+
+        if(!updateString.isEmpty()){
+            logger.info("action / Command = {} / {}", msg_type, updateString);
+            databaseConnection.executeNoResultSet(updateString);
         }
     }
 
