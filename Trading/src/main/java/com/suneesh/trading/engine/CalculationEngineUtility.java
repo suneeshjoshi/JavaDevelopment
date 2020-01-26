@@ -9,19 +9,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 @Data
 @Slf4j
 public class CalculationEngineUtility {
+
+
     private DatabaseConnection databaseConnection;
     final static long CONTRACT_DURATION_IN_SECONDS = 60L;
-    final static double LOWEST_VALID_BID_AMOUNT = 0.35D;
+    final static double INITIAL_BID_AMOUNT = 1.00D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
 
     public CalculationEngineUtility(DatabaseConnection databaseConnection) {
@@ -58,66 +59,55 @@ public class CalculationEngineUtility {
         return result;
     }
 
-    int getNextStepCount() {
+    void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
         int stepCount = 1;
-        Map<String, String> lastTrade = getLastTrade();
+//        Map<String, String> lastTrade = getLastTrade();
+
         if(!MapUtils.isEmpty(lastTrade)){
             String previousTradeResult = String.valueOf(lastTrade.get("result"));
-            int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
+            int previousTradeStrategyID =  Integer.valueOf(lastTrade.get("strategy_id"));
+            int previousStepCount = Integer.parseInt(lastTrade.get("step_count"));
+            Map<String, String> previousTradeStrategy = getStrategy(previousTradeStrategyID,false);
+            boolean reset_step_count_on_success = previousTradeStrategy.getOrDefault("reset_step_count_on_success", "True").equalsIgnoreCase("True");
 
             if(previousTradeResult.equalsIgnoreCase("SUCCESS") ){
-                if(previousStrategy==1) {
+                if(reset_step_count_on_success) {
                     stepCount = 1;
                 }
                 else{
-                    stepCount++;
+                    stepCount=previousStepCount+1;
                 }
             }
 
             if(previousTradeResult.equalsIgnoreCase("FAIL")){
-                stepCount = Integer.valueOf(lastTrade.get("step_count"));
-                stepCount++;
+//                stepCount = Integer.valueOf(lastTrade.get("step_count"));
+                stepCount=previousStepCount+1;
             }
         }
-        return stepCount;
+        nextTradeDetails.setNextStepCount(stepCount);
     }
 
-    String getTradeDatabaseInsertString(BuyContractParameters parameters, int stepCount) {
+    String getTradeDatabaseInsertString(BuyContractParameters parameters, NextTradeDetails nextTradeDetails) {
         return
                 "INSERT INTO public.trade " +
                         "(bid_amount, call_or_put, symbol, step_count, strategy_id, trade_time, trade_time_string, amount_won) " +
                         " VALUES (" + AutoTradingUtility.quotedString(parameters.getAmount())+", "
                         + AutoTradingUtility.quotedString(parameters.getContractType())+", "
                         + AutoTradingUtility.quotedString(parameters.getSymbol())+", "
-                        + AutoTradingUtility.quotedString(stepCount)+", "
-                        + AutoTradingUtility.quotedString("1")+","
+                        + AutoTradingUtility.quotedString(nextTradeDetails.getNextStepCount())+", "
+                        + AutoTradingUtility.quotedString(nextTradeDetails.getStrategyId())+","
                         + "extract(epoch from now()) ,"
                         + "now()::timestamp ,"
                         +"0.00 );";
     }
 
-    BuyContractParameters getParameters(String symbol, double bidAmount, String callOrPut, long contractDuration, String currency) {
-        String json = "{\n" +
-                "  \"amount\": \""+ bidAmount +"\",\n" +
-                "  \"basis\": \"stake\",\n" +
-                "  \"contract_type\": \""+callOrPut+"\",\n" +
-                "  \"currency\": \""+currency+"\",\n" +
-                "  \"duration\": \""+contractDuration+"\",\n" +
-                "  \"duration_unit\": \"s\",\n" +
-                "  \"symbol\": \""+symbol+"\"\n" +
-                "}";
-
-        Gson gson = new Gson();
-        return gson.fromJson(json, BuyContractParameters.class);
-    }
-
-    public long getContractDuration() {
-        return CONTRACT_DURATION_IN_SECONDS;
+    public void getContractDuration(NextTradeDetails nextTradeDetails) {
+        nextTradeDetails.setContractDuration(CONTRACT_DURATION_IN_SECONDS);
     }
 
     private double getInitialTradeAmount(){
         // Lowest amount possible.
-        double amount = LOWEST_VALID_BID_AMOUNT;
+        double amount = INITIAL_BID_AMOUNT;
         List<Map<String,String>> result = databaseConnection.executeQuery(
                 "select ss.value from strategy_steps ss join strategy s on ( ss.strategy_id = s.identifier ) WHERE s.is_default_strategy=true and ss.step_count=1");
         if(!CollectionUtils.isEmpty(result)){
@@ -127,56 +117,86 @@ public class CalculationEngineUtility {
         return amount;
     }
 
-    private Map<String,String> getStrategy(int strategy_id){
-        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy WHERE identifier = "+strategy_id)).get(0);
-    }
-
-    private Map<String,String> getStrategySteps(int strategyId, int stepCount){
-        return (Map<String, String>) (databaseConnection.executeQuery("select * from strategy_steps WHERE strategy_id = "+strategyId+" AND step_count = "+stepCount)).get(0);
-    }
-
-    private double getStrategyAmount( int strategyId, int stepCount){
-        // Lowest amount possible.
-        double amount = LOWEST_VALID_BID_AMOUNT;
-        int strategyToUse = strategyId;
-
-        Map<String, String> strategy = getStrategy(strategyId);
-        int maxSteps = Integer.valueOf(strategy.get("max_steps"));
-        if(stepCount > maxSteps){
-            strategyToUse = Integer.valueOf(strategy.get("next_strategy_id_link"));
-            // Reset step count for next strategy
-            stepCount=1;
+    private Map<String,String> getStrategy(int strategyId, boolean defaultStrategy){
+        Map<String, String>result = null;
+        String queryToExecute="";
+        if(defaultStrategy){
+            queryToExecute="select * From strategy where strategy.is_default_strategy = true";
+        }
+        else{
+            queryToExecute="select * from strategy WHERE identifier = "+strategyId;
         }
 
-        log.info("Strategy to Use = {}",strategyToUse);
-        Map<String, String> nextStrategySteps = getStrategySteps(strategyToUse, stepCount);
-
-        nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
-
-        amount = Double.valueOf(nextStrategySteps.get("value"));
-
-        return amount;
+        log.debug("getStrategy = {}",queryToExecute);
+        List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
+        if( CollectionUtils.isEmpty(list)){
+            log.error("Unable to find Strategy for query = {}",queryToExecute);
+        }
+        else{
+            result= list.get(0);
+        }
+        return result;
     }
 
-    double getBidAmount(int nextStepCount) {
-        double amount = LOWEST_VALID_BID_AMOUNT;
+
+    private Map<String,String> getStrategySteps(int strategyId, int stepCount){
+        Map<String, String>result = null;
+        String queryToExecute="select * from strategy_steps WHERE strategy_id = "+strategyId+" AND step_count = "+stepCount;
+        log.debug("getStrategySteps = {}",queryToExecute);
+        List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
+        if( CollectionUtils.isEmpty(list)){
+            log.error("Unable to find StrategySteps for query = {}",queryToExecute);
+        }
+        else{
+            result= list.get(0);
+        }
+        return result;
+
+    }
+
+
+    void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
+        int nextTradeStrategyId = -1;
+
+        if( !MapUtils.isEmpty(lastTrade)) {
+            // Lowest amount possible.
+            int previousTradeStrategyId = Integer.valueOf(lastTrade.getOrDefault("strategy_id","1"));
+
+            Map<String, String> strategy = getStrategy(previousTradeStrategyId, false);
+            int maxSteps = Integer.valueOf(strategy.get("max_steps"));
+            if (nextTradeDetails.getNextStepCount() > maxSteps) {
+                nextTradeStrategyId = Integer.valueOf(strategy.get("next_strategy_id_link"));
+
+                // Resetting step_count to 1
+                nextTradeDetails.setNextStepCount(1);
+            }
+            else{
+                nextTradeStrategyId = previousTradeStrategyId;
+            }
+        }
+        else{
+            Map<String, String> strategy = getStrategy(-1, true);
+            nextTradeStrategyId = Integer.valueOf(strategy.get("identifier"));
+
+        }
+        nextTradeDetails.setStrategyId(nextTradeStrategyId);
+    }
+
+    void getBidAmount(NextTradeDetails nextTradeDetails) {
+        double amount = INITIAL_BID_AMOUNT;
         Map<String, String> lastTrade = getLastTrade();
         if(MapUtils.isEmpty(lastTrade)){
             getInitialTradeAmount();
         }
         else{
-//            String previousTradeResult = String.valueOf(lastTrade.get("result"));
-//            if(previousTradeResult.equalsIgnoreCase("SUCCESS")){
-//                nextStepCount =1;
-//            }
-
-            int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
-            amount = getStrategyAmount(previousStrategy,nextStepCount);
+            Map<String, String> nextStrategySteps = getStrategySteps(nextTradeDetails.getStrategyId(), nextTradeDetails.getNextStepCount());
+            nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
+            amount = Double.valueOf(nextStrategySteps.get("value"));
         }
-        return amount;
+        nextTradeDetails.setAmount(amount);
     }
 
-    String getCallOrPut(){
+    void getCallOrPut(NextTradeDetails nextTradeDetails){
         String callOrPutResult = "CALL";
         Map<String, String> lastCandle = getLastCandle();
         if(!MapUtils.isEmpty(lastCandle)) {
@@ -189,7 +209,8 @@ public class CalculationEngineUtility {
 
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
-        return callOrPutResult;
+        nextTradeDetails.setCallOrPut(callOrPutResult);
+//        return callOrPutResult;
     }
 
 
@@ -206,5 +227,21 @@ public class CalculationEngineUtility {
             }
         }
         return result;
+    }
+
+
+    BuyContractParameters getParameters(String symbol, NextTradeDetails nextTradeDetails, String currency) {
+        String json = "{\n" +
+                "  \"amount\": \""+ nextTradeDetails.getAmount() +"\",\n" +
+                "  \"basis\": \"stake\",\n" +
+                "  \"contract_type\": \""+nextTradeDetails.getCallOrPut()+"\",\n" +
+                "  \"currency\": \""+currency+"\",\n" +
+                "  \"duration\": \""+nextTradeDetails.getContractDuration()+"\",\n" +
+                "  \"duration_unit\": \"s\",\n" +
+                "  \"symbol\": \""+symbol+"\"\n" +
+                "}";
+
+        Gson gson = new Gson();
+        return gson.fromJson(json, BuyContractParameters.class);
     }
 }

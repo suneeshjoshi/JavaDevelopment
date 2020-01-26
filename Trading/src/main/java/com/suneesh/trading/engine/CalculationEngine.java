@@ -4,10 +4,12 @@ import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 public class CalculationEngine extends AbstractCommandGenerator {
@@ -69,15 +71,31 @@ public class CalculationEngine extends AbstractCommandGenerator {
                 System.exit(-1);
             }
 
-            String callOrPut = calculationEngineUtility.getCallOrPut();
-            long contractDuration = calculationEngineUtility.getContractDuration();
-            int nextStepCount = calculationEngineUtility.getNextStepCount();
-            double bidAmount = calculationEngineUtility.getBidAmount(nextStepCount);
+            Map<String, String> lastTrade = calculationEngineUtility.getLastTrade();
+//            if(MapUtils.isEmpty(lastTrade)){
+//                getInitialTradeAmount();
+//            }
+//            else{
+//                int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
+//                amount = getStrategyAmount(previousStrategy,nextStepCount);
+//            }
 
-            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, bidAmount, callOrPut, contractDuration, currency);
-            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(bidAmount), parameters);
 
-            String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextStepCount);
+
+            NextTradeDetails nextTradeDetails = new NextTradeDetails();
+
+            calculationEngineUtility.getCallOrPut(nextTradeDetails);
+            calculationEngineUtility.getContractDuration(nextTradeDetails);
+            calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
+            calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
+            calculationEngineUtility.getBidAmount(nextTradeDetails);
+
+
+
+            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
+            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters);
+
+            String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
             logger.debug(tradeInsertStatement);
             calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
 
