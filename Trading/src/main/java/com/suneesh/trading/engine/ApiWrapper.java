@@ -40,7 +40,7 @@ public class ApiWrapper {
     public BehaviorSubject<WebsocketEvent> websocketEmitter = BehaviorSubject.create();
     private PublishSubject<String> responseEmitter = PublishSubject.create();
     private PublishSubject<String> requestEmitter = PublishSubject.create();
-//    protected static Map<Long, ResponseBase> cache = new LinkedHashMap<>();
+
     protected DatabaseConnection databaseConnection;
 
 

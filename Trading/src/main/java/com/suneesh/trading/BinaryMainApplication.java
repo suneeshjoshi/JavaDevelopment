@@ -15,7 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BinaryMainApplication {
     private static Logger logger = LogManager.getLogger();
 
-    private static ApiWrapper api;
     private static String applicationId;
     private static String applicationAuthorizeToken;
     private static String databaseServer;
@@ -40,7 +39,6 @@ public class BinaryMainApplication {
                                                                                             dbURL,
                                                                                             symbolToTrade);
         binaryWebServiceConnector.init();
-        binaryWebServiceConnector.sendInitialSetupRequest();
     }
 
 }

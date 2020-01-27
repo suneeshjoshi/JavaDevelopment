@@ -2,15 +2,17 @@ package com.suneesh.trading.engine;
 
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
+import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
 
-
+@Data
 public class BinaryWebServiceConnector {
 
     private static final Logger logger = (Logger) LogManager.getLogger();
@@ -55,7 +57,6 @@ public class BinaryWebServiceConnector {
         databaseConnection.checkAndPopulateTables();
 
         commandProcessor = new CommandProcessor(commandQueue,api);
-//        commandGenerator = new AbstractCommandGenerator(commandQueue,symbolToTrade);
         calculationEngine = new CalculationEngine(commandQueue, databaseConnection, symbolToTrade);
 
         threadCreation();
