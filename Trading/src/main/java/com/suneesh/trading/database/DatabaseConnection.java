@@ -1,9 +1,6 @@
 package com.suneesh.trading.database;
 
-import com.suneesh.trading.utils.AutoTradingUtility;
-
 import java.sql.Connection;
-import java.util.Arrays;
 import java.util.List;
 
 public interface DatabaseConnection {
@@ -27,4 +24,6 @@ public interface DatabaseConnection {
     void createDBSchema();
 
     void checkAndPopulateTables();
+
+    void init(boolean backTestingMode);
 }

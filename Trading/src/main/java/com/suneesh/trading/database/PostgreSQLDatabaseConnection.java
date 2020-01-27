@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
@@ -128,8 +127,6 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void createDBSchema() {
-        dropTables();
-
         listOfTables.stream().forEach(table -> {
             if(checkTableExists(table)){
                 logger.info("Table {} Exists.", table);
@@ -180,6 +177,17 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
                 logger.info("{} table already populated.",table);
             }
         });
+    }
+
+    public void init(boolean backTestingMode){
+        if(!backTestingMode) {
+            dropTables();
+        }
+        else{
+            logger.info("DROPPInG TABLE NOT ALLOWED IN BACKTESTING MODE.");
+        }
+        createDBSchema();
+        checkAndPopulateTables();
     }
 
 }
