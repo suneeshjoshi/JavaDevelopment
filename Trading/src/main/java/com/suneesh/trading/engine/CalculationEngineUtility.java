@@ -21,7 +21,8 @@ public class CalculationEngineUtility {
 
 
     private DatabaseConnection databaseConnection;
-    final static long CONTRACT_DURATION_IN_SECONDS = 60L;
+//    final static long CONTRACT_DURATION_IN_SECONDS = 60L;
+    final static long CONTRACT_DURATION_IN_SECONDS = 58L;
     final static double INITIAL_BID_AMOUNT = 1.00D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
 

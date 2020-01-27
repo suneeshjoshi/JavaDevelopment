@@ -3,7 +3,10 @@ package com.suneesh.trading.utils;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class AutoTradingUtility {
 
@@ -76,4 +79,10 @@ public class AutoTradingUtility {
         }
     }
 
+
+    public static List<String> readListFromPropertyFile(String property){
+        String listAsString = AutoTradingUtility.getPropertyFromPropertyFile(property);
+        List<String> list= Arrays.asList(listAsString.split(","));
+        return(list.stream().map(m -> m.trim()).collect(Collectors.toList()));
+    }
 }

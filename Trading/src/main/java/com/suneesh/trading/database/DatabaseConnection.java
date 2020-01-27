@@ -10,7 +10,8 @@ public interface DatabaseConnection {
     String URL = null;
     Connection connection = null;
     List<String> listOfTables = null;
-    boolean dropAllTables = false;
+    List<String> tablesToPopulate = null;
+    List<String> tablesToDrop = null;
 
     Connection createConnection();
     String getUrl();

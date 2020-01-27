@@ -21,21 +21,15 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     Connection connection;
     private List<String> listOfTables;
     private List<String> tablesToPopulate;
-    private boolean dropAllTables;
+    private List<String> tablesToDrop;
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
         this.connection = createConnection();
 
-        String listOfDatabaseTables = AutoTradingUtility.getPropertyFromPropertyFile("ListOfDatabaseTables");
-        List<String> tempListOfTables=Arrays.asList(listOfDatabaseTables.split(","));
-        listOfTables = tempListOfTables.stream().map(m -> m.trim()).collect(Collectors.toList());
-
-        String tablesToPopulateString = AutoTradingUtility.getPropertyFromPropertyFile("DatabaseTablesToPopulate");
-        List<String> tempTablesToPopulate=Arrays.asList(tablesToPopulateString.split(","));
-        tablesToPopulate = tempTablesToPopulate.stream().map(m -> m.trim()).collect(Collectors.toList());
-
-        dropAllTables= Boolean.valueOf(AutoTradingUtility.getPropertyFromPropertyFile("DropAllTables"));
+        this.listOfTables = AutoTradingUtility.readListFromPropertyFile("ListOfDatabaseTables");
+        this.tablesToPopulate = AutoTradingUtility.readListFromPropertyFile("DatabaseTablesToPopulate");
+        this.tablesToDrop = AutoTradingUtility.readListFromPropertyFile("DatabaseTablesToDrop");
     }
 
     @Override
@@ -124,8 +118,8 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void dropTables(){
-        if(dropAllTables){
-            listOfTables.stream().forEach(table -> {
+        if(CollectionUtils.isNotEmpty(tablesToDrop)){
+            tablesToDrop.stream().forEach(table -> {
                 logger.info("Dropping table, {}", table);
                 executeNoResultSet("DROP TABLE "+table);
             });
