@@ -2,6 +2,7 @@ package com.suneesh.trading.models.responses;
 
 import com.suneesh.trading.models.requests.BuyContractRequest;
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
 /**
  * <h1>BuyContractResponse</h1>
@@ -15,6 +16,7 @@ import com.google.gson.annotations.SerializedName;
  * @version 1.0.0
  * @since 8/8/2017
  */
+@Data
 public class BuyContractResponse extends ResponseBase<BuyContractRequest> {
 
     /**

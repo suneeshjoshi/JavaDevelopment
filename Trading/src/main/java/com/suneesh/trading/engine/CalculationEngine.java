@@ -51,14 +51,16 @@ public class CalculationEngine extends AbstractCommandGenerator {
 
         // Keep booking trades
         while(true) {
-            logger.info("Going to send trade {}...",tradeCount++);
+            logger.info("Going to send trade {}...",tradeCount);
             createAndSendTrade();
-            logger.info("Trade sent. sleeping for 60 seconds");
+            logger.info("Trade {} sent, waiting for the trade to be completed...", tradeCount);
 
             /// waiting till last trade is completed.
             while(calculationEngineUtility.waitToBookNextTrade()){
                 AutoTradingUtility.sleep(1000);
             }
+            logger.info("Trade {} completed.",tradeCount);
+            tradeCount++;
         }
 
     }
@@ -72,17 +74,12 @@ public class CalculationEngine extends AbstractCommandGenerator {
             }
 
             Map<String, String> lastTrade = calculationEngineUtility.getLastTrade();
-//            if(MapUtils.isEmpty(lastTrade)){
-//                getInitialTradeAmount();
-//            }
-//            else{
-//                int previousStrategy =  Integer.valueOf(lastTrade.get("strategy_id"));
-//                amount = getStrategyAmount(previousStrategy,nextStepCount);
-//            }
+            long lastTradeId = 0L;
+            if(!MapUtils.isEmpty(lastTrade)){
+                lastTradeId = Long.valueOf(lastTrade.get("identifier"));
+            }
 
-
-
-            NextTradeDetails nextTradeDetails = new NextTradeDetails(Long.valueOf(lastTrade.get("identifier")));
+            NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
 
             calculationEngineUtility.getCallOrPut(nextTradeDetails);
             calculationEngineUtility.getContractDuration(nextTradeDetails);

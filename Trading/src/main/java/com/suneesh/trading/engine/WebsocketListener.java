@@ -59,7 +59,7 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-                    logger.info("Received Message: {}", o);
+//                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
@@ -149,7 +149,7 @@ WebsocketListener extends WebSocketListener {
 
                                 if( (transactionData != null) && ( transactionData.has("transaction_id")) ) {
 
-//                                    processTransaction(transactionData, req_id);
+                                    processTransaction(msg_type, transactionData, null);
 
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
@@ -169,8 +169,8 @@ WebsocketListener extends WebSocketListener {
 
                                     BuyContractResponse buyContractResponse1 = gson.fromJson(String.valueOf(buyData), BuyContractResponse.class);
 
-                                    logger.info(String.valueOf(buyContractResponse1));
-                                    writeToDatabase(buyContractResponse1, true);
+                                    logger.info("BuyContractResponse =  {}",buyContractResponse1.toString());
+//                                    writeToDatabase(buyContractResponse1, true);
                                 }
 
                                 break;
@@ -187,8 +187,8 @@ WebsocketListener extends WebSocketListener {
 
                                     SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
 
-                                    logger.info(String.valueOf(sellContractResponse1));
-                                    writeToDatabase(sellContractResponse1, true);
+                                    logger.info("SellContractResponse =  {}",sellContractResponse1.toString());
+//                                    writeToDatabase(sellContractResponse1, true);
                                 }
 
                                 break;
@@ -236,44 +236,46 @@ WebsocketListener extends WebSocketListener {
         );
     }
 
-    private void processTransaction(String msg_type, JSONObject buyDataSellData, Integer req_id) {
+    private void processTransaction(String msg_type, JSONObject jsonData, Integer req_id) {
         String tradeIdentifier = null;
         String updateString = null;
-        long contract_id = buyDataSellData.getLong("contract_id");
+        long contract_id = jsonData.getLong("contract_id");
 
         if(req_id!=null){
             tradeIdentifier = String.valueOf(req_id);
-            if (tradeIdentifier != null) {
-                updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE identifier = "+tradeIdentifier;
-            }
-            else{
+            if (tradeIdentifier == null) {
+//                updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE identifier = "+tradeIdentifier;
+//            }
+//            else{
                 logger.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
             }
         }
 
         switch(msg_type){
             case "buy":
-                if(updateString==null){
+                if(tradeIdentifier==null){
                     updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE contract_id is null AND result is null";
                 }
                 else {
                     updateString = "UPDATE trade SET contract_id = '" + String.valueOf(contract_id) + "', result='OPEN' WHERE identifier = " + tradeIdentifier;
                 }
                 break;
-            case "sell":
-                BigDecimal amount = buyDataSellData.getBigDecimal("amount");
-                String tradeResult= amount.doubleValue()>0?"SUCCESS":"FAIL";
-                if(updateString==null){
-                    updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE contract_id ='"+String.valueOf(contract_id)+"' AND result ='OPEN'";
-                }
-                else {
-                    updateString= "UPDATE trade SET result='"+tradeResult+"', amount_won = '"+amount.toPlainString()+"' WHERE identifier = "+tradeIdentifier;
+            case "transaction":
+                String action = jsonData.getString("action");
+                if(action.equalsIgnoreCase("sell")) {
+                    BigDecimal amount = jsonData.getBigDecimal("amount");
+                    String tradeResult = amount.doubleValue() > 0 ? "SUCCESS" : "FAIL";
+                    if (tradeIdentifier == null) {
+                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result ='OPEN'";
+                    } else {
+                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE identifier = " + tradeIdentifier;
+                    }
                 }
                 break;
             default : logger.info("Unhandled action . action = {}",msg_type);
         }
 
-        if(!updateString.isEmpty()){
+        if(updateString!=null && !updateString.isEmpty()){
             logger.info("action / Command = {} / {}", msg_type, updateString);
             databaseConnection.executeNoResultSet(updateString);
         }
