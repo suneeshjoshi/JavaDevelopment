@@ -27,7 +27,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
         sendRequest(new TickRequest(symbol));
     }
 
-    public void getCandleDetails(String symbol) {
+    public void getCandleDetailsFromBinaryWS(String symbol) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setSubscribe(1);
@@ -39,13 +39,13 @@ public class CalculationEngine extends AbstractCommandGenerator {
     public void process(){
         int tradeCount =1;
         getTickDetail(symbol);
-        getCandleDetails(symbol);
+        getCandleDetailsFromBinaryWS(symbol);
         logger.info("Sleeping for the start of next minute.");
         calculationEngineUtility.sleepTillStartOfNextMinute();
 
         logger.info("\n\n");
         logger.info("*************************************************************************************************************************************");
-        logger.info("*** Sleeping for another minute to stablise last candle values, and to ensure its recorded completely and accurately for trading. ***");
+        logger.info("*** Sleeping for another minute to stabalise last candle values, and to ensure its recorded completely and accurately for trading. ***");
         logger.info("*************************************************************************************************************************************\n\n");
 //        calculationEngineUtility.sleepTillStartOfNextMinute();
 

@@ -180,12 +180,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
     public void init(boolean backTestingMode){
-        if(!backTestingMode) {
-            dropTables();
-        }
-        else{
-            logger.info("DROPPInG TABLE NOT ALLOWED IN BACKTESTING MODE.");
-        }
+        dropTables();
         createDBSchema();
         checkAndPopulateTables();
     }
