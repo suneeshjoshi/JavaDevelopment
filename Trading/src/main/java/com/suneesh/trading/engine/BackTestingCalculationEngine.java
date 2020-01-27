@@ -61,7 +61,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
 
-    private void createDummyTrade(Map<String,String> candleData){
+    private void createDummyTrade(Map<String, String> candleData, Map<String, String> nextCandleData){
         try {
             String currency = calculationEngineUtility.getCurrency();
             if(currency.isEmpty()){
@@ -89,7 +89,22 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             logger.debug(tradeInsertStatement);
             calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
 
-            logger.info("SKIPPING Sending buy Contract Request as runing in BACKTESTING MODE... ");
+            logger.info("SKIPPING Sending buy Contract Request as running in BACKTESTING MODE... ");
+            logger.info("Checking next candle status to set result of the latest trade created now...");
+            String presentCandleDirection = nextCandleData.get("direction");
+            String nextCandleDirection = nextCandleData.get("direction");
+
+            String tradeResult=null;
+            if(!presentCandleDirection.equalsIgnoreCase(nextCandleDirection)){
+                tradeResult="FAIL";
+            }
+            else{
+                tradeResult="SUCCESS";
+            }
+
+            String tradeResultString = "UPDATE trade SET result ='"+tradeResult+"' , contract_id=identifier*100 WHERE identifier = "+nextTradeDetails.getTradeId();
+            databaseConnection.executeNoResultSet(tradeResultString);
+
         }
         catch (Exception e ){
             logger.info("Exception caught while create new trade. {}",e.getMessage());
@@ -111,13 +126,16 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
         log.info("Received {} candle data points", candleDataFromDB.size());
 
-        for(Map<String,String> row : candleDataFromDB){
-            for(Map.Entry<String,String> entry : row.entrySet()){
-                log.info("{} - {} ", entry.getKey(), entry.getValue());
-            }
+        // Checking till Size - 1, as we are going to use 2 rows simultaneously
+        for(int i=0;i<candleDataFromDB.size()-1;i++){
+            Map<String,String> row = candleDataFromDB.get(i);
+            Map<String,String> nextRow = candleDataFromDB.get(i+1);
+//
+//            for(Map.Entry<String,String> entry : row.entrySet()){
+//                log.info("{} - {} ", entry.getKey(), entry.getValue());
+//            }
 
-            createDummyTrade(row);
-
+            createDummyTrade(row, nextRow);
 
         }
 
