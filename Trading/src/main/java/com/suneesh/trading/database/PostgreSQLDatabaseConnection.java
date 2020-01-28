@@ -21,6 +21,8 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     private List<String> listOfTables;
     private List<String> tablesToPopulate;
     private List<String> tablesToDrop;
+    private boolean dropDbTables;
+
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
@@ -28,7 +30,12 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
         this.listOfTables = AutoTradingUtility.readListFromPropertyFile("ListOfDatabaseTables");
         this.tablesToPopulate = AutoTradingUtility.readListFromPropertyFile("DatabaseTablesToPopulate");
-        this.tablesToDrop = AutoTradingUtility.readListFromPropertyFile("DatabaseTablesToDrop");
+        this.dropDbTables = Boolean.parseBoolean(AutoTradingUtility.getPropertyFromPropertyFile("DropDatabaseTables"));
+
+        String listToDrop = AutoTradingUtility.getPropertyFromPropertyFile("ListOfDatabaseTablesToDrop");
+        if(!listToDrop.isEmpty()) {
+            this.tablesToDrop = AutoTradingUtility.readListFromPropertyFile(listToDrop);
+        }
     }
 
     @Override
@@ -117,11 +124,20 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void dropTables(){
-        if(CollectionUtils.isNotEmpty(tablesToDrop)){
-            tablesToDrop.stream().forEach(table -> {
-                logger.info("Dropping table, {}", table);
-                executeNoResultSet("DROP TABLE "+table);
-            });
+        if(dropDbTables){
+            logger.info("DROPPING DATABASE TABLES.");
+            if(CollectionUtils.isNotEmpty(tablesToDrop)){
+                tablesToDrop.stream().forEach(table -> {
+                    logger.info("Dropping table, {}", table);
+                    executeNoResultSet("DROP TABLE "+table);
+                });
+            }
+            else{
+                logger.info("No Tables defined to be dropped.");
+            }
+        }
+        else{
+            logger.info("NOT DROPPING DATABASE TABLES.");
         }
     }
 
