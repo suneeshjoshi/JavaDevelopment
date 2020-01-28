@@ -22,18 +22,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-@Data
+
 public class BackTestingCalculationEngine extends CalculationEngine{
     private static final Logger logger = LogManager.getLogger();
     private String symbol;
+
     private DatabaseConnection databaseConnection;
-    final int CANDLE_DATA_POINTS=1440;
+    final int CANDLE_DATA_POINTS=2;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
 
     public BackTestingCalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue, dbConnection, symbol);
         this.databaseConnection = dbConnection;
         this.symbol = symbol;
+    }
+
+    public DatabaseConnection getDatabaseConnection() {
+        return databaseConnection;
     }
 
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
@@ -155,6 +160,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
     private String getFirstElementFromDBQuery(String query) {
+        logger.debug("Query = {}", query);
         String result = null;
         List<Map<String,String>> dbResultList = (List<Map<String,String>>)databaseConnection.executeQuery(query);
         if (CollectionUtils.isNotEmpty(dbResultList)) {
@@ -164,21 +170,41 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
     private void generateReportFromTradeData() {
-        List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT distinct(strategy_id) FROM trade");
+        List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT s.identifier, s.max_steps FROM strategy s where identifier in ( SELECT distinct(strategy_id) FROM trade)");
         if (CollectionUtils.isNotEmpty(distinctStrategyIdList)) {
             distinctStrategyIdList.forEach(row -> {
-                insertTradeReport(row.get("strategy_id"));
+                insertTradeReport(row);
+                updateMaxFailed(row.get("identifier"));
+
+
             } );
         }
     }
 
+    private void updateMaxFailed(String strategyId ){
+        logger.info("going to update the maxFailedSteps.");
 
-    private void insertTradeReport(String strategyId){
+        String maxFailedStepsQuery = "select max(step_count) from trade where trade.strategy_id = "+strategyId;
+        double maxFailedSteps = Double.parseDouble(getFirstElementFromDBQuery(maxFailedStepsQuery));
+
+        String updateQuery= "UPDATE amount_result set maxFailedSteps = "+maxFailedSteps+" WHERE strategy_id ="+strategyId;
+        logger.info("update Queru = {}", updateQuery);
+        databaseConnection.executeNoResultSet(updateQuery);
+        logger.info("going to update the maxFailedSteps.");
+
+    }
+
+    private void insertTradeReport(Map<String, String> row){
+        String strategyId = row.get("identifier");
+        String maxSteps = row.get("max_steps");
+
         String totalBidAmountQuery = "select sum(bid_amount) as query_result from trade where trade.strategy_id="+strategyId;
         String totalAmountWonQuery = "select sum(amount_won) as query_result from trade where trade.strategy_id="+strategyId;
         String totalSuccessfulTradesQuery="select count(*) as query_result from trade where result='SUCCESS' AND trade.strategy_id="+strategyId;
         String totalFailedTradesQuery="select count(*) as query_result from trade where result='FAIL' AND trade.strategy_id="+strategyId;
 
+//        double maxFailedSteps = Double.parseDouble(getFirstElementFromDBQuery(maxFailedStepsQuery));
+        double maxFailedSteps = 0D;
         double totalBidAmount = Double.parseDouble(getFirstElementFromDBQuery(totalBidAmountQuery));
         double totalAmountWon = Double.parseDouble(getFirstElementFromDBQuery(totalAmountWonQuery));
         double totalSuccessfulTrades = Double.parseDouble(getFirstElementFromDBQuery(totalSuccessfulTradesQuery));
@@ -186,14 +212,16 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         double diff = totalAmountWon - totalBidAmount;
         double totalTrades = totalSuccessfulTrades + totalFailedTrades;
 
-        String insertQuery = "INSERT INTO amount_result (strategy_id, total_bid_amount ,total_amount_won ,net_amount_diff,total_trades ,total_successful_trades, total_failed_trades) VALUES( ";
+        String insertQuery = "INSERT INTO amount_result (strategy_id, total_bid_amount ,total_amount_won ,net_amount_diff,total_trades ,total_successful_trades, total_failed_trades, max_steps, max_failed_steps) VALUES( ";
         insertQuery = insertQuery+strategyId + ","+
                 totalBidAmount + ","+
                 totalAmountWon + ","+
                 diff  + ","+
                 totalTrades + ","+
                 totalSuccessfulTrades + ","+
-                totalFailedTrades + ");";
+                totalFailedTrades + "," +
+                maxSteps + "," +
+                maxFailedSteps + ");";
 
         databaseConnection.executeNoResultSet(insertQuery);
     }

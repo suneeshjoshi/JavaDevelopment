@@ -5,5 +5,7 @@ total_amount_won bigint,
 net_amount_diff bigint,
 total_trades integer,
 total_successful_trades integer,
-total_failed_trades integer
+total_failed_trades integer,
+max_steps integer,
+max_failed_steps integer
 );
