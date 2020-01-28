@@ -87,7 +87,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
+            calculationEngineUtility.getBidAmount(nextTradeDetails);
 
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);

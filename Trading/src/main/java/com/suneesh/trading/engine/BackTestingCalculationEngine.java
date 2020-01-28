@@ -13,11 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.IntStream;
 
 
 public class BackTestingCalculationEngine extends CalculationEngine{
@@ -59,7 +57,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             databaseConnection.executeNoResultSet("UPDATE strategy SET max_steps = "+i+" WHERE strategy_name = 'Backtesting strategy 1'");
             logger.info("Setting Backtesting strategy's MAX Step = {}",i);
 
-            simualteAndReport(candleDataFromDB,test_run_id);
+            simulateAndReport(candleDataFromDB,test_run_id);
             test_run_id++;
         }
 
@@ -104,15 +102,18 @@ public class BackTestingCalculationEngine extends CalculationEngine{
                 lastTradeId = Long.valueOf(lastTrade.get("identifier"));
             }
 
-            Map<String, String> lastCandle = calculationEngineUtility.getLastCandle();
+            Map<String, String> lastCandle = candleData;
 
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
             calculationEngineUtility.getCallOrPut(nextTradeDetails, lastCandle);
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
-
+            calculationEngineUtility.getBidAmount(nextTradeDetails);
+            boolean closePriceAtDirectionExtreme = calculationEngineUtility.closePriceAtDirectionExtreme(lastCandle);
+            if(closePriceAtDirectionExtreme){
+                nextTradeDetails.setAmount(nextTradeDetails.getAmount()*2);
+            }
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
@@ -135,9 +136,14 @@ public class BackTestingCalculationEngine extends CalculationEngine{
                 tradeResult="SUCCESS";
             }
 
+            if(closePriceAtDirectionExtreme){
+                tradeResult=tradeResult+"INCREASED";
+            }
+
             String tradeResultString = "UPDATE trade SET result ='"+tradeResult+"', contract_id=identifier*100 ";
             String whereString = " WHERE identifier = "+nextTradeDetails.getTradeId();
-            if(tradeResult.equalsIgnoreCase("SUCCESS")){
+            if( (tradeResult.equalsIgnoreCase("SUCCESS") ) ||
+                    (tradeResult.equalsIgnoreCase("SUCCESSINCREASED") ) ){
                  tradeResultString = tradeResultString+", amount_won = "+nextTradeDetails.getAmount()*1.95;
             }
 
@@ -154,7 +160,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
 
-    private void simualteAndReport(List<Map<String, String>> candleDataFromDB, int test_run_id){
+    private void simulateAndReport(List<Map<String, String>> candleDataFromDB, int test_run_id){
         // Checking till Size - 1, as we are going to use 2 rows simultaneously
         for(int i=0;i<candleDataFromDB.size()-1;i++){
             Map<String,String> row = candleDataFromDB.get(i);
@@ -177,8 +183,6 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
 
     private int getTestRunId(){
-        String query_result2 = databaseConnection.getFirstElementFromDBQuery("select max(test_run_id) From amount_result");
-
         int test_run_id=1;
         List<Map<String,String>> lastTestRunIdResult = (List<Map<String,String>>)databaseConnection.executeQuery("select max(test_run_id) From amount_result");
         if (CollectionUtils.isNotEmpty(lastTestRunIdResult)) {
