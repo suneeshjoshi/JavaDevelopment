@@ -9,22 +9,26 @@ import com.suneesh.trading.models.requests.TickHistoryRequest;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-@Slf4j
 @Data
 public class BackTestingCalculationEngine extends CalculationEngine{
     private static final Logger logger = LogManager.getLogger();
     private String symbol;
     private DatabaseConnection databaseConnection;
-    final int CANDLE_DATA_POINTS=5000;
+    final int CANDLE_DATA_POINTS=1440;
+    final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
 
     public BackTestingCalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue, dbConnection, symbol);
@@ -35,7 +39,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
-        tickHistoryRequest.setCount(5000);
+        tickHistoryRequest.setCount(candleDataPoints);
         tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
     }
@@ -49,10 +53,10 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         if(!MapUtils.isEmpty(candleData)) {
             String previousCandleDirection = candleData.get("direction");
 
-            log.debug("************ : {}", previousCandleDirection);
-            for (Map.Entry<String, String> entry : candleData.entrySet()) {
-                log.debug("{} - {} ", entry.getKey(), entry.getValue());
-            }
+//            logger.debug("************ : {}", previousCandleDirection);
+//            for (Map.Entry<String, String> entry : candleData.entrySet()) {
+//                logger.debug("{} - {} ", entry.getKey(), entry.getValue());
+//            }
 
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
@@ -91,7 +95,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
             logger.info("SKIPPING Sending buy Contract Request as running in BACKTESTING MODE... ");
             logger.info("Checking next candle status to set result of the latest trade created now...");
-            String presentCandleDirection = nextCandleData.get("direction");
+            String presentCandleDirection = candleData.get("direction");
             String nextCandleDirection = nextCandleData.get("direction");
 
             String tradeResult=null;
@@ -102,7 +106,14 @@ public class BackTestingCalculationEngine extends CalculationEngine{
                 tradeResult="SUCCESS";
             }
 
-            String tradeResultString = "UPDATE trade SET result ='"+tradeResult+"' , contract_id=identifier*100 WHERE identifier = "+nextTradeDetails.getTradeId();
+            String tradeResultString = "UPDATE trade SET result ='"+tradeResult+"', contract_id=identifier*100 ";
+            String whereString = " WHERE identifier = "+nextTradeDetails.getTradeId();
+            if(tradeResult.equalsIgnoreCase("SUCCESS")){
+                 tradeResultString = tradeResultString+", amount_won = "+nextTradeDetails.getAmount()*1.95;
+            }
+
+            tradeResultString = tradeResultString+whereString;
+            logger.info("UPDATING trade result / amount / contract_id... {}",tradeResultString);
             databaseConnection.executeNoResultSet(tradeResultString);
 
         }
@@ -115,16 +126,16 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
 
     public void process(){
-        log.info("Request sent to Binary Websocket to get last {} candle data points ...");
+        logger.info("Request sent to Binary Websocket to get last {} candle data points ...");
         getCandleDetailsFromBinaryWS(symbol,CANDLE_DATA_POINTS);
 
-        log.info("getting candle data from DB ...");
+        logger.info("getting candle data from DB ...");
 
-        log.info("Waiting to receive data from Binary WS ...");
-        AutoTradingUtility.sleep(5000);
+        logger.info("Waiting to receive data from Binary WS ...");
+        AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
         List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
 
-        log.info("Received {} candle data points", candleDataFromDB.size());
+        logger.info("Received {} candle data points", candleDataFromDB.size());
 
         // Checking till Size - 1, as we are going to use 2 rows simultaneously
         for(int i=0;i<candleDataFromDB.size()-1;i++){
@@ -132,14 +143,31 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             Map<String,String> nextRow = candleDataFromDB.get(i+1);
 //
 //            for(Map.Entry<String,String> entry : row.entrySet()){
-//                log.info("{} - {} ", entry.getKey(), entry.getValue());
+//                logger.info("{} - {} ", entry.getKey(), entry.getValue());
 //            }
 
             createDummyTrade(row, nextRow);
 
         }
-
+        generateReportFromTradeData();
 
         System.exit(-1);
+    }
+
+    private void generateReportFromTradeData() {
+        String table = "amount_result";
+        File file = AutoTradingUtility.getFileFromResources("amount_result.sql");
+        try {
+            databaseConnection.executeNoResultSet(AutoTradingUtility.readFile(file));
+            if( !CollectionUtils.isEmpty(databaseConnection.executeQuery("select * from "+table) ))
+            {
+                logger.info("{} table populated.", table);
+            }
+            else{
+                logger.error("ERROR! {} table NOT populated.",table);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

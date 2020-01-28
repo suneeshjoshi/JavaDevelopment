@@ -191,7 +191,7 @@ public class CalculationEngineUtility {
         }
         else{
             Map<String, String> nextStrategySteps = getStrategySteps(nextTradeDetails.getStrategyId(), nextTradeDetails.getNextStepCount());
-            nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
+//            nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
             amount = Double.valueOf(nextStrategySteps.get("value"));
         }
         nextTradeDetails.setAmount(amount);
@@ -203,10 +203,10 @@ public class CalculationEngineUtility {
         if(!MapUtils.isEmpty(lastCandle)) {
             String previousCandleDirection = lastCandle.get("direction");
 
-            log.debug("************ : {}", previousCandleDirection);
-            for (Map.Entry<String, String> entry : lastCandle.entrySet()) {
-                log.debug("{} - {} ", entry.getKey(), entry.getValue());
-            }
+//            log.debug("************ : {}", previousCandleDirection);
+//            for (Map.Entry<String, String> entry : lastCandle.entrySet()) {
+//                log.debug("{} - {} ", entry.getKey(), entry.getValue());
+//            }
 
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
