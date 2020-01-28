@@ -128,7 +128,7 @@ public class CalculationEngineUtility {
             queryToExecute="select * from strategy WHERE identifier = "+strategyId;
         }
 
-        log.debug("getStrategy = {}",queryToExecute);
+//        log.debug("getStrategy = {}",queryToExecute);
         List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
         if( CollectionUtils.isEmpty(list)){
             log.error("Unable to find Strategy for query = {}",queryToExecute);
@@ -143,7 +143,8 @@ public class CalculationEngineUtility {
     private Map<String,String> getStrategySteps(int strategyId, int stepCount){
         Map<String, String>result = null;
         String queryToExecute="select * from strategy_steps WHERE strategy_id = "+strategyId+" AND step_count = "+stepCount;
-        log.debug("getStrategySteps = {}",queryToExecute);
+
+//        log.debug("getStrategySteps = {}",queryToExecute);
         List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
         if( CollectionUtils.isEmpty(list)){
             log.error("Unable to find StrategySteps for query = {}",queryToExecute);

@@ -202,7 +202,6 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     }
 
     public String getFirstElementFromDBQuery(String query) {
-        logger.debug("Query = {}", query);
         String result = null;
         List<HashMap<String, String>> dbResultList = executeQuery(query);
         if (CollectionUtils.isNotEmpty(dbResultList)) {

@@ -13,9 +13,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.IntStream;
 
 
 public class BackTestingCalculationEngine extends CalculationEngine{
@@ -36,6 +38,33 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         return databaseConnection;
     }
 
+    public void process(){
+        logger.info("Request sent to Binary Websocket to get last {} candle data points ...");
+        getCandleDetailsFromBinaryWS(symbol,CANDLE_DATA_POINTS);
+
+        logger.info("Waiting to receive data from Binary WS ...");
+        AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
+
+        logger.info("getting candle data from DB ...");
+        List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
+        logger.info("Received {} candle data points", candleDataFromDB.size());
+
+        int test_run_id = getTestRunId();
+
+        // Simulate different max_steps in the backtesting strategy.
+        for(int i = 1; i <= 10; ++i){
+            databaseConnection.executeNoResultSet("UPDATE strategy SET max_steps = "+i+" WHERE strategy_name = 'Backtesting strategy 1'");
+            logger.info("Setting Backtesting strategy's MAX Step = {}",i);
+
+            simualteAndReport(candleDataFromDB,test_run_id);
+            test_run_id++;
+        }
+
+
+        System.exit(-1);
+    }
+
+
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
@@ -53,15 +82,9 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         if(!MapUtils.isEmpty(candleData)) {
             String previousCandleDirection = candleData.get("direction");
 
-//            logger.debug("************ : {}", previousCandleDirection);
-//            for (Map.Entry<String, String> entry : candleData.entrySet()) {
-//                logger.debug("{} - {} ", entry.getKey(), entry.getValue());
-//            }
-
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
         nextTradeDetails.setCallOrPut(callOrPutResult);
-//        return callOrPutResult;
     }
 
 
@@ -90,11 +113,12 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
 
             String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
-            logger.debug(tradeInsertStatement);
+//            logger.debug(tradeInsertStatement);
+
             calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
 
-            logger.info("SKIPPING Sending buy Contract Request as running in BACKTESTING MODE... ");
-            logger.info("Checking next candle status to set result of the latest trade created now...");
+//            logger.debug("SKIPPING Sending buy Contract Request as running in BACKTESTING MODE... ");
+//            logger.debug("Checking next candle status to set result of the latest trade created now...");
             String presentCandleDirection = candleData.get("direction");
             String nextCandleDirection = nextCandleData.get("direction");
 
@@ -113,7 +137,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             }
 
             tradeResultString = tradeResultString+whereString;
-            logger.info("UPDATING trade result / amount / contract_id... {}",tradeResultString);
+//            logger.info("UPDATING trade result / amount / contract_id... {}",tradeResultString);
             databaseConnection.executeNoResultSet(tradeResultString);
 
         }
@@ -125,18 +149,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
 
-    public void process(){
-        logger.info("Request sent to Binary Websocket to get last {} candle data points ...");
-        getCandleDetailsFromBinaryWS(symbol,CANDLE_DATA_POINTS);
-
-        logger.info("Waiting to receive data from Binary WS ...");
-        AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
-
-        logger.info("getting candle data from DB ...");
-        List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
-
-        logger.info("Received {} candle data points", candleDataFromDB.size());
-
+    private void simualteAndReport(List<Map<String, String>> candleDataFromDB, int test_run_id){
         // Checking till Size - 1, as we are going to use 2 rows simultaneously
         for(int i=0;i<candleDataFromDB.size()-1;i++){
             Map<String,String> row = candleDataFromDB.get(i);
@@ -144,14 +157,11 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
             createDummyTrade(row, nextRow);
         }
-        generateReportFromTradeData();
+        generateReportFromTradeData(test_run_id);
 
-        System.exit(-1);
     }
 
-    private void generateReportFromTradeData() {
-        int test_run_id = getTestRunId();
-
+    private void generateReportFromTradeData(int test_run_id) {
         List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT s.identifier, s.max_steps FROM strategy s where identifier in ( SELECT distinct(strategy_id) FROM trade)");
         if (CollectionUtils.isNotEmpty(distinctStrategyIdList)) {
             for(Map<String,String> row : distinctStrategyIdList) {
@@ -162,6 +172,8 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
 
     private int getTestRunId(){
+        String query_result2 = databaseConnection.getFirstElementFromDBQuery("select max(test_run_id) From amount_result");
+
         int test_run_id=1;
         List<Map<String,String>> lastTestRunIdResult = (List<Map<String,String>>)databaseConnection.executeQuery("select max(test_run_id) From amount_result");
         if (CollectionUtils.isNotEmpty(lastTestRunIdResult)) {
