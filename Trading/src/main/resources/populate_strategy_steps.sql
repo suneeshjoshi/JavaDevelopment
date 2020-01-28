@@ -1,4 +1,4 @@
-DELETE FROM public.strategy_steps WHERE strategy_id in ( 1,2 );
+DELETE FROM public.strategy_steps WHERE strategy_id in ( 1,2,3);
 
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (1, 1, 1.00);
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (1, 2, 2.50);

@@ -26,4 +26,6 @@ public interface DatabaseConnection {
     void checkAndPopulateTables();
 
     void init(boolean backTestingMode);
+
+    String getFirstElementFromDBQuery(String Query);
 }
