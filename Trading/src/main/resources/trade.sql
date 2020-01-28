@@ -12,4 +12,5 @@ CREATE TABLE IF NOT EXISTS public.trade
     trade_time_string timestamp,
     amount_won numeric(19,4) NOT NULL,
     CONSTRAINT trade_pkey PRIMARY KEY (identifier)
-)
+);
+

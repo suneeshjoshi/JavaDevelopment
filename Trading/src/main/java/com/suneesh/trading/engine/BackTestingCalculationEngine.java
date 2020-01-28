@@ -154,20 +154,47 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         System.exit(-1);
     }
 
-    private void generateReportFromTradeData() {
-        String table = "amount_result";
-        File file = AutoTradingUtility.getFileFromResources("amount_result.sql");
-        try {
-            databaseConnection.executeNoResultSet(AutoTradingUtility.readFile(file));
-            if( !CollectionUtils.isEmpty(databaseConnection.executeQuery("select * from "+table) ))
-            {
-                logger.info("{} table populated.", table);
-            }
-            else{
-                logger.error("ERROR! {} table NOT populated.",table);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private String getFirstElementFromDBQuery(String query) {
+        String result = null;
+        List<Map<String,String>> dbResultList = (List<Map<String,String>>)databaseConnection.executeQuery(query);
+        if (CollectionUtils.isNotEmpty(dbResultList)) {
+            result = dbResultList.get(0).get("query_result");
         }
+        return result;
+    }
+
+    private void generateReportFromTradeData() {
+        List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT distinct(strategy_id) FROM trade");
+        if (CollectionUtils.isNotEmpty(distinctStrategyIdList)) {
+            distinctStrategyIdList.forEach(row -> {
+                insertTradeReport(row.get("strategy_id"));
+            } );
+        }
+    }
+
+
+    private void insertTradeReport(String strategyId){
+        String totalBidAmountQuery = "select sum(bid_amount) as query_result from trade where trade.strategy_id="+strategyId;
+        String totalAmountWonQuery = "select sum(amount_won) as query_result from trade where trade.strategy_id="+strategyId;
+        String totalSuccessfulTradesQuery="select count(*) as query_result from trade where result='SUCCESS' AND trade.strategy_id="+strategyId;
+        String totalFailedTradesQuery="select count(*) as query_result from trade where result='FAIL' AND trade.strategy_id="+strategyId;
+
+        double totalBidAmount = Double.parseDouble(getFirstElementFromDBQuery(totalBidAmountQuery));
+        double totalAmountWon = Double.parseDouble(getFirstElementFromDBQuery(totalAmountWonQuery));
+        double totalSuccessfulTrades = Double.parseDouble(getFirstElementFromDBQuery(totalSuccessfulTradesQuery));
+        double totalFailedTrades = Double.parseDouble(getFirstElementFromDBQuery(totalFailedTradesQuery));
+        double diff = totalAmountWon - totalBidAmount;
+        double totalTrades = totalSuccessfulTrades + totalFailedTrades;
+
+        String insertQuery = "INSERT INTO amount_result (strategy_id, total_bid_amount ,total_amount_won ,net_amount_diff,total_trades ,total_successful_trades, total_failed_trades) VALUES( ";
+        insertQuery = insertQuery+strategyId + ","+
+                totalBidAmount + ","+
+                totalAmountWon + ","+
+                diff  + ","+
+                totalTrades + ","+
+                totalSuccessfulTrades + ","+
+                totalFailedTrades + ");";
+
+        databaseConnection.executeNoResultSet(insertQuery);
     }
 }
