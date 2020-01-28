@@ -11,7 +11,6 @@ import org.apache.commons.collections4.MapUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -184,7 +183,7 @@ public class CalculationEngineUtility {
         nextTradeDetails.setStrategyId(nextTradeStrategyId);
     }
 
-    void getBidAmount(NextTradeDetails nextTradeDetails) {
+    void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
         double amount = INITIAL_BID_AMOUNT;
         Map<String, String> lastTrade = getLastTrade();
         if(MapUtils.isEmpty(lastTrade)){
@@ -194,13 +193,40 @@ public class CalculationEngineUtility {
             Map<String, String> nextStrategySteps = getStrategySteps(nextTradeDetails.getStrategyId(), nextTradeDetails.getNextStepCount());
 //            nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
             amount = Double.valueOf(nextStrategySteps.get("value"));
+
+            // Here i am testing the logic to see if the close value of the
+            // candle is high or low , then the chance of next candle going in similar direction is higher
+            if(lastCandle!=null){
+                double high = Double.parseDouble(lastCandle.get("high"));
+                double low = Double.parseDouble(lastCandle.get("low"));
+                double open = Double.parseDouble(lastCandle.get("open"));
+                double close = Double.parseDouble(lastCandle.get("close"));
+                String direction = lastCandle.get("direction");
+
+                if(direction.equalsIgnoreCase("UP")){
+                    log.info("DIRECTION UP, CLOSE IS HIGH. INCREASING AMOUNT FROM {} -> {}", amount, amount*2);
+                    if(close==high){
+                        amount = amount*2;
+                    }
+                }
+
+                if(direction.equalsIgnoreCase("DOWN")){
+                    log.info("DIRECTION DOWN, CLOSE IS LOW. INCREASING AMOUNT FROM {} -> {}", amount, amount*2);
+                    if(close==low){
+                        amount = amount*2;
+                    }
+                }
+
+
+            }
+
+
         }
         nextTradeDetails.setAmount(amount);
     }
 
-    void getCallOrPut(NextTradeDetails nextTradeDetails){
+    void getCallOrPut(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
         String callOrPutResult = "CALL";
-        Map<String, String> lastCandle = getLastCandle();
         if(!MapUtils.isEmpty(lastCandle)) {
             String previousCandleDirection = lastCandle.get("direction");
 

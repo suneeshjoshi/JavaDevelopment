@@ -79,13 +79,15 @@ public class CalculationEngine extends AbstractCommandGenerator {
                 lastTradeId = Long.valueOf(lastTrade.get("identifier"));
             }
 
+            Map<String, String> lastCandle = calculationEngineUtility.getLastCandle();
+
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
 
-            calculationEngineUtility.getCallOrPut(nextTradeDetails);
+            calculationEngineUtility.getCallOrPut(nextTradeDetails, lastCandle);
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails);
+            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
 
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);

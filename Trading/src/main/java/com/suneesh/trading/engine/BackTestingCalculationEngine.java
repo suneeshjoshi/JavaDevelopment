@@ -52,7 +52,10 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         int test_run_id = getTestRunId();
 
         // Simulate different max_steps in the backtesting strategy.
-        for(int i = 1; i <= 10; ++i){
+//        for(int i = 1; i <= 10; ++i){
+
+        // Defaulting to 5 steps.
+        for(int i = 5; i <= 5; ++i){
             databaseConnection.executeNoResultSet("UPDATE strategy SET max_steps = "+i+" WHERE strategy_name = 'Backtesting strategy 1'");
             logger.info("Setting Backtesting strategy's MAX Step = {}",i);
 
@@ -63,7 +66,6 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
         System.exit(-1);
     }
-
 
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
@@ -102,12 +104,15 @@ public class BackTestingCalculationEngine extends CalculationEngine{
                 lastTradeId = Long.valueOf(lastTrade.get("identifier"));
             }
 
+            Map<String, String> lastCandle = calculationEngineUtility.getLastCandle();
+
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
-            getCallOrPutFromCandleData(nextTradeDetails,candleData);
+            calculationEngineUtility.getCallOrPut(nextTradeDetails, lastCandle);
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails);
+            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
+
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
