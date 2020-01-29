@@ -28,8 +28,8 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         this.URL =url;
         this.connection = createConnection();
 
-        this.listOfTables = AutoTradingUtility.readListFromPropertyFile("ListOfDatabaseTables");
-        this.tablesToPopulate = AutoTradingUtility.readListFromPropertyFile("DatabaseTablesToPopulate");
+        this.listOfTables = AutoTradingUtility.readListFromPropertyFile("ListOfDatabaseTablesToCreate");
+        this.tablesToPopulate = AutoTradingUtility.readListFromPropertyFile("ListOfDatabaseTablesToPopulate");
         this.dropDbTables = Boolean.parseBoolean(AutoTradingUtility.getPropertyFromPropertyFile("DropDatabaseTables"));
 
         String listToDrop = AutoTradingUtility.getPropertyFromPropertyFile("ListOfDatabaseTablesToDrop");
