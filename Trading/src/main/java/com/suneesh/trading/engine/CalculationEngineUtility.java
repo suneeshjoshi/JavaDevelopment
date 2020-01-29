@@ -2,6 +2,7 @@ package com.suneesh.trading.engine;
 
 import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.engine.technical.BollingerBand;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class CalculationEngineUtility {
     final static long CONTRACT_DURATION_IN_SECONDS = 58L;
     final static double INITIAL_BID_AMOUNT = 1.00D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
+    final int BOLLINGER_BAND_DATA_COUNT=20;
 
     public CalculationEngineUtility(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -41,14 +43,24 @@ public class CalculationEngineUtility {
     }
 
     Map<String,String> getLastCandle(){
-        List<Map<String, String>> lastCandleList = null;
-        Map<String,String> lastCandle = null;
-        lastCandleList = (databaseConnection.executeQuery("select * from candle order by identifier desc limit 1"));
-        if(!CollectionUtils.isEmpty(lastCandleList)){
-            lastCandle = lastCandleList.get(0);
+        Map<String,String> result =null;
+        List<Map<String, String>> allCandles = getAllCandles(true);
+        if(CollectionUtils.isNotEmpty(allCandles)){
+            result = allCandles.get(0);
         }
-        return lastCandle;
+        return result;
     }
+
+    List<Map<String,String>> getAllCandles(boolean getLastCandle){
+        String query = "select * from candle order by identifier";
+        if(getLastCandle) {
+            query = "select * from candle order by identifier desc limit 1";
+        }
+
+        return databaseConnection.executeQuery(query);
+    }
+
+
 
     Map<String,String> getLastTrade(){
         Map<String,String> result = null;
@@ -273,4 +285,25 @@ public class CalculationEngineUtility {
         Gson gson = new Gson();
         return gson.fromJson(json, BuyContractParameters.class);
     }
+
+    public void calculateBollingerBands(List<Map<String, String>> candleDataFromDB) {
+        if(CollectionUtils.isNotEmpty(candleDataFromDB)) {
+            if(candleDataFromDB.size()>BOLLINGER_BAND_DATA_COUNT) {
+                for(int i=0;i<=candleDataFromDB.size()-BOLLINGER_BAND_DATA_COUNT; ++i){
+                    int start = i;
+                    int end = i + BOLLINGER_BAND_DATA_COUNT;
+
+                    List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
+
+                    BollingerBand bollingerBand = new BollingerBand(candleSubList);
+                    bollingerBand.calculate();
+                    log.info(bollingerBand.toString());
+
+                    bollingerBand.writeToDB(databaseConnection);
+                }
+            }
+        }
+        log.info("Bollinger Band calculations done.");
+    }
+
 }

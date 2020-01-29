@@ -116,6 +116,11 @@ WebsocketListener extends WebSocketListener {
                                     writeToDatabase(tickHistoryResponse, false);
                                 }
 
+                                CalculationEngineUtility calculationEngineUtility = new CalculationEngineUtility(databaseConnection);
+                                List<Map<String, String>> allCandles = calculationEngineUtility.getAllCandles(false);
+
+                                calculationEngineUtility.calculateBollingerBands(allCandles);
+
                                 break;
                             case "ohlc":
 

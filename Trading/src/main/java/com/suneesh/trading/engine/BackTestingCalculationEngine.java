@@ -28,7 +28,6 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     private DatabaseConnection databaseConnection;
     final int CANDLE_DATA_POINTS=1440;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
-    final int BOLLINGER_BAND_DATA_COUNT=20;
 
     public BackTestingCalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue, dbConnection, symbol);
@@ -51,7 +50,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
-        calculateBollingerBands(candleDataFromDB);
+        calculationEngineUtility.calculateBollingerBands(candleDataFromDB);
 
         int test_run_id = getTestRunId();
 
@@ -71,26 +70,6 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         System.exit(-1);
     }
 
-    private void calculateBollingerBands(List<Map<String, String>> candleDataFromDB) {
-        if(CollectionUtils.isNotEmpty(candleDataFromDB)) {
-            if(candleDataFromDB.size()>BOLLINGER_BAND_DATA_COUNT) {
-                for(int i=0;i<=candleDataFromDB.size()-BOLLINGER_BAND_DATA_COUNT; ++i){
-                    int start = i;
-                    int end = i + BOLLINGER_BAND_DATA_COUNT;
-
-                    List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
-//                    List<Double> closePriceList = candleSubList.stream().map(f -> Double.parseDouble(f.get("close"))).collect(Collectors.toList());
-
-                    BollingerBand bollingerBand = new BollingerBand(candleSubList);
-                    bollingerBand.calculate();
-                    logger.info(bollingerBand.toString());
-
-                    bollingerBand.writeToDB(databaseConnection);
-                }
-            }
-        }
-        logger.info("Bollinger Band calculations done.");
-    }
 
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
@@ -101,7 +80,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     }
 
     private List getCandleDataFromDB(){
-        return getDatabaseConnection().executeQuery("Select * from candle order by identifier ASC");
+        return getDatabaseConnection().executeQuery("/order by identifier ASC");
     }
 
     void getCallOrPutFromCandleData(NextTradeDetails nextTradeDetails, Map<String,String> candleData){

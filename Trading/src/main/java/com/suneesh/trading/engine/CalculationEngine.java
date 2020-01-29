@@ -31,7 +31,7 @@ public class CalculationEngine extends AbstractCommandGenerator {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setSubscribe(1);
-        tickHistoryRequest.setCount(1);
+        tickHistoryRequest.setCount(25);
         tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
     }
