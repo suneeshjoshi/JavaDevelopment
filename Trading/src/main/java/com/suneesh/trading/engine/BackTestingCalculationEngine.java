@@ -1,6 +1,7 @@
 package com.suneesh.trading.engine;
 
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.engine.technical.BollingerBand;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.models.requests.BuyContractRequest;
@@ -13,9 +14,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 
 public class BackTestingCalculationEngine extends CalculationEngine{
@@ -25,6 +28,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     private DatabaseConnection databaseConnection;
     final int CANDLE_DATA_POINTS=1440;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
+    final int BOLLINGER_BAND_DATA_COUNT=20;
 
     public BackTestingCalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue, dbConnection, symbol);
@@ -47,6 +51,8 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
+        calculateBollingerBands(candleDataFromDB);
+
         int test_run_id = getTestRunId();
 
         // Simulate different max_steps in the backtesting strategy.
@@ -63,6 +69,27 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
 
         System.exit(-1);
+    }
+
+    private void calculateBollingerBands(List<Map<String, String>> candleDataFromDB) {
+        if(CollectionUtils.isNotEmpty(candleDataFromDB)) {
+            if(candleDataFromDB.size()>BOLLINGER_BAND_DATA_COUNT) {
+                for(int i=0;i<=candleDataFromDB.size()-BOLLINGER_BAND_DATA_COUNT; ++i){
+                    int start = i;
+                    int end = i + BOLLINGER_BAND_DATA_COUNT;
+
+                    List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
+//                    List<Double> closePriceList = candleSubList.stream().map(f -> Double.parseDouble(f.get("close"))).collect(Collectors.toList());
+
+                    BollingerBand bollingerBand = new BollingerBand(candleSubList);
+                    bollingerBand.calculate();
+                    logger.info(bollingerBand.toString());
+
+                    bollingerBand.writeToDB(databaseConnection);
+                }
+            }
+        }
+        logger.info("Bollinger Band calculations done.");
     }
 
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
@@ -110,7 +137,10 @@ public class BackTestingCalculationEngine extends CalculationEngine{
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
             calculationEngineUtility.getBidAmount(nextTradeDetails);
-            boolean closePriceAtDirectionExtreme = calculationEngineUtility.closePriceAtDirectionExtreme(lastCandle);
+
+            boolean closePriceAtDirectionExtreme = calculationEngineUtility.closePriceAtDirectionExtreme(nextTradeDetails,lastCandle);
+//            boolean closePriceAtDirectionExtreme = false;
+
             if(closePriceAtDirectionExtreme){
                 nextTradeDetails.setAmount(nextTradeDetails.getAmount()*2);
             }

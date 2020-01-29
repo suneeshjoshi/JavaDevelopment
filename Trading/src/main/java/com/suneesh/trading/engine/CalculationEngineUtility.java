@@ -213,8 +213,9 @@ public class CalculationEngineUtility {
 //        return callOrPutResult;
     }
 
-    boolean closePriceAtDirectionExtreme(Map<String, String> lastCandle){
+    boolean closePriceAtDirectionExtreme(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
         boolean result = false;
+        final int maxStepCountToApplyFactor=3;
         // Here i am testing the logic to see if the close value of the
         // candle is high or low , then the chance of next candle going in similar direction is higher
         if(lastCandle!=null){
@@ -226,14 +227,14 @@ public class CalculationEngineUtility {
             String direction = lastCandle.get("direction");
 
             if(direction.equalsIgnoreCase("UP")){
-                if(close==high){
+                if(close==high && nextTradeDetails.nextStepCount<=maxStepCountToApplyFactor){
                     log.info(lastCandle.toString());
                     result= true;
                 }
             }
 
             if(direction.equalsIgnoreCase("DOWN")){
-                if(close==low){
+                if(close==low && nextTradeDetails.nextStepCount<=maxStepCountToApplyFactor){
                     log.info(lastCandle.toString());
                     result= true;
                 }
