@@ -1,14 +1,12 @@
 package com.suneesh.trading.core;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.suneesh.trading.core.calculations.Engine;
 import com.suneesh.trading.core.calculations.Utility;
-import com.suneesh.trading.core.strategy.StrategyImplementation;
+import com.suneesh.trading.core.strategy.CandleFollowWithIncreaseStrategyImplementation;
+import com.suneesh.trading.core.strategy.ClosePriceHighLowStrategyImplementation;
+import com.suneesh.trading.core.strategy.StrategyImplementationInterface;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
-import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.models.requests.BuyContractRequest;
@@ -25,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class BackTestingEngine extends Engine {
@@ -34,7 +30,7 @@ public class BackTestingEngine extends Engine {
     private String symbol;
 
     private DatabaseConnection databaseConnection;
-    final int CANDLE_DATA_POINTS=10;
+    final int CANDLE_DATA_POINTS=21;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
 
     public BackTestingEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
@@ -48,7 +44,7 @@ public class BackTestingEngine extends Engine {
     }
 
     public void process(){
-        List<Strategy> strategies = getCalculationEngineUtility().loadAllStrategies();
+        getCalculationUtility().loadAllStrategies();
         logger.info("Loading all Strategy Objects.");
 
         logger.info("Request sent to Binary Websocket to get last {} candle data points ...");
@@ -58,7 +54,7 @@ public class BackTestingEngine extends Engine {
         AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
 
         logger.info("getting candle data from DB ...");
-        List<Map<String,String>> candleDataFromDB = getCalculationEngineUtility().getCandles(Optional.empty(), Optional.empty());
+        List<Map<String,String>> candleDataFromDB = getCalculationUtility().getCandles(Optional.empty(), Optional.empty());
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
         getCalculateSignals().calculateBollingerBands(candleDataFromDB, Optional.empty());
@@ -81,17 +77,12 @@ public class BackTestingEngine extends Engine {
         System.exit(-1);
     }
 
-
     public void getCandleDetailsFromBinaryWS(String symbol, int candleDataPoints) {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setCount(candleDataPoints);
         tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
-    }
-
-    private List getCandleDataFromDB(){
-        return getDatabaseConnection().executeQuery("Select * from candle order by identifier ASC");
     }
 
     void getCallOrPutFromCandleData(NextTradeDetails nextTradeDetails, Map<String,String> candleData){
@@ -107,38 +98,45 @@ public class BackTestingEngine extends Engine {
 
     private void createDummyTrade(Map<String, String> candleData, Map<String, String> nextCandleData){
         try {
-            Utility calculationEngineUtility = getCalculationEngineUtility();
-            String currency = calculationEngineUtility.getCurrency();
+            Utility calculationUtility = getCalculationUtility();
+            String currency = calculationUtility.getCurrency();
             if(currency.isEmpty()){
                 logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");
                 System.exit(-1);
             }
 
-            Map<String, String> lastTrade = calculationEngineUtility.getLastTrade();
+            Map<String, String> lastTrade = calculationUtility.getLastTrade();
             long lastTradeId = 0L;
             if(!MapUtils.isEmpty(lastTrade)){
                 lastTradeId = Long.valueOf(lastTrade.get("identifier"));
             }
 
             Map<String, String> lastCandle = candleData;
-
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
-            calculationEngineUtility.getCallOrPut(nextTradeDetails, lastCandle);
-            calculationEngineUtility.getContractDuration(nextTradeDetails);
-            calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
 
-            StrategyImplementation strategyImplementation = new StrategyImplementation();
-            strategyImplementation.calculateAmount(nextTradeDetails,lastCandle);
+            Strategy strategyToUse = calculationUtility.getStrategyToUse();
 
-            BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
+            // Get Present Strategy's details for booking trade
+            StrategyImplementationInterface strategy = new CandleFollowWithIncreaseStrategyImplementation(databaseConnection, strategyToUse, calculationUtility);
+//            StrategyImplementationInterface strategy = new ClosePriceHighLowStrategyImplementation(databaseConnection,  strategyToUse);
+
+            strategy.getCallOrPut(nextTradeDetails, lastCandle);
+            strategy.getContractDuration(nextTradeDetails);
+            strategy.getNextStepCount(nextTradeDetails, lastTrade);
+            strategy.getNextTradeStrategyId(nextTradeDetails, lastTrade);
+            strategy.getBidAmount(nextTradeDetails, lastCandle);
+
+
+
+
+
+            BuyContractParameters parameters = calculationUtility.getParameters(symbol, nextTradeDetails, currency);
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
 
-            String tradeInsertStatement = calculationEngineUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
+            String tradeInsertStatement = calculationUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
 //            logger.debug(tradeInsertStatement);
 
-            calculationEngineUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
+            calculationUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
 
 //            logger.debug("SKIPPING Sending buy Contract Request as running in BACKTESTING MODE... ");
 //            logger.debug("Checking next candle status to set result of the latest trade created now...");
@@ -153,9 +151,9 @@ public class BackTestingEngine extends Engine {
                 tradeResult="SUCCESS";
             }
 
-            if(strategyImplementation.closePriceAtDirectionExtreme(nextTradeDetails, lastCandle)){
-                tradeResult=tradeResult+"INCREASED";
-            }
+//            if(strategyImplementation.closePriceAtDirectionExtreme(nextTradeDetails, lastCandle)){
+//                tradeResult=tradeResult+"INCREASED";
+//            }
 
             String tradeResultString = "UPDATE trade SET result ='"+tradeResult+"', contract_id=identifier*100 ";
             String whereString = " WHERE identifier = "+nextTradeDetails.getTradeId();

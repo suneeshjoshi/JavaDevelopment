@@ -40,6 +40,11 @@ public class Strategy {
     @Expose
     boolean resetStepCountOnSuccess;
 
+
+    @SerializedName("active_strategy")
+    @Expose
+    boolean activeStrategy;
+
     HashMap<Integer, Double> stepValuesMap = new HashMap<>();
 
     public void setStepValueMap(List<StrategySteps> strategyStepsList){

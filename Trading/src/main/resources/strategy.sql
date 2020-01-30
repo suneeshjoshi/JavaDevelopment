@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.strategy
     next_strategy_id_link INTEGER,
     is_default_strategy boolean,
     reset_step_count_on_success boolean,
+    active_strategy boolean,
     CONSTRAINT strategy_pkey PRIMARY KEY (identifier)
 )
 

@@ -6,7 +6,7 @@ import lombok.Data;
 public class NextTradeDetails {
         long tradeId;
         double amount;
-        int strategyId;
+        long strategyId;
         String callOrPut ;
         long contractDuration;
         int nextStepCount;

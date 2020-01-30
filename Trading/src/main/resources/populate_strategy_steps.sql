@@ -29,3 +29,14 @@ INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (3, 8, 
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (3, 9, 1525.88);
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (3, 10, 3814.70);
 
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 1, 1.00);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 2, 2.50);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 3, 6.25);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 4, 15.63);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 5, 39.07);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 6, 97.66);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 7, 244.14);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 8, 610.35);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 9, 1525.88);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (4, 10, 3814.70);
+

@@ -16,18 +16,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @Slf4j
 public class Utility {
-
-
     private DatabaseConnection databaseConnection;
-//    final static long CONTRACT_DURATION_IN_SECONDS = 60L;
-    final static long CONTRACT_DURATION_IN_SECONDS = 58L;
-    final static double INITIAL_BID_AMOUNT = 1.00D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
+    List<Strategy> allStrategies;
 
     public Utility(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -36,16 +34,17 @@ public class Utility {
     public String getCurrency(){
         String applicationMode = AutoTradingUtility.getPropertyFromPropertyFile("ApplicationMode");
         String currencyProperty = applicationMode+ACCOUNT_CURRENCY;
-        return (AutoTradingUtility.getPropertyFromPropertyFile(currencyProperty));
+        String currency = AutoTradingUtility.getPropertyFromPropertyFile(currencyProperty);
+        if(currency.isEmpty()){
+            log.error("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");
+            System.exit(-1);
+        }
+        return currency;
     }
 
     void sleepTillStartOfNextMinute(){
         int secondsToNextMinute = 60- Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)%60);
         AutoTradingUtility.sleep(secondsToNextMinute*1000);
-    }
-
-    List<Map<String,String>> getAllCandles(){
-        return getCandles(Optional.empty(), Optional.empty());
     }
 
     Map<String,String> getLastCandle(){
@@ -64,45 +63,6 @@ public class Utility {
         return databaseConnection.executeQuery("select * from candle order by identifier "+querySortOrder+" limit "+queryResultLimit);
     }
 
-
-
-    public Map<String,String> getLastTrade(){
-        Map<String,String> result = null;
-        List<Map<String,String>> list = databaseConnection.executeQuery("select * from trade order by identifier desc limit 1");
-        if(!CollectionUtils.isEmpty(list)){
-            result = list.get(0);
-        }
-        return result;
-    }
-
-    public void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-        int stepCount = 1;
-//        Map<String, String> lastTrade = getLastTrade();
-
-        if(!MapUtils.isEmpty(lastTrade)){
-            String previousTradeResult = String.valueOf(lastTrade.get("result"));
-            int previousTradeStrategyID =  Integer.valueOf(lastTrade.get("strategy_id"));
-            int previousStepCount = Integer.parseInt(lastTrade.get("step_count"));
-            Map<String, String> previousTradeStrategy = getStrategy(previousTradeStrategyID,false);
-            boolean reset_step_count_on_success = previousTradeStrategy.getOrDefault("reset_step_count_on_success", "True").equalsIgnoreCase("True");
-
-            if(previousTradeResult.equalsIgnoreCase("SUCCESS") ){
-                if(reset_step_count_on_success) {
-                    stepCount = 1;
-                }
-                else{
-                    stepCount=previousStepCount+1;
-                }
-            }
-
-            if(previousTradeResult.equalsIgnoreCase("FAIL")){
-//                stepCount = Integer.valueOf(lastTrade.get("step_count"));
-                stepCount=previousStepCount+1;
-            }
-        }
-        nextTradeDetails.setNextStepCount(stepCount);
-    }
-
     public String getTradeDatabaseInsertString(BuyContractParameters parameters, NextTradeDetails nextTradeDetails) {
         return
                 "INSERT INTO public.trade " +
@@ -117,117 +77,18 @@ public class Utility {
                         +"0.00 );";
     }
 
-    public void getContractDuration(NextTradeDetails nextTradeDetails) {
-        nextTradeDetails.setContractDuration(CONTRACT_DURATION_IN_SECONDS);
-    }
 
-    private double getInitialTradeAmount(){
-        // Lowest amount possible.
-        double amount = INITIAL_BID_AMOUNT;
-        List<Map<String,String>> result = databaseConnection.executeQuery(
-                "select ss.value from strategy_steps ss join strategy s on ( ss.strategy_id = s.identifier ) WHERE s.is_default_strategy=true and ss.step_count=1");
-        if(!CollectionUtils.isEmpty(result)){
-            Map<String,String> firstRow = result.get(0);
-            amount = Double.valueOf(firstRow.get("value"));
-        }
-        return amount;
-    }
 
-    private Map<String,String> getStrategy(int strategyId, boolean defaultStrategy){
-        Map<String, String>result = null;
-        String queryToExecute="";
-        if(defaultStrategy){
-            queryToExecute="select * From strategy where strategy.is_default_strategy = true";
-        }
-        else{
-            queryToExecute="select * from strategy WHERE identifier = "+strategyId;
-        }
-
-//        log.debug("getStrategy = {}",queryToExecute);
-        List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
-        if( CollectionUtils.isEmpty(list)){
-            log.error("Unable to find Strategy for query = {}",queryToExecute);
-        }
-        else{
-            result= list.get(0);
+    public Map<String,String> getLastTrade(){
+        Map<String,String> result = null;
+        List<Map<String,String>> list = databaseConnection.executeQuery("select * from trade order by identifier desc limit 1");
+        if(!CollectionUtils.isEmpty(list)){
+            result = list.get(0);
         }
         return result;
     }
 
 
-    private Map<String,String> getStrategySteps(int strategyId, int stepCount){
-        Map<String, String>result = null;
-        String queryToExecute="select * from strategy_steps WHERE strategy_id = "+strategyId+" AND step_count = "+stepCount;
-
-//        log.debug("getStrategySteps = {}",queryToExecute);
-        List<Map<String, String>> list = (List<Map<String, String>>) databaseConnection.executeQuery(queryToExecute);
-        if( CollectionUtils.isEmpty(list)){
-            log.error("Unable to find StrategySteps for query = {}",queryToExecute);
-        }
-        else{
-            result= list.get(0);
-        }
-        return result;
-
-    }
-
-
-    public void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-        int nextTradeStrategyId = -1;
-
-        if( !MapUtils.isEmpty(lastTrade)) {
-            // Lowest amount possible.
-            int previousTradeStrategyId = Integer.valueOf(lastTrade.getOrDefault("strategy_id","1"));
-
-            Map<String, String> strategy = getStrategy(previousTradeStrategyId, false);
-            int maxSteps = Integer.valueOf(strategy.get("max_steps"));
-            if (nextTradeDetails.getNextStepCount() > maxSteps) {
-                nextTradeStrategyId = Integer.valueOf(strategy.get("next_strategy_id_link"));
-
-                // Resetting step_count to 1
-                nextTradeDetails.setNextStepCount(1);
-            }
-            else{
-                nextTradeStrategyId = previousTradeStrategyId;
-            }
-        }
-        else{
-            Map<String, String> strategy = getStrategy(-1, true);
-            nextTradeStrategyId = Integer.valueOf(strategy.get("identifier"));
-
-        }
-        nextTradeDetails.setStrategyId(nextTradeStrategyId);
-    }
-
-    public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
-        double amount = INITIAL_BID_AMOUNT;
-        Map<String, String> lastTrade = getLastTrade();
-        if(MapUtils.isEmpty(lastTrade)){
-            getInitialTradeAmount();
-        }
-        else{
-            Map<String, String> nextStrategySteps = getStrategySteps(nextTradeDetails.getStrategyId(), nextTradeDetails.getNextStepCount());
-//            nextStrategySteps.entrySet().forEach(e->log.info("STRATEGY_STEPS : {} - {}", e.getKey(),e.getValue()));
-            amount = Double.valueOf(nextStrategySteps.get("value"));
-        }
-        nextTradeDetails.setAmount(amount);
-    }
-
-    public void getCallOrPut(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
-        String callOrPutResult = "CALL";
-        if(!MapUtils.isEmpty(lastCandle)) {
-            String previousCandleDirection = lastCandle.get("direction");
-
-//            log.debug("************ : {}", previousCandleDirection);
-//            for (Map.Entry<String, String> entry : lastCandle.entrySet()) {
-//                log.debug("{} - {} ", entry.getKey(), entry.getValue());
-//            }
-
-            callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
-        }
-        nextTradeDetails.setCallOrPut(callOrPutResult);
-//        return callOrPutResult;
-    }
 
     boolean waitToBookNextTrade(){
         boolean result = true;
@@ -272,10 +133,8 @@ public class Utility {
         return quote;
     }
 
-    public List<Strategy> loadAllStrategies(){
-        List<Strategy> allStrategies  = null;
+    public void loadAllStrategies(){
         Gson gson = new Gson();
-
         List<String> jsonResultDBQuery = databaseConnection.getJsonResultDBQuery("select * from strategy");
         if(CollectionUtils.isNotEmpty(jsonResultDBQuery)) {
             allStrategies = jsonResultDBQuery.stream().map(ele -> gson.fromJson(ele, Strategy.class)).collect(Collectors.toList());
@@ -283,12 +142,73 @@ public class Utility {
             List<String> jsonResultDBQuery2 = databaseConnection.getJsonResultDBQuery("select * from strategy_steps");
             List<StrategySteps> allStrategySteps = jsonResultDBQuery2.stream().map(ele -> gson.fromJson(ele, StrategySteps.class)).collect(Collectors.toList());
 
-            allStrategies.parallelStream().forEach(
+            allStrategies.stream().forEach(
                     strategy -> {
                         strategy.setStepValueMap(allStrategySteps.stream().filter(f -> f.getStrategyId() == strategy.getIdentifier()).collect(Collectors.toList()));
                     }
             );
         }
-        return allStrategies ;
     }
+
+    public Strategy getStrategyToUse() {
+        List<Strategy> activeStrategies = allStrategies.stream().filter(s -> s.isActiveStrategy()).collect(Collectors.toList());
+        if(activeStrategies.size()>1){
+            log.error("ERROR! Multiple strategies marked as active. ONLY ONE STRATEGY can be active at a given time.");
+            System.exit(-2);
+        }
+
+        Strategy strategy = activeStrategies.get(0);
+
+        if (strategy==null){
+            strategy=getStrategy(Optional.empty(), Optional.of(true));
+        }
+        return strategy;
+    }
+
+
+    public Strategy getStrategy(Optional<Long> strategyId, Optional<Boolean> defaultStrategy){
+        Strategy strategy= null;
+        final int INVALID_STRATEGY_ID = -1;
+
+        boolean defaultStrategyToUse=defaultStrategy.isPresent()?defaultStrategy.get():false;
+        long strategyIdToUse=strategyId.isPresent()?strategyId.get():INVALID_STRATEGY_ID;
+        try {
+            // incase a number lower than -1 is passed.
+            if (strategyIdToUse < 0) {
+                strategyIdToUse = INVALID_STRATEGY_ID;
+            }
+            if (defaultStrategyToUse) {
+                List<Strategy> defaultStrategies = allStrategies.stream().filter(ele -> ele.isDefaultStrategy()).collect(Collectors.toList());
+                if (defaultStrategies.size() > 1) {
+                    log.error("ERROR! Multiple strategies marked as default. ONLY ONE STRATEGY can be default at a given time.");
+                    System.exit(-3);
+                }
+                strategy = defaultStrategies.get(0);
+            } else {
+                if (strategyIdToUse != INVALID_STRATEGY_ID) {
+                    long finalStrategyIdToUse = strategyIdToUse;
+                    List<Strategy> filteredStrategies = allStrategies.stream().filter(ele -> ele.isDefaultStrategy()).collect(Collectors.toList());
+                    if (filteredStrategies.size() > 1) {
+                        log.error("ERROR! Multiple strategies have same identifier. ALL STRATEGIES MUST HAVE UNIQUE Identifier.");
+                        System.exit(-4);
+                    }
+                    strategy = filteredStrategies.get(0);
+                }
+                if (strategy == null) {
+                    List<Strategy> defaultStrategies = allStrategies.stream().filter(ele -> ele.isDefaultStrategy()).collect(Collectors.toList());
+                    if (defaultStrategies.size() > 1) {
+                        log.error("ERROR! Multiple strategies marked as default. ONLY ONE STRATEGY can be default at a given time.");
+                        System.exit(-3);
+                    }
+                    strategy = defaultStrategies.get(0);
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return strategy;
+    }
+
 }
