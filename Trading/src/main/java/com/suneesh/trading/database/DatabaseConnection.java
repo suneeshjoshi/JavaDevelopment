@@ -1,6 +1,7 @@
 package com.suneesh.trading.database;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface DatabaseConnection {
@@ -28,4 +29,6 @@ public interface DatabaseConnection {
     void init(boolean backTestingMode);
 
     String getFirstElementFromDBQuery(String Query);
+
+    ArrayList<String> getJsonResultDBQuery(String query);
 }

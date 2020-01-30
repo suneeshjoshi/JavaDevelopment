@@ -101,7 +101,7 @@ public class Engine extends AbstractCommandGenerator {
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails);
+            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
 
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);

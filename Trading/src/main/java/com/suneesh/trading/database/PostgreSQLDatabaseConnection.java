@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
@@ -206,6 +207,17 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         List<HashMap<String, String>> dbResultList = executeQuery(query);
         if (CollectionUtils.isNotEmpty(dbResultList)) {
             result = dbResultList.get(0).entrySet().iterator().next().getValue();
+        }
+        return result;
+    }
+
+    @Override
+    public ArrayList<String> getJsonResultDBQuery(String query) {
+        ArrayList<String> result = new ArrayList<>();
+        List<HashMap<String, String>> dbResultList = executeQuery("select row_to_json(t) as json_result from (" + query + " ) t");
+        if (CollectionUtils.isNotEmpty(dbResultList)) {
+            result = (ArrayList<String>) dbResultList.stream().map(ele -> ele.get("json_result")).collect(Collectors.toList());
+
         }
         return result;
     }

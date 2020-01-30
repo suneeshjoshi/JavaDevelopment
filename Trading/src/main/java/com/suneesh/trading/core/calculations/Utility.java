@@ -3,6 +3,8 @@ package com.suneesh.trading.core.calculations;
 import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.core.NextTradeDetails;
+import com.suneesh.trading.models.Strategy;
+import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -196,7 +199,7 @@ public class Utility {
         nextTradeDetails.setStrategyId(nextTradeStrategyId);
     }
 
-    public void getBidAmount(NextTradeDetails nextTradeDetails) {
+    public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
         double amount = INITIAL_BID_AMOUNT;
         Map<String, String> lastTrade = getLastTrade();
         if(MapUtils.isEmpty(lastTrade)){
@@ -224,36 +227,6 @@ public class Utility {
         }
         nextTradeDetails.setCallOrPut(callOrPutResult);
 //        return callOrPutResult;
-    }
-
-    public boolean closePriceAtDirectionExtreme(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
-        boolean result = false;
-        final int maxStepCountToApplyFactor=3;
-        // Here i am testing the logic to see if the close value of the
-        // candle is high or low , then the chance of next candle going in similar direction is higher
-        if(lastCandle!=null){
-            double INCREASED_MOMENTUM_FACTOR= 2.5;
-            double high = Double.parseDouble(lastCandle.get("high"));
-            double low = Double.parseDouble(lastCandle.get("low"));
-            double open = Double.parseDouble(lastCandle.get("open"));
-            double close = Double.parseDouble(lastCandle.get("close"));
-            String direction = lastCandle.get("direction");
-
-            if(direction.equalsIgnoreCase("UP")){
-                if(close==high && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
-                    log.info(lastCandle.toString());
-                    result= true;
-                }
-            }
-
-            if(direction.equalsIgnoreCase("DOWN")){
-                if(close==low && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
-                    log.info(lastCandle.toString());
-                    result= true;
-                }
-            }
-        }
-        return result;
     }
 
     boolean waitToBookNextTrade(){
@@ -299,4 +272,23 @@ public class Utility {
         return quote;
     }
 
+    public List<Strategy> loadAllStrategies(){
+        List<Strategy> allStrategies  = null;
+        Gson gson = new Gson();
+
+        List<String> jsonResultDBQuery = databaseConnection.getJsonResultDBQuery("select * from strategy");
+        if(CollectionUtils.isNotEmpty(jsonResultDBQuery)) {
+            allStrategies = jsonResultDBQuery.stream().map(ele -> gson.fromJson(ele, Strategy.class)).collect(Collectors.toList());
+
+            List<String> jsonResultDBQuery2 = databaseConnection.getJsonResultDBQuery("select * from strategy_steps");
+            List<StrategySteps> allStrategySteps = jsonResultDBQuery2.stream().map(ele -> gson.fromJson(ele, StrategySteps.class)).collect(Collectors.toList());
+
+            allStrategies.parallelStream().forEach(
+                    strategy -> {
+                        strategy.setStepValueMap(allStrategySteps.stream().filter(f -> f.getStrategyId() == strategy.getIdentifier()).collect(Collectors.toList()));
+                    }
+            );
+        }
+        return allStrategies ;
+    }
 }

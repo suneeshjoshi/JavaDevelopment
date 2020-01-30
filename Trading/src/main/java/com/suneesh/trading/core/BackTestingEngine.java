@@ -1,8 +1,14 @@
 package com.suneesh.trading.core;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.suneesh.trading.core.calculations.Engine;
 import com.suneesh.trading.core.calculations.Utility;
+import com.suneesh.trading.core.strategy.StrategyImplementation;
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.models.Strategy;
+import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.models.requests.BuyContractRequest;
@@ -19,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class BackTestingEngine extends Engine {
@@ -26,7 +34,7 @@ public class BackTestingEngine extends Engine {
     private String symbol;
 
     private DatabaseConnection databaseConnection;
-    final int CANDLE_DATA_POINTS=1440;
+    final int CANDLE_DATA_POINTS=10;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
 
     public BackTestingEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
@@ -40,6 +48,9 @@ public class BackTestingEngine extends Engine {
     }
 
     public void process(){
+        List<Strategy> strategies = getCalculationEngineUtility().loadAllStrategies();
+        logger.info("Loading all Strategy Objects.");
+
         logger.info("Request sent to Binary Websocket to get last {} candle data points ...");
         getCandleDetailsFromBinaryWS(symbol,CANDLE_DATA_POINTS);
 
@@ -47,7 +58,7 @@ public class BackTestingEngine extends Engine {
         AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
 
         logger.info("getting candle data from DB ...");
-        List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
+        List<Map<String,String>> candleDataFromDB = getCalculationEngineUtility().getCandles(Optional.empty(), Optional.empty());
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
         getCalculateSignals().calculateBollingerBands(candleDataFromDB, Optional.empty());
@@ -80,7 +91,7 @@ public class BackTestingEngine extends Engine {
     }
 
     private List getCandleDataFromDB(){
-        return getDatabaseConnection().executeQuery("/order by identifier ASC");
+        return getDatabaseConnection().executeQuery("Select * from candle order by identifier ASC");
     }
 
     void getCallOrPutFromCandleData(NextTradeDetails nextTradeDetails, Map<String,String> candleData){
@@ -116,14 +127,10 @@ public class BackTestingEngine extends Engine {
             calculationEngineUtility.getContractDuration(nextTradeDetails);
             calculationEngineUtility.getNextStepCount(nextTradeDetails, lastTrade);
             calculationEngineUtility.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            calculationEngineUtility.getBidAmount(nextTradeDetails);
+            calculationEngineUtility.getBidAmount(nextTradeDetails, lastCandle);
 
-            boolean closePriceAtDirectionExtreme = calculationEngineUtility.closePriceAtDirectionExtreme(nextTradeDetails,lastCandle);
-//            boolean closePriceAtDirectionExtreme = false;
-
-            if(closePriceAtDirectionExtreme){
-                nextTradeDetails.setAmount(nextTradeDetails.getAmount()*2);
-            }
+            StrategyImplementation strategyImplementation = new StrategyImplementation();
+            strategyImplementation.calculateAmount(nextTradeDetails,lastCandle);
 
             BuyContractParameters parameters = calculationEngineUtility.getParameters(symbol, nextTradeDetails, currency);
             BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
@@ -146,7 +153,7 @@ public class BackTestingEngine extends Engine {
                 tradeResult="SUCCESS";
             }
 
-            if(closePriceAtDirectionExtreme){
+            if(strategyImplementation.closePriceAtDirectionExtreme(nextTradeDetails, lastCandle)){
                 tradeResult=tradeResult+"INCREASED";
             }
 
