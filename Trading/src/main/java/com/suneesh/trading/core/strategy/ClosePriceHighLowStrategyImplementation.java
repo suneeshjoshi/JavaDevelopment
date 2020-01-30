@@ -15,8 +15,8 @@ import java.util.Optional;
 @Slf4j
 public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyClass{
 
-    public ClosePriceHighLowStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility) {
-        super(databaseConnection, strategy, calculationUtility);
+    public ClosePriceHighLowStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility, Boolean isBackTestingMode) {
+        super(databaseConnection, strategy, calculationUtility, isBackTestingMode);
     }
 
 

@@ -61,7 +61,7 @@ public class BinaryWebServiceConnector {
         databaseConnection.init(isBackTestingMode());
 
         commandProcessor = new CommandProcessor(commandQueue,api);
-        calculationEngine = new Engine(commandQueue, databaseConnection, symbolToTrade);
+        calculationEngine = new Engine(commandQueue, databaseConnection, symbolToTrade, false);
         threadCreation();
         sendInitialSetupRequest();
     }
@@ -111,7 +111,7 @@ public class BinaryWebServiceConnector {
             commandGeneratorThread.submit(()->{
                 Thread.currentThread().setName("BackTestingEngine");
                 logger.info("{} started ... ", Thread.currentThread().getName());
-                new BackTestingEngine(commandQueue, databaseConnection, symbolToTrade).process();
+                new BackTestingEngine(commandQueue, databaseConnection, symbolToTrade, true).process();
             });
         }
 

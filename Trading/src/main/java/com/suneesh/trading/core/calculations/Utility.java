@@ -29,6 +29,7 @@ public class Utility {
 
     public Utility(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
+        loadAllStrategies();
     }
 
     public String getCurrency(){
@@ -211,4 +212,19 @@ public class Utility {
         return strategy;
     }
 
+    public Strategy getBackTestingStrategy() {
+        Strategy strategy = null;
+        List<Strategy> backTestigStrategies = getAllStrategies().stream().filter(f -> f.isBacktestingStrategy()).collect(Collectors.toList());
+        if (backTestigStrategies.size() > 1) {
+            log.info("ERROR! Only one strategy can be allowed to be a backtest strategy. Exiting.");
+            System.exit(-1);
+        }
+
+        if (CollectionUtils.isEmpty(backTestigStrategies)) {
+            log.info("ERROR! No  strategy defined as backtesting strategy. Exiting.");
+            System.exit(-1);
+        }
+
+        return backTestigStrategies.get(0);
+    }
 }

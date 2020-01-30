@@ -2,12 +2,14 @@ CREATE TABLE IF NOT EXISTS public.strategy
 (
     identifier SERIAL,
     strategy_name character varying(255) ,
-    creation_date timestamp NOT NULL,
     max_steps INTEGER NOT NULL,
     next_strategy_id_link INTEGER,
-    is_default_strategy boolean,
-    reset_step_count_on_success boolean,
     active_strategy boolean,
+    is_default_strategy boolean,
+    is_backtesting_strategy boolean,
+    reset_step_count_on_success boolean,
+    classname character varying(255) ,
+    creation_date timestamp NOT NULL,
     CONSTRAINT strategy_pkey PRIMARY KEY (identifier)
 )
 

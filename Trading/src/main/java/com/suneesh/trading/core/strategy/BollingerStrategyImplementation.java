@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class BollingerStrategyImplementation extends AbstractStrategyClass {
 
-    public BollingerStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility) {
-        super(databaseConnection, strategy, calculationUtility);
+    public BollingerStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility, Boolean isBackTestingMode) {
+        super(databaseConnection, strategy, calculationUtility, isBackTestingMode);
     }
 
     @Override

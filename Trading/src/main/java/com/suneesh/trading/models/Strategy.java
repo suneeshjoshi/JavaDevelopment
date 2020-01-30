@@ -20,6 +20,10 @@ public class Strategy {
     @Expose
     String strategyName ;
 
+    @SerializedName("classname")
+    @Expose
+    String className ;
+
     @SerializedName("creation_date")
     @Expose
     String creationDate;
@@ -31,6 +35,10 @@ public class Strategy {
     @SerializedName("next_strategy_id_link")
     @Expose
     int nextStrategyIdLink;
+
+    @SerializedName("is_backtesting_strategy")
+    @Expose
+    boolean isBacktestingStrategy;
 
     @SerializedName("is_default_strategy")
     @Expose

@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class CandleFollowWithIncreaseStrategyImplementation extends AbstractStrategyClass{
 
-    public CandleFollowWithIncreaseStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility) {
-        super(databaseConnection, strategy, calculationUtility);
+    public CandleFollowWithIncreaseStrategyImplementation(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility, Boolean isBackTestingMode) {
+        super(databaseConnection, strategy, calculationUtility, isBackTestingMode);
     }
 
 }

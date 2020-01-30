@@ -4,6 +4,7 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,11 +24,13 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
     DatabaseConnection databaseConnection;
     Strategy strategy;
     Utility calculationUtility;
+    Boolean isBackTestingMode;
 
-    public AbstractStrategyClass(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility) {
+    public AbstractStrategyClass(DatabaseConnection databaseConnection, Strategy strategy, Utility calculationUtility, Boolean isBackTestingMode) {
         this.databaseConnection = databaseConnection;
         this.strategy = strategy;
         this.calculationUtility = calculationUtility;
+        this.isBackTestingMode= isBackTestingMode;
     }
 
 
@@ -126,7 +129,12 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
             }
         }
         else{
-            Strategy strategy = calculationUtility.getStrategy(Optional.empty(),Optional.of(true));
+            if(isBackTestingMode){
+                Strategy strategy = calculationUtility.getBackTestingStrategy();
+            }
+            else{
+                Strategy strategy = calculationUtility.getStrategy(Optional.empty(),Optional.of(true));
+            }
             nextTradeStrategyId = strategy.getIdentifier();
 
         }

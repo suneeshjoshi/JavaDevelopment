@@ -1,6 +1,6 @@
 package com.suneesh.trading.core.calculations;
 
-import com.suneesh.trading.core.strategy.CandleFollowWithIncreaseStrategyImplementation;
+import com.suneesh.trading.core.strategy.StrategyFactory;
 import com.suneesh.trading.core.strategy.StrategyImplementationInterface;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.core.AbstractCommandGenerator;
@@ -9,12 +9,12 @@ import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.Data;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -24,16 +24,21 @@ public class Engine extends AbstractCommandGenerator {
     DatabaseConnection databaseConnection;
     Utility calculationUtility;
     Signals calculateSignals;
+    StrategyFactory strategyFactory;
+    Boolean isBackTestingMode;
+
     final int NUMBER_OF_INITIAL_CANDLES_TO_READ=25;
     final int CANDLE_60_SECOND_GRANULARITY=60;
     final int CANDLE_300_SECOND_GRANULARITY=300;
 
-    public Engine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
+    public Engine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol, Boolean isBackTestingMode) {
         super(inputMessageQueue);
         this.databaseConnection = dbConnection;
         this.symbol = symbol;
         this.calculationUtility = new Utility(dbConnection);
         this.calculateSignals = new Signals(dbConnection);
+        this.isBackTestingMode = isBackTestingMode;
+        this.strategyFactory = new StrategyFactory(databaseConnection, calculationUtility,isBackTestingMode);
     }
 
     public Signals getCalculateSignals() {
@@ -45,7 +50,6 @@ public class Engine extends AbstractCommandGenerator {
     }
 
     public void init(){
-        calculationUtility.loadAllStrategies();
         getTickDetail(symbol);
         getCandleDetailsFromBinaryWS(symbol);
     }
@@ -95,45 +99,58 @@ public class Engine extends AbstractCommandGenerator {
 
     private void createAndSendTrade(){
         try {
-            String currency = calculationUtility.getCurrency();
-
-            Map<String, String> lastTrade = calculationUtility.getLastTrade();
             long lastTradeId = 0L;
-            if(!MapUtils.isEmpty(lastTrade)){
+            Map<String, String> lastTrade = calculationUtility.getLastTrade();
+            if (!MapUtils.isEmpty(lastTrade)) {
                 lastTradeId = Long.valueOf(lastTrade.get("identifier"));
             }
 
+            String currency = calculationUtility.getCurrency();
             Map<String, String> lastCandle = calculationUtility.getLastCandle();
-
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
-
             Strategy strategyToUse = calculationUtility.getStrategyToUse();
 
+            // Create Trade
+            logger.info("Creating trade ... ");
+            BuyContractRequest buyContractRequest = createTrade(strategyToUse, nextTradeDetails, currency, lastCandle, lastTrade, true);
+
+            logger.info("Sending buy Contract Request ... ");
+            // Send trade
+            sendRequest(buyContractRequest);
+        }
+        catch(Exception e) {
+            logger.info("Exception caught while creating new trade. {}",e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public BuyContractRequest createTrade(Strategy strategyToUse, NextTradeDetails nextTradeDetails, String currency, Map<String, String> lastCandle, Map<String, String> lastTrade, boolean debug) {
+        BuyContractRequest buyContractRequest = null;
+        try{
+
             // Get Present Strategy's details for booking trade
-            StrategyImplementationInterface strategy = new CandleFollowWithIncreaseStrategyImplementation(databaseConnection, strategyToUse,calculationUtility);
+            StrategyImplementationInterface strategy = strategyFactory.getStrategyImplementation(strategyToUse);
             strategy.getCallOrPut(nextTradeDetails, lastCandle);
             strategy.getContractDuration(nextTradeDetails);
             strategy.getNextStepCount(nextTradeDetails, lastTrade);
             strategy.getNextTradeStrategyId(nextTradeDetails, lastTrade);
             strategy.getBidAmount(nextTradeDetails, lastCandle);
 
-
             BuyContractParameters parameters = calculationUtility.getParameters(symbol, nextTradeDetails, currency);
-            BuyContractRequest buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
-
             String tradeInsertStatement = calculationUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
-            logger.debug(tradeInsertStatement);
-            calculationUtility.getDatabaseConnection().executeNoResultSet(tradeInsertStatement);
+            if(debug) {
+                logger.debug(tradeInsertStatement);
+            }
+            databaseConnection.executeNoResultSet(tradeInsertStatement);
+            buyContractRequest = new BuyContractRequest(new BigDecimal(nextTradeDetails.getAmount()), parameters, nextTradeDetails.getTradeId());
 
-            logger.info("Sending buy Contract Request ... ");
-            sendRequest(buyContractRequest);
         }
         catch (Exception e ){
             logger.info("Exception caught while create new trade. {}",e.getMessage());
             e.printStackTrace();
         }
+        return buyContractRequest;
     }
-
 
 
 }
