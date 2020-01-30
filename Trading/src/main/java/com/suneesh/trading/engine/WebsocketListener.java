@@ -54,7 +54,11 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
         this.databaseConnection = dbConnection;
-        final AtomicInteger[] OHLC_count = {new AtomicInteger(1)};
+        // Calculate and write Bolling Bands for the received Candle data.
+        CalculationEngineUtility calculationEngineUtility = new CalculationEngineUtility(databaseConnection);
+
+        AtomicInteger ohlcCount = new AtomicInteger(0);
+
         final Candle[] previousCandle = {new Candle()};
 
         this.responseEmitter.subscribe(
@@ -116,10 +120,7 @@ WebsocketListener extends WebSocketListener {
                                     writeToDatabase(tickHistoryResponse, false);
                                 }
 
-                                CalculationEngineUtility calculationEngineUtility = new CalculationEngineUtility(databaseConnection);
-                                List<Map<String, String>> allCandles = calculationEngineUtility.getAllCandles(false);
-
-                                calculationEngineUtility.calculateBollingerBands(allCandles);
+                                calculationEngineUtility.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"), Optional.empty()), Optional.of("CANDLES"));
 
                                 break;
                             case "ohlc":
@@ -140,12 +141,18 @@ WebsocketListener extends WebSocketListener {
                                         ohlcTickHistoryResponse.setCandles(candles);
 //                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
+                                        // If this is the first OHLC candle received, then we will have a duplicate candle record
+                                        // all the candles received in "CANDLE" message contais an incomplete last candle , which this OHLC candle is completing
+                                        if(ohlcCount.get()==0){
+                                            databaseConnection.executeNoResultSet("DELETE FROM candle WHERE epoch = "+updatedPreviousCandle.getOpen_time());
+                                        }
                                         writeToDatabase(ohlcTickHistoryResponse, false);
+                                        calculationEngineUtility.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"),Optional.of(20)) , Optional.empty());
+                                        ohlcCount.incrementAndGet();
                                     }
                                 }
 
                                 previousCandle[0] = gson.fromJson(String.valueOf(OHLCData), Candle.class);
-                                OHLC_count[0].incrementAndGet();
 
                                 break;
                             case "transaction":

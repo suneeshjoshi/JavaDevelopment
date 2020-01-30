@@ -6,5 +6,6 @@ create table IF NOT EXISTS bollinger_band(
     lowerBand NUMERIC(19,4),
     bandWidth NUMERIC(19,4),
     candle_id bigint,
-	PRIMARY KEY(identifier)
+    candle_epoch_string timestamp,
+    PRIMARY KEY(identifier)
 );

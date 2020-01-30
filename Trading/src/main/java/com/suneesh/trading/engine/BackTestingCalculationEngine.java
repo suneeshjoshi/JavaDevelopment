@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
-        calculationEngineUtility.calculateBollingerBands(candleDataFromDB);
+        calculationEngineUtility.calculateBollingerBands(candleDataFromDB, Optional.empty());
 
         int test_run_id = getTestRunId();
 

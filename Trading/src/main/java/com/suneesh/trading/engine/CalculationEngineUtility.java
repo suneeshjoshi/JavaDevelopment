@@ -12,8 +12,7 @@ import org.apache.commons.collections4.MapUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @Slf4j
@@ -42,22 +41,24 @@ public class CalculationEngineUtility {
         AutoTradingUtility.sleep(secondsToNextMinute*1000);
     }
 
+    List<Map<String,String>> getAllCandles(){
+        return getCandles(Optional.empty(), Optional.empty());
+    }
+
     Map<String,String> getLastCandle(){
         Map<String,String> result =null;
-        List<Map<String, String>> allCandles = getAllCandles(true);
+        List<Map<String, String>> allCandles = getCandles(Optional.of("DESC"), Optional.of(1));
         if(CollectionUtils.isNotEmpty(allCandles)){
             result = allCandles.get(0);
         }
         return result;
     }
 
-    List<Map<String,String>> getAllCandles(boolean getLastCandle){
-        String query = "select * from candle order by identifier";
-        if(getLastCandle) {
-            query = "select * from candle order by identifier desc limit 1";
-        }
+    List<Map<String,String>> getCandles(Optional<String> sortOrder, Optional<Integer> numberOfRows){
+        String querySortOrder = sortOrder.isPresent()?sortOrder.get():"ASC";
+        int queryResultLimit = numberOfRows.isPresent()?numberOfRows.get():99999;
 
-        return databaseConnection.executeQuery(query);
+        return databaseConnection.executeQuery("select * from candle order by identifier "+querySortOrder+" limit "+queryResultLimit);
     }
 
 
@@ -286,12 +287,20 @@ public class CalculationEngineUtility {
         return gson.fromJson(json, BuyContractParameters.class);
     }
 
-    public void calculateBollingerBands(List<Map<String, String>> candleDataFromDB) {
+    public void calculateBollingerBands(List<Map<String, String>> candleDataFromDB, Optional<String> candleSource) {
+        String source = candleSource.isPresent()?candleSource.get():"";
+
         if(CollectionUtils.isNotEmpty(candleDataFromDB)) {
-            if(candleDataFromDB.size()>BOLLINGER_BAND_DATA_COUNT) {
-                for(int i=0;i<=candleDataFromDB.size()-BOLLINGER_BAND_DATA_COUNT; ++i){
-                    int start = i;
-                    int end = i + BOLLINGER_BAND_DATA_COUNT;
+            if(candleDataFromDB.size()>=BOLLINGER_BAND_DATA_COUNT) {
+                int lastElementCounter = candleDataFromDB.size();
+                if(source.equalsIgnoreCase("CANDLES")) {
+                    lastElementCounter = candleDataFromDB.size()-1;
+                }
+
+                for(int i=lastElementCounter;i>=BOLLINGER_BAND_DATA_COUNT; --i){
+                    int start = i-BOLLINGER_BAND_DATA_COUNT ;
+                    int end = i;
+                    log.info("start : end = {} : {} ", start, end);
 
                     List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
 

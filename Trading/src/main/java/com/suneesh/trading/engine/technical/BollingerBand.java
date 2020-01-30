@@ -1,13 +1,14 @@
 package com.suneesh.trading.engine.technical;
 
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 public class BollingerBand {
     List<Map<String, String>> candleList;
@@ -17,6 +18,7 @@ public class BollingerBand {
     double lowerBand;
     double bandWidth;
     long candleIdentifier;
+    String candle_epoch_string;
     final int bandMultiple=2;
 
     public BollingerBand(List<Map<String, String>> subList){
@@ -37,7 +39,10 @@ public class BollingerBand {
             lowerBand = average-(bandMultiple*standardDeviation);
             bandWidth = upperBand-lowerBand;
         }
-        candleIdentifier = Integer.parseInt(candleList.get(candleList.size()-1).get("identifier"));
+
+//        candleList has to be in descending order
+        candleIdentifier = Integer.parseInt(candleList.get(0).get("identifier"));
+        candle_epoch_string = candleList.get(0).get("epoch_string");
 
     }
 
@@ -48,12 +53,16 @@ public class BollingerBand {
     }
 
     public List<String> databaseInsertStringList(){
-        return Arrays.asList("INSERT INTO bollinger_band ( average, standardDeviation, upperBand, lowerBand, bandWidth, candle_id) VALUES " +
+        String query = "INSERT INTO bollinger_band ( average, standardDeviation, upperBand, lowerBand, bandWidth, candle_id, candle_epoch_string) VALUES " +
                 "(" + getAverage() + "," +
                 getStandardDeviation() + "," +
                 getUpperBand() + "," +
                 getLowerBand() + "," +
                 getBandWidth() + "," +
-                getCandleIdentifier() + ");");
+                getCandleIdentifier() + "," +
+                AutoTradingUtility.quotedString(getCandle_epoch_string()) +");";
+
+        log.info("query = {}",query);
+        return Arrays.asList(query);
     }
 }
