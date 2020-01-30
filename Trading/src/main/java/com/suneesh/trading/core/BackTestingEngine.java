@@ -57,7 +57,7 @@ public class BackTestingEngine extends Engine {
         List<Map<String,String>> candleDataFromDB = getCalculationUtility().getCandles(Optional.empty(), Optional.empty());
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
-        getCalculateSignals().calculateBollingerBands(candleDataFromDB, Optional.empty());
+//        getCalculateSignals().calculateBollingerBands(candleDataFromDB, Optional.empty());
 
         int test_run_id = getTestRunId();
 
