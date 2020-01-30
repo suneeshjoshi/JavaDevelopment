@@ -1,6 +1,6 @@
 package com.suneesh.trading;
 
-import com.suneesh.trading.engine.ApiWrapper;
+import com.suneesh.trading.core.ApiWrapper;
 import org.junit.After;
 import org.junit.Before;
 

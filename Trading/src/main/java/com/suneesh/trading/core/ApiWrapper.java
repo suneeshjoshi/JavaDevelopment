@@ -1,4 +1,4 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,8 +20,6 @@ import org.apache.logging.log4j.Logger;
 
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Created by morteza on 7/19/2017.

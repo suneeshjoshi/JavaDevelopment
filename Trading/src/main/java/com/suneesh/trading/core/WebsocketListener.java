@@ -1,7 +1,9 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
 import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.core.calculations.Signals;
+import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.models.WebsocketEvent;
 
 import com.suneesh.trading.models.responses.*;
@@ -11,7 +13,6 @@ import lombok.Data;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +55,12 @@ WebsocketListener extends WebSocketListener {
         this.responseEmitter = responseEmitter;
         this.requestEmitter = requestEmitter;
         this.databaseConnection = dbConnection;
+
         // Calculate and write Bolling Bands for the received Candle data.
-        CalculationEngineUtility calculationEngineUtility = new CalculationEngineUtility(databaseConnection);
+        Utility calculationEngineUtility = new Utility(databaseConnection);
+
+        // Calculate and write Bolling Bands for the received Candle data.
+        Signals signals = new Signals(databaseConnection);
 
         AtomicInteger ohlcCount = new AtomicInteger(0);
 
@@ -120,7 +125,7 @@ WebsocketListener extends WebSocketListener {
                                     writeToDatabase(tickHistoryResponse, false);
                                 }
 
-                                calculationEngineUtility.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"), Optional.empty()), Optional.of("CANDLES"));
+                                signals.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"), Optional.empty()), Optional.of("CANDLES"));
 
                                 break;
                             case "ohlc":
@@ -147,7 +152,7 @@ WebsocketListener extends WebSocketListener {
                                             databaseConnection.executeNoResultSet("DELETE FROM candle WHERE epoch = "+updatedPreviousCandle.getOpen_time());
                                         }
                                         writeToDatabase(ohlcTickHistoryResponse, false);
-                                        calculationEngineUtility.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"),Optional.of(20)) , Optional.empty());
+                                        signals.calculateBollingerBands(calculationEngineUtility.getCandles(Optional.of("DESC"),Optional.of(20)) , Optional.empty());
                                         ohlcCount.incrementAndGet();
                                     }
                                 }
@@ -171,7 +176,6 @@ WebsocketListener extends WebSocketListener {
                                 break;
                             case "buy":
                                 BuyContractResponse buyContractResponse = new BuyContractResponse();
-//                                TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject buyData = (JSONObject) jsonObject.get("buy");
 
                                 if( (buyData != null) && ( buyData.has("contract_id")) ) {
@@ -180,16 +184,13 @@ WebsocketListener extends WebSocketListener {
                                     processTransaction(msg_type, buyData, req_id);
 
                                     BuyContractResponse buyContractResponse1 = gson.fromJson(String.valueOf(buyData), BuyContractResponse.class);
-
                                     logger.info("BuyContractResponse =  {}",buyContractResponse1.toString());
-//                                    writeToDatabase(buyContractResponse1, true);
                                 }
 
                                 break;
 
                             case "sell":
                                 SellContractResponse sellContractResponse = new SellContractResponse();
-//                                TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject sellData = (JSONObject) jsonObject.get("buy");
 
                                 if( (sellData != null) && ( sellData.has("contract_id")) ) {
@@ -198,9 +199,7 @@ WebsocketListener extends WebSocketListener {
                                     processTransaction(msg_type, sellData, req_id);
 
                                     SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
-
                                     logger.info("SellContractResponse =  {}",sellContractResponse1.toString());
-//                                    writeToDatabase(sellContractResponse1, true);
                                 }
 
                                 break;
@@ -256,9 +255,6 @@ WebsocketListener extends WebSocketListener {
         if(req_id!=null){
             tradeIdentifier = String.valueOf(req_id);
             if (tradeIdentifier == null) {
-//                updateString= "UPDATE trade SET contract_id = '"+String.valueOf(contract_id)+"', result='OPEN' WHERE identifier = "+tradeIdentifier;
-//            }
-//            else{
                 logger.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
             }
         }
@@ -291,44 +287,6 @@ WebsocketListener extends WebSocketListener {
             logger.info("action / Command = {} / {}", msg_type, updateString);
             databaseConnection.executeNoResultSet(updateString);
         }
-    }
-
-    private BigDecimal getTickForEpochTime(long epochTime){
-        BigDecimal quote= new BigDecimal(-1);
-        List<Map<String,String>>  tickResult = databaseConnection.executeQuery(
-                "select * from tick t where t.epoch = " + String.valueOf(epochTime));
-        if(!CollectionUtils.isEmpty(tickResult)){
-            Map<String, String> tickRow = tickResult.get(0);
-            quote = new BigDecimal(tickRow.get("quote"));
-        }
-        return quote;
-    }
-
-
-    private Candle calculateLastTickforCandle(Candle prevCandle) {
-        long previousCandleEpochTime;
-
-        List<Map<String,String>> result = (List<Map<String, String>>) databaseConnection.executeQuery(
-                "select epoch from candle order by identifier desc limit 1");
-        if(!CollectionUtils.isEmpty(result)){
-            Map<String,String> firstRow = result.get(0);
-            previousCandleEpochTime = Long.valueOf(firstRow.get("epoch"));
-
-            BigDecimal tickQuote = getTickForEpochTime(previousCandleEpochTime);
-
-            if (tickQuote.doubleValue()!=-1) {
-                if(tickQuote.doubleValue() > prevCandle.getHigh().doubleValue()) {
-                    prevCandle.setHigh(tickQuote);
-                }
-
-                if(tickQuote.doubleValue() < prevCandle.getLow().doubleValue()){
-                    prevCandle.setLow(tickQuote);
-                }
-
-                prevCandle.setClose(tickQuote);
-            }
-        }
-        return prevCandle;
     }
 
     @Override

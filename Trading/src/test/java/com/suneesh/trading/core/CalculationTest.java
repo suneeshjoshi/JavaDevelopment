@@ -1,4 +1,4 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

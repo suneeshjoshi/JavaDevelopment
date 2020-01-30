@@ -1,7 +1,8 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
+import com.suneesh.trading.core.calculations.Engine;
+import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.database.DatabaseConnection;
-import com.suneesh.trading.engine.technical.BollingerBand;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.models.requests.BuyContractRequest;
@@ -14,15 +15,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
 
 
-public class BackTestingCalculationEngine extends CalculationEngine{
+public class BackTestingEngine extends Engine {
     private static final Logger logger = LogManager.getLogger();
     private String symbol;
 
@@ -30,7 +29,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
     final int CANDLE_DATA_POINTS=1440;
     final int CANDLE_DATA_DELAY_MILLISECONDS=10000;
 
-    public BackTestingCalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
+    public BackTestingEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue, dbConnection, symbol);
         this.databaseConnection = dbConnection;
         this.symbol = symbol;
@@ -51,7 +50,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
         List<Map<String,String>> candleDataFromDB = getCandleDataFromDB();
         logger.info("Received {} candle data points", candleDataFromDB.size());
 
-        calculationEngineUtility.calculateBollingerBands(candleDataFromDB, Optional.empty());
+        getCalculateSignals().calculateBollingerBands(candleDataFromDB, Optional.empty());
 
         int test_run_id = getTestRunId();
 
@@ -97,6 +96,7 @@ public class BackTestingCalculationEngine extends CalculationEngine{
 
     private void createDummyTrade(Map<String, String> candleData, Map<String, String> nextCandleData){
         try {
+            Utility calculationEngineUtility = getCalculationEngineUtility();
             String currency = calculationEngineUtility.getCurrency();
             if(currency.isEmpty()){
                 logger.fatal("FATAL ERROR! No Currency detail found. Cannot book trade.\nExiting application.");

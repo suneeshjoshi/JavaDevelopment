@@ -1,10 +1,7 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
-import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.PingRequest;
 import com.suneesh.trading.models.requests.RequestBase;
-import com.suneesh.trading.models.requests.TickHistoryRequest;
-import com.suneesh.trading.models.requests.TickRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

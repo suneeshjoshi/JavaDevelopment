@@ -1,9 +1,12 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core.calculations;
 
 import com.suneesh.trading.database.DatabaseConnection;
+import com.suneesh.trading.core.AbstractCommandGenerator;
+import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.Data;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,15 +15,26 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-public class CalculationEngine extends AbstractCommandGenerator {
+public class Engine extends AbstractCommandGenerator {
     private static final Logger logger = LogManager.getLogger();
     private String symbol;
-    CalculationEngineUtility calculationEngineUtility;
 
-    public CalculationEngine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
+    Utility calculationEngineUtility;
+    Signals calculateSignals;
+
+    public Engine(BlockingQueue<RequestBase> inputMessageQueue, DatabaseConnection dbConnection, String symbol) {
         super(inputMessageQueue);
         this.symbol = symbol;
-        this.calculationEngineUtility = new CalculationEngineUtility(dbConnection);
+        this.calculationEngineUtility = new Utility(dbConnection);
+        this.calculateSignals = new Signals(dbConnection);
+    }
+
+    public Signals getCalculateSignals() {
+        return calculateSignals;
+    }
+
+    public Utility getCalculationEngineUtility() {
+        return calculationEngineUtility;
     }
 
     public void getTickDetail(String symbol) {

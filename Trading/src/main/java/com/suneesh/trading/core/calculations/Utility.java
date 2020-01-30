@@ -1,8 +1,8 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core.calculations;
 
 import com.google.gson.Gson;
 import com.suneesh.trading.database.DatabaseConnection;
-import com.suneesh.trading.engine.technical.BollingerBand;
+import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.models.requests.BuyContractParameters;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
@@ -10,13 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
 @Data
 @Slf4j
-public class CalculationEngineUtility {
+public class Utility {
 
 
     private DatabaseConnection databaseConnection;
@@ -24,13 +25,12 @@ public class CalculationEngineUtility {
     final static long CONTRACT_DURATION_IN_SECONDS = 58L;
     final static double INITIAL_BID_AMOUNT = 1.00D;
     final static String ACCOUNT_CURRENCY="AccountCurrency";
-    final int BOLLINGER_BAND_DATA_COUNT=20;
 
-    public CalculationEngineUtility(DatabaseConnection databaseConnection) {
+    public Utility(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
     }
 
-    String getCurrency(){
+    public String getCurrency(){
         String applicationMode = AutoTradingUtility.getPropertyFromPropertyFile("ApplicationMode");
         String currencyProperty = applicationMode+ACCOUNT_CURRENCY;
         return (AutoTradingUtility.getPropertyFromPropertyFile(currencyProperty));
@@ -54,7 +54,7 @@ public class CalculationEngineUtility {
         return result;
     }
 
-    List<Map<String,String>> getCandles(Optional<String> sortOrder, Optional<Integer> numberOfRows){
+    public List<Map<String,String>> getCandles(Optional<String> sortOrder, Optional<Integer> numberOfRows){
         String querySortOrder = sortOrder.isPresent()?sortOrder.get():"ASC";
         int queryResultLimit = numberOfRows.isPresent()?numberOfRows.get():99999;
 
@@ -63,7 +63,7 @@ public class CalculationEngineUtility {
 
 
 
-    Map<String,String> getLastTrade(){
+    public Map<String,String> getLastTrade(){
         Map<String,String> result = null;
         List<Map<String,String>> list = databaseConnection.executeQuery("select * from trade order by identifier desc limit 1");
         if(!CollectionUtils.isEmpty(list)){
@@ -72,7 +72,7 @@ public class CalculationEngineUtility {
         return result;
     }
 
-    void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
+    public void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
         int stepCount = 1;
 //        Map<String, String> lastTrade = getLastTrade();
 
@@ -100,7 +100,7 @@ public class CalculationEngineUtility {
         nextTradeDetails.setNextStepCount(stepCount);
     }
 
-    String getTradeDatabaseInsertString(BuyContractParameters parameters, NextTradeDetails nextTradeDetails) {
+    public String getTradeDatabaseInsertString(BuyContractParameters parameters, NextTradeDetails nextTradeDetails) {
         return
                 "INSERT INTO public.trade " +
                         "(bid_amount, call_or_put, symbol, step_count, strategy_id, trade_time, trade_time_string, amount_won) " +
@@ -169,7 +169,7 @@ public class CalculationEngineUtility {
     }
 
 
-    void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
+    public void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
         int nextTradeStrategyId = -1;
 
         if( !MapUtils.isEmpty(lastTrade)) {
@@ -196,7 +196,7 @@ public class CalculationEngineUtility {
         nextTradeDetails.setStrategyId(nextTradeStrategyId);
     }
 
-    void getBidAmount(NextTradeDetails nextTradeDetails) {
+    public void getBidAmount(NextTradeDetails nextTradeDetails) {
         double amount = INITIAL_BID_AMOUNT;
         Map<String, String> lastTrade = getLastTrade();
         if(MapUtils.isEmpty(lastTrade)){
@@ -210,7 +210,7 @@ public class CalculationEngineUtility {
         nextTradeDetails.setAmount(amount);
     }
 
-    void getCallOrPut(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
+    public void getCallOrPut(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
         String callOrPutResult = "CALL";
         if(!MapUtils.isEmpty(lastCandle)) {
             String previousCandleDirection = lastCandle.get("direction");
@@ -226,7 +226,7 @@ public class CalculationEngineUtility {
 //        return callOrPutResult;
     }
 
-    boolean closePriceAtDirectionExtreme(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
+    public boolean closePriceAtDirectionExtreme(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
         boolean result = false;
         final int maxStepCountToApplyFactor=3;
         // Here i am testing the logic to see if the close value of the
@@ -240,14 +240,14 @@ public class CalculationEngineUtility {
             String direction = lastCandle.get("direction");
 
             if(direction.equalsIgnoreCase("UP")){
-                if(close==high && nextTradeDetails.nextStepCount<=maxStepCountToApplyFactor){
+                if(close==high && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
                     log.info(lastCandle.toString());
                     result= true;
                 }
             }
 
             if(direction.equalsIgnoreCase("DOWN")){
-                if(close==low && nextTradeDetails.nextStepCount<=maxStepCountToApplyFactor){
+                if(close==low && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
                     log.info(lastCandle.toString());
                     result= true;
                 }
@@ -272,7 +272,7 @@ public class CalculationEngineUtility {
     }
 
 
-    BuyContractParameters getParameters(String symbol, NextTradeDetails nextTradeDetails, String currency) {
+    public BuyContractParameters getParameters(String symbol, NextTradeDetails nextTradeDetails, String currency) {
         String json = "{\n" +
                 "  \"amount\": \""+ nextTradeDetails.getAmount() +"\",\n" +
                 "  \"basis\": \"stake\",\n" +
@@ -287,32 +287,16 @@ public class CalculationEngineUtility {
         return gson.fromJson(json, BuyContractParameters.class);
     }
 
-    public void calculateBollingerBands(List<Map<String, String>> candleDataFromDB, Optional<String> candleSource) {
-        String source = candleSource.isPresent()?candleSource.get():"";
 
-        if(CollectionUtils.isNotEmpty(candleDataFromDB)) {
-            if(candleDataFromDB.size()>=BOLLINGER_BAND_DATA_COUNT) {
-                int lastElementCounter = candleDataFromDB.size();
-                if(source.equalsIgnoreCase("CANDLES")) {
-                    lastElementCounter = candleDataFromDB.size()-1;
-                }
-
-                for(int i=lastElementCounter;i>=BOLLINGER_BAND_DATA_COUNT; --i){
-                    int start = i-BOLLINGER_BAND_DATA_COUNT ;
-                    int end = i;
-                    log.info("start : end = {} : {} ", start, end);
-
-                    List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
-
-                    BollingerBand bollingerBand = new BollingerBand(candleSubList);
-                    bollingerBand.calculate();
-                    log.info(bollingerBand.toString());
-
-                    bollingerBand.writeToDB(databaseConnection);
-                }
-            }
+    private BigDecimal getTickForEpochTime(long epochTime){
+        BigDecimal quote= new BigDecimal(-1);
+        List<Map<String,String>>  tickResult = databaseConnection.executeQuery(
+                "select * from tick t where t.epoch = " + String.valueOf(epochTime));
+        if(!CollectionUtils.isEmpty(tickResult)){
+            Map<String, String> tickRow = tickResult.get(0);
+            quote = new BigDecimal(tickRow.get("quote"));
         }
-        log.info("Bollinger Band calculations done.");
+        return quote;
     }
 
 }

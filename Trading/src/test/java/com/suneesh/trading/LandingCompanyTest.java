@@ -1,6 +1,6 @@
 package com.suneesh.trading;
 
-import com.suneesh.trading.engine.ApiWrapper;
+import com.suneesh.trading.core.ApiWrapper;
 import com.suneesh.trading.models.requests.LandingCompanyRequest;
 import com.suneesh.trading.models.responses.LandingCompanyResponse;
 import com.suneesh.trading.models.responses.ResponseBase;

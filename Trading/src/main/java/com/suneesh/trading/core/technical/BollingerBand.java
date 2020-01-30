@@ -1,4 +1,4 @@
-package com.suneesh.trading.engine.technical;
+package com.suneesh.trading.core.technical;
 
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.utils.AutoTradingUtility;

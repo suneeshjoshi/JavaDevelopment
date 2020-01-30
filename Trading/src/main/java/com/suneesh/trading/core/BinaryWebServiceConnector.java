@@ -1,8 +1,8 @@
-package com.suneesh.trading.engine;
+package com.suneesh.trading.core;
 
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.database.PostgreSQLDatabaseConnection;
-import com.suneesh.trading.models.enums.TickStyles;
+import com.suneesh.trading.core.calculations.Engine;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
 import com.suneesh.trading.utils.AutoTradingUtility;
@@ -24,7 +24,7 @@ public class BinaryWebServiceConnector {
     private String databaseServer;
     private String databaseURL;
     protected CommandProcessor commandProcessor;
-    protected CalculationEngine calculationEngine;
+    protected Engine calculationEngine;
     protected String symbolToTrade;
     protected boolean backTestingMode;
 
@@ -61,7 +61,7 @@ public class BinaryWebServiceConnector {
         databaseConnection.init(isBackTestingMode());
 
         commandProcessor = new CommandProcessor(commandQueue,api);
-        calculationEngine = new CalculationEngine(commandQueue, databaseConnection, symbolToTrade);
+        calculationEngine = new Engine(commandQueue, databaseConnection, symbolToTrade);
         threadCreation();
         sendInitialSetupRequest();
     }
@@ -94,7 +94,7 @@ public class BinaryWebServiceConnector {
         if(!isBackTestingMode()){
             ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
             commandGeneratorThread.submit(()->{
-                Thread.currentThread().setName("CalculationEngine");
+                Thread.currentThread().setName("Engine");
                 logger.info("{} started ... ", Thread.currentThread().getName());
                 calculationEngine.process();
             });
@@ -109,9 +109,9 @@ public class BinaryWebServiceConnector {
         else{
             ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
             commandGeneratorThread.submit(()->{
-                Thread.currentThread().setName("BackTestingCalculationEngine");
+                Thread.currentThread().setName("BackTestingEngine");
                 logger.info("{} started ... ", Thread.currentThread().getName());
-                new BackTestingCalculationEngine(commandQueue, databaseConnection, symbolToTrade).process();
+                new BackTestingEngine(commandQueue, databaseConnection, symbolToTrade).process();
             });
         }
 
