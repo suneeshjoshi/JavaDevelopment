@@ -98,7 +98,7 @@ public class BackTestingEngine extends Engine {
 
         }
 
-        generateReportFromTradeData(test_run_id);
+        generateReportFromTradeData(test_run_id, simulate_max_steps_count);
     }
 
     private void createDummyTrade(Engine calculationEngine, Strategy backTestingStrategy, Map<String, String> candleData, Map<String, String> nextCandleData){
@@ -156,11 +156,11 @@ public class BackTestingEngine extends Engine {
     }
 
 
-    private void generateReportFromTradeData(int test_run_id) {
-        List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT s.identifier, s.max_steps FROM strategy s where identifier in ( SELECT distinct(strategy_id) FROM trade)");
+    private void generateReportFromTradeData(int test_run_id, int simulate_max_steps_count) {
+        List<Map<String,String>> distinctStrategyIdList = (List<Map<String,String>>)databaseConnection.executeQuery("SELECT distinct(strategy_id) FROM trade");
         if (CollectionUtils.isNotEmpty(distinctStrategyIdList)) {
             for(Map<String,String> row : distinctStrategyIdList) {
-                writeTradeReportToDB(row, test_run_id);
+                writeTradeReportToDB(row, test_run_id, simulate_max_steps_count);
             }
         }
     }
@@ -182,9 +182,9 @@ public class BackTestingEngine extends Engine {
     }
 
 
-    private void writeTradeReportToDB(Map<String, String> row, int test_run_id){
-        String strategyId = row.get("identifier");
-        String maxSteps = row.get("max_steps");
+    private void writeTradeReportToDB(Map<String, String> row, int test_run_id, int simulate_max_steps_count){
+        String strategyId = row.get("strategy_id");
+        String maxSteps = String.valueOf(simulate_max_steps_count);
 
         String totalBidAmountQuery = "select sum(bid_amount) from trade where trade.strategy_id="+strategyId;
         String totalAmountWonQuery = "select sum(amount_won) from trade where trade.strategy_id="+strategyId;
