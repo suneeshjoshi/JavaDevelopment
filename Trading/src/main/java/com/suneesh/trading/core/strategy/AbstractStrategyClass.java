@@ -19,7 +19,9 @@ import java.util.Optional;
 public abstract class AbstractStrategyClass implements StrategyImplementationInterface {
 
     //    final static long CONTRACT_DURATION_IN_SECONDS = 60L;
-    final static long CONTRACT_DURATION_IN_SECONDS = 58L;
+//    final static long CONTRACT_DURATION_IN_SECONDS = 58L;
+    // This should be the same as the granularity of the candle
+    final static long CONTRACT_DURATION_IN_SECONDS = 300L;
     final static double INITIAL_BID_AMOUNT = 1.00D;
     DatabaseConnection databaseConnection;
     Strategy strategy;

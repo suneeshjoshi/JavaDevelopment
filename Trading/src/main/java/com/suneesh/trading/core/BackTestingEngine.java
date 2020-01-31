@@ -56,7 +56,7 @@ public class BackTestingEngine extends Engine {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setCount(candleDataPoints);
-        tickHistoryRequest.setGranularity(60);
+        tickHistoryRequest.setGranularity(300);
         sendRequest(tickHistoryRequest);
     }
 
@@ -71,10 +71,10 @@ public class BackTestingEngine extends Engine {
         int test_run_id = getTestRunId();
 
         // Simulate different max_steps in the backtesting strategy.
-        for(int simulate_max_steps_count = 1; simulate_max_steps_count <= 10; ++simulate_max_steps_count){
+//        for(int simulate_max_steps_count = 1; simulate_max_steps_count <= 10; ++simulate_max_steps_count){
 
         // Defaulting to 5 steps.
-//         for(int simulate_max_steps_count = 5; simulate_max_steps_count <= 5; ++simulate_max_steps_count){
+         for(int simulate_max_steps_count = 5; simulate_max_steps_count <= 5; ++simulate_max_steps_count){
             logger.info("Setting Backtesting strategy's MAX Step = {}",simulate_max_steps_count);
 
             simulateAndReport(candleDataFromDB, test_run_id, simulate_max_steps_count);

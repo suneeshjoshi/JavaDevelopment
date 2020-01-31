@@ -9,13 +9,13 @@ import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
-import lombok.Data;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 public class Engine extends AbstractCommandGenerator {
@@ -63,7 +63,7 @@ public class Engine extends AbstractCommandGenerator {
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setSubscribe(1);
         tickHistoryRequest.setCount(NUMBER_OF_INITIAL_CANDLES_TO_READ);
-        tickHistoryRequest.setGranularity(CANDLE_60_SECOND_GRANULARITY);
+        tickHistoryRequest.setGranularity(CANDLE_300_SECOND_GRANULARITY);
         sendRequest(tickHistoryRequest);
     }
 
@@ -73,7 +73,7 @@ public class Engine extends AbstractCommandGenerator {
         init();
 
         logger.info("Sleeping for the start of next minute.");
-        calculationUtility.sleepTillStartOfNextMinute();
+        calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
 
         logger.info("\n\n");
         logger.info("*************************************************************************************************************************************");
@@ -89,7 +89,9 @@ public class Engine extends AbstractCommandGenerator {
 
             /// waiting till last trade is completed.
             while(calculationUtility.waitToBookNextTrade()){
-                AutoTradingUtility.sleep(100);
+
+                calculationUtility.checkDeltaPercentageToCloseTrade();
+                AutoTradingUtility.sleep(500);
             }
             logger.info("Trade {} completed.",tradeCount);
             tradeCount++;
@@ -135,8 +137,8 @@ public class Engine extends AbstractCommandGenerator {
             strategy.getNextStepCount(nextTradeDetails, lastTrade);
             strategy.getNextTradeStrategyId(nextTradeDetails, lastTrade);
             strategy.getBidAmount(nextTradeDetails, lastCandle);
-
             BuyContractParameters parameters = calculationUtility.getParameters(symbol, nextTradeDetails, currency);
+            nextTradeDetails.setStrikePrice(calculationUtility.getTickForEpochTime(Optional.empty(),symbol));
             String tradeInsertStatement = calculationUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);
             if(debug) {
                 logger.debug(tradeInsertStatement);

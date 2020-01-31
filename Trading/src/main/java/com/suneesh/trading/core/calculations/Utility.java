@@ -16,9 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Data
 @Slf4j
@@ -43,9 +41,10 @@ public class Utility {
         return currency;
     }
 
-    void sleepTillStartOfNextMinute(){
-        int secondsToNextMinute = 60- Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)%60);
-        AutoTradingUtility.sleep(secondsToNextMinute*1000);
+    void sleepTillStartOfNextMinuteMinusSeconds(int seconds){
+        int secondsToNextMinute = 60 - getPresentEpochtime()%60 ;
+        int secondsToNextMinute2 = secondsToNextMinute - seconds;
+        AutoTradingUtility.sleep(secondsToNextMinute2*1000);
     }
 
     Map<String,String> getLastCandle(){
@@ -65,10 +64,13 @@ public class Utility {
     }
 
     public String getTradeDatabaseInsertString(BuyContractParameters parameters, NextTradeDetails nextTradeDetails) {
+
         return
                 "INSERT INTO public.trade " +
-                        "(bid_amount, call_or_put, symbol, step_count, strategy_id, trade_time, trade_time_string, amount_won) " +
-                        " VALUES (" + AutoTradingUtility.quotedString(parameters.getAmount())+", "
+                        "(bid_amount, strike_price, call_or_put, symbol, step_count, strategy_id, trade_time, trade_time_string, amount_won) " +
+                        " VALUES (" +
+                        AutoTradingUtility.quotedString(parameters.getAmount())+", "
+                        + AutoTradingUtility.quotedString(nextTradeDetails.getStrikePrice())+", "
                         + AutoTradingUtility.quotedString(parameters.getContractType())+", "
                         + AutoTradingUtility.quotedString(parameters.getSymbol())+", "
                         + AutoTradingUtility.quotedString(nextTradeDetails.getNextStepCount())+", "
@@ -123,15 +125,26 @@ public class Utility {
     }
 
 
-    private BigDecimal getTickForEpochTime(long epochTime){
+    public double getTickForEpochTime(Optional<Integer> epochTimeObj, String symbol){
+        int epochTime = epochTimeObj.isPresent()?epochTimeObj.get():getPresentEpochtime();
+
         BigDecimal quote= new BigDecimal(-1);
         List<Map<String,String>>  tickResult = databaseConnection.executeQuery(
-                "select * from tick t where t.epoch = " + String.valueOf(epochTime));
+                "select quote from tick t where t.symbol = '"+symbol+"' AND t.epoch = " + String.valueOf(epochTime));
         if(!CollectionUtils.isEmpty(tickResult)){
             Map<String, String> tickRow = tickResult.get(0);
             quote = new BigDecimal(tickRow.get("quote"));
         }
-        return quote;
+        else{
+            // Get all the tick prices for the last 10 seconds
+            tickResult = databaseConnection.executeQuery(
+                    "select quote from tick t where t.symbol = '"+symbol+"' AND t.epoch > " + String.valueOf(epochTime - 10) +"  order by identifier desc limit 1");
+            if(!CollectionUtils.isEmpty(tickResult)){
+                Map<String, String> tickRow = tickResult.get(0);
+                quote = new BigDecimal(tickRow.get("quote"));
+            }
+        }
+        return quote.doubleValue();
     }
 
     public void loadAllStrategies(){
@@ -227,4 +240,55 @@ public class Utility {
 
         return backTestigStrategies.get(0);
     }
+
+    public void checkDeltaPercentageToCloseTrade() {
+        HashMap<String, Double> inputMap = new HashMap<>();
+        final double VOLATILITY = 0.03D;
+        final double INTEREST = 0.01D;
+        final double TRADE_DURATION = 300D;
+
+        try {
+            log.info("Going to check open trades...");
+            ArrayList<HashMap<String, String>> list =
+                    (ArrayList<HashMap<String, String>>) databaseConnection.executeQuery("select identifier,  CAST( ( extract(epoch from now() ) - trade_time) as BIGINT) as time_since_trade_booked , strike_price ,symbol  from trade where result = 'OPEN'");
+            log.info("open trades = {}", list.size());
+
+            if (list.size() > 1) {
+                log.error("#######################################################################################");
+                log.error("ERROR ! more than one trades open. Expected to have only one trade open at a given time.");
+                log.error("#######################################################################################");
+            }
+
+            for (HashMap<String, String> row : list) {
+                double timeSinceTradeBooked = Long.valueOf(row.get("time_since_trade_booked"));
+                double strikePrice = Double.valueOf(row.get("strike_price"));
+                String symbol = row.get("symbol");
+
+                double timeLeftOnTrade = TRADE_DURATION - timeSinceTradeBooked;
+                double timeHorizon = (timeLeftOnTrade / 365) / 365;
+
+                double tickForEpochTime = getTickForEpochTime(Optional.empty(), symbol);
+
+                inputMap.put("stock", tickForEpochTime);
+                inputMap.put("strike", strikePrice);
+                inputMap.put("volatility", VOLATILITY);
+                inputMap.put("interest", INTEREST);
+                inputMap.put("timehorizon", timeHorizon);
+
+                log.info(inputMap.toString());
+
+                DeltaPercentage dp = new DeltaPercentage(inputMap);
+                double tradeDeltaPercentage = dp.calculate();
+                log.info("Trade's Delta Percentage = {}", tradeDeltaPercentage);
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public int getPresentEpochtime(){
+        return Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+    }
+
 }

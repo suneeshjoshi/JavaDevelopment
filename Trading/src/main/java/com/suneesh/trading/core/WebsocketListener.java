@@ -68,7 +68,7 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-                    logger.info("Received Message: {}", o);
+//                    logger.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
@@ -161,6 +161,8 @@ WebsocketListener extends WebSocketListener {
 
                                 break;
                             case "transaction":
+                                logger.info("Received Message: {}", o);
+
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject transactionData = (JSONObject) jsonObject.get("transaction");
 

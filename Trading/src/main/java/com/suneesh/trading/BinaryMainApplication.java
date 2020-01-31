@@ -18,7 +18,7 @@ public class BinaryMainApplication {
     private static String dbURL;
     private static String dbName;
     private static BlockingQueue<RequestBase> inputMessageQueue = new LinkedBlockingQueue<>();
-    private static final String symbolToTrade ="R_10";
+    private static final String symbolToTrade ="R_50";
     private static boolean backTestingMode;
 
     private static void init(){
