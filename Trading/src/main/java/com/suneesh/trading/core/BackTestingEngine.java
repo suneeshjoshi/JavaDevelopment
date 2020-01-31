@@ -46,7 +46,6 @@ public class BackTestingEngine extends Engine {
         return databaseConnection;
     }
 
-
     public void init(){
         calculationUtility.loadAllStrategies();
         strategyFactory = new StrategyFactory(databaseConnection, calculationUtility, isBackTestingMode);

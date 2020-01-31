@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.strategy
     is_default_strategy boolean,
     is_backtesting_strategy boolean,
     reset_step_count_on_success boolean,
-    classname character varying(255) ,
+    strategy_algorithm bigint ,
     creation_date timestamp NOT NULL,
     CONSTRAINT strategy_pkey PRIMARY KEY (identifier)
 )
