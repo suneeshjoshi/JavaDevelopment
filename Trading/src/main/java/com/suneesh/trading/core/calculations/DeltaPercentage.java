@@ -23,7 +23,7 @@ public class DeltaPercentage {
         HashMap<String, Double> inputMap2 = new HashMap<>(inputMap);
         inputMap2.put("stock",  inputMap.get("stock")+epsilon);
 
-        BlackScholes bs2 = new BlackScholes(inputMap);
+        BlackScholes bs2 = new BlackScholes(inputMap2);
         double callPrice2 = bs2.getCall();
 
         double priceDiff = callPrice2 - callPrice1;
