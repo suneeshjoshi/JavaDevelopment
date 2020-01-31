@@ -62,7 +62,7 @@ public class BollingerBand {
                 getCandleIdentifier() + "," +
                 AutoTradingUtility.quotedString(getCandle_epoch_string()) +");";
 
-        log.info("query = {}",query);
+//        log.info("query = {}",query);
         return Arrays.asList(query);
     }
 }

@@ -72,23 +72,23 @@ public class BackTestingEngine extends Engine {
         int test_run_id = getTestRunId();
 
         // Simulate different max_steps in the backtesting strategy.
-        for(int i = 1; i <= 10; ++i){
+        for(int simulate_max_steps_count = 1; simulate_max_steps_count <= 10; ++simulate_max_steps_count){
 
         // Defaulting to 5 steps.
-        // for(int i = 5; i <= 5; ++i){
-            databaseConnection.executeNoResultSet("UPDATE strategy SET max_steps = "+i+" WHERE is_backtesting_strategy = TRUE");
-            logger.info("Setting Backtesting strategy's MAX Step = {}",i);
+//         for(int simulate_max_steps_count = 5; simulate_max_steps_count <= 5; ++simulate_max_steps_count){
+            logger.info("Setting Backtesting strategy's MAX Step = {}",simulate_max_steps_count);
 
-            simulateAndReport(candleDataFromDB,test_run_id);
+            simulateAndReport(candleDataFromDB, test_run_id, simulate_max_steps_count);
             test_run_id++;
         }
 
         System.exit(-1);
     }
 
-    private void simulateAndReport(List<Map<String, String>> candleDataFromDB, int test_run_id){
+    private void simulateAndReport(List<Map<String, String>> candleDataFromDB, int test_run_id, int simulate_max_steps_count){
         Engine calculationEngine = new Engine(null, databaseConnection, symbol,isBackTestingMode);
         Strategy backTestingStrategy = calculationUtility.getBackTestingStrategy();
+        backTestingStrategy.setMaxSteps(simulate_max_steps_count);
 
         // Checking till Size - 1, as we are going to use 2 rows simultaneously
         for(int i=0;i<candleDataFromDB.size()-1;i++){

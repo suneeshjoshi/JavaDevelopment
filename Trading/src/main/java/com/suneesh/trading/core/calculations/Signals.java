@@ -33,13 +33,13 @@ public class Signals {
                 for(int i=lastElementCounter;i>=BOLLINGER_BAND_DATA_COUNT; --i){
                     int start = i-BOLLINGER_BAND_DATA_COUNT ;
                     int end = i;
-                    log.info("start : end = {} : {} ", start, end);
+//                    log.info("start : end = {} : {} ", start, end);
 
                     List<Map<String, String>> candleSubList = candleDataFromDB.subList(start, end);
 
                     BollingerBand bollingerBand = new BollingerBand(candleSubList);
                     bollingerBand.calculate();
-                    log.info(bollingerBand.toString());
+//                    log.info(bollingerBand.toString());
 
                     bollingerBand.writeToDB(databaseConnection);
                 }

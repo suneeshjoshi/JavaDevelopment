@@ -42,47 +42,20 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
         String callOrPutResult = "CALL";
         if(!MapUtils.isEmpty(lastCandle)) {
             String previousCandleDirection = lastCandle.get("direction");
-
-//            log.debug("************ : {}", previousCandleDirection);
-//            for (Map.Entry<String, String> entry : lastCandle.entrySet()) {
-//                log.debug("{} - {} ", entry.getKey(), entry.getValue());
-//            }
-
             callOrPutResult = previousCandleDirection.equalsIgnoreCase("UP") ? "CALL" : "PUT";
         }
         nextTradeDetails.setCallOrPut(callOrPutResult);
-//        return callOrPutResult;
-    }
-
-    public double getInitialTradeAmount(){
-        // Lowest amount possible.
-        double amount = INITIAL_BID_AMOUNT;
-        List<Map<String,String>> result = databaseConnection.executeQuery(
-                "select ss.value from strategy_steps ss join strategy s on ( ss.strategy_id = s.identifier ) WHERE s.is_default_strategy=true and ss.step_count=1");
-        if(!CollectionUtils.isEmpty(result)){
-            Map<String,String> firstRow = result.get(0);
-            amount = Double.valueOf(firstRow.get("value"));
-        }
-        return amount;
     }
 
     public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
         double amount = INITIAL_BID_AMOUNT;
-        Map<String, String> lastTrade = calculationUtility.getLastTrade();
-        if(MapUtils.isEmpty(lastTrade)){
-            getInitialTradeAmount();
-        }
-        else{
-            Strategy strategy = calculationUtility.getStrategy(Optional.of(nextTradeDetails.getStrategyId()) , Optional.of(false));
-            int nextStepCount = nextTradeDetails.getNextStepCount();
-            amount = strategy.getStepValuesMap().get(nextStepCount);
-        }
+        int nextStepCount = nextTradeDetails.getNextStepCount();
+        amount = strategy.getStepValuesMap().get(nextStepCount);
         nextTradeDetails.setAmount(amount);
     }
 
     public void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
         int stepCount = 1;
-//        Map<String, String> lastTrade = getLastTrade();
 
         if(!MapUtils.isEmpty(lastTrade)){
             String previousTradeResult = String.valueOf(lastTrade.get("result"));
@@ -102,7 +75,6 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
             }
 
             if(previousTradeResult.equalsIgnoreCase("FAIL")){
-//                stepCount = Integer.valueOf(lastTrade.get("step_count"));
                 stepCount=previousStepCount+1;
             }
         }

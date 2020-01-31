@@ -74,15 +74,10 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
         final double INCREASED_MOMENTUM_FACTOR= 2.5;
         boolean increaseAmount = false;
 
-        Map<String, String> lastTrade = calculationUtility.getLastTrade();
-        if(MapUtils.isEmpty(lastTrade)){
-            getInitialTradeAmount();
-        }
-        else{
-            Strategy strategy = calculationUtility.getStrategy(Optional.of(nextTradeDetails.getStrategyId()) , Optional.of(false));
-            int nextStepCount = nextTradeDetails.getNextStepCount();
-            amount = strategy.getStepValuesMap().get(nextStepCount);
-        }
+        int nextStepCount = nextTradeDetails.getNextStepCount();
+        amount = strategy.getStepValuesMap().get(nextStepCount);
+
+        nextTradeDetails.setAmount(amount);
 
         increaseAmount = closePriceAtDirectionExtreme(nextTradeDetails,lastCandle);
         if(increaseAmount){
