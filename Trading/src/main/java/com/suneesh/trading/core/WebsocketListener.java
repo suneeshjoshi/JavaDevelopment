@@ -60,9 +60,9 @@ WebsocketListener extends WebSocketListener {
         if(queryMode.equalsIgnoreCase("UPDATE")) {
             objectToWrite.databaseUpdateStringList().forEach(f -> {
                 if (debug) {
-                    logger.debug(f);
+                    logger.debug((String) f);
                 }
-                databaseConnection.executeNoResultSet(f);
+                databaseConnection.executeNoResultSet((String) f);
             });
         }
 

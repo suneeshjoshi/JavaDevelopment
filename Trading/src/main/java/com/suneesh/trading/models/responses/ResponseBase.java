@@ -33,6 +33,4 @@ public abstract class ResponseBase<T> implements DatabaseOperation {
     public Error getError() {
         return error;
     }
-
-    public abstract List<String> databaseUpdateStringList();
 }
