@@ -4,13 +4,10 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
-import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +49,7 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
     public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
         double amount = INITIAL_BID_AMOUNT;
         int nextStepCount = nextTradeDetails.getNextStepCount();
-        amount = strategy.getStepValuesMap().get(nextStepCount);
+        amount = strategy.getStepToStrategyStepsMap().get(nextStepCount);
         nextTradeDetails.setAmount(amount);
     }
 

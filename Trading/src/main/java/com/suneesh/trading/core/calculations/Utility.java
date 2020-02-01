@@ -6,7 +6,6 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.requests.BuyContractParameters;
-import com.suneesh.trading.models.requests.ProposalOpenContractRequest;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +97,9 @@ public class Utility {
         return result;
     }
 
+    public List<Map<String,String>> getTradesByResult(String resultString){
+        return databaseConnection.executeQuery("select * from trade WHERE RESULT = "+AutoTradingUtility.quotedString(resultString));
+    }
 
 
     boolean waitToBookNextTrade(){
@@ -298,5 +300,30 @@ public class Utility {
 
     public void checkPotentialProfit() {
         log.info("This method will check the profitability of a given open trade.");
+        List<Map<String, String>> proposalOpenContractSentTradeList = getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
+        for(Map<String, String> trade : proposalOpenContractSentTradeList){
+            long tradeId = Long.valueOf(trade.get("identifier"));
+            long strategyId = Long.valueOf(trade.get("strategy_id"));
+            Strategy strategy = getStrategy(Optional.of(strategyId), Optional.empty());
+            HashMap<Integer, StrategySteps> stepToStrategyStepsMap1 = strategy.getStepToStrategyStepsMap();
+
+            int step_count = Integer.valueOf(trade.get("step_count"));
+            StrategySteps strategyStepsForGivenStepCount = stepToStrategyStepsMap1.get(step_count);
+
+            double profitPercentageThreshold = strategyStepsForGivenStepCount.getProfit_percentage_threshold();
+
+            double tradeInstantaneousProfitPercentage = 0;
+            List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery("select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.identifier = " + tradeId);
+            if(CollectionUtils.isEmpty(tradeProfitPercentageResult)){
+                log.error("ERROR! Unable to get profit_percentage for trade {} -> strategy {} -> step_count {}.",tradeId, strategyId, step_count);
+            }
+            else{
+                if(tradeInstantaneousProfitPercentage > profitPercentageThreshold){
+                    log.info("Trade {} has profit percentage of {} , which is >= {}. [ strategyID {} -> step_count {} profit threshold {} ] ",tradeId,tradeInstantaneousProfitPercentage,profitPercentageThreshold,strategyId,step_count,profitPercentageThreshold);
+                }
+            }
+
+        }
+
     }
 }

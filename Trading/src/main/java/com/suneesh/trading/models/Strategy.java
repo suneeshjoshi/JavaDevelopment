@@ -53,12 +53,12 @@ public class Strategy {
     @Expose
     boolean activeStrategy;
 
-    HashMap<Integer, Double> stepValuesMap = new HashMap<>();
+    HashMap<Integer, StrategySteps> stepToStrategyStepsMap = new HashMap<>();
 
     public void setStepValueMap(List<StrategySteps> strategyStepsList){
         try {
             if (CollectionUtils.isNotEmpty(strategyStepsList)) {
-                strategyStepsList.stream().forEach(ele -> stepValuesMap.putIfAbsent(Integer.valueOf(ele.getStepCount()), Double.valueOf(ele.getValue())));
+                strategyStepsList.stream().forEach(ele -> stepToStrategyStepsMap.putIfAbsent(Integer.valueOf(ele.getStepCount()), ele));
             }
         }
         catch(Exception e){

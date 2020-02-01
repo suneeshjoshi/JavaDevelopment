@@ -23,4 +23,8 @@ public class StrategySteps {
     @SerializedName("value")
     @Expose
     double value;
+
+    @SerializedName("profit_percentage_threshold")
+    @Expose
+    double profit_percentage_threshold;
 }
