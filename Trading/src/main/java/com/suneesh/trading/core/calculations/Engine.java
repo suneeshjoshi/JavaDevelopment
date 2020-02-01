@@ -14,6 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -90,14 +92,25 @@ public class Engine extends AbstractCommandGenerator {
             /// waiting till last trade is completed.
             while(calculationUtility.waitToBookNextTrade()){
 
+                sendProposalOpenContract();
                 calculationUtility.checkDeltaPercentageToCloseTrade();
-                AutoTradingUtility.sleep(500);
+                AutoTradingUtility.sleep(2000);
             }
             logger.info("Trade {} completed.",tradeCount);
             tradeCount++;
         }
-
     }
+
+    private void sendProposalOpenContract() {
+        List<HashMap<String,String>> openContractsList = databaseConnection.executeQuery("select contract_id From trade where result ='OPEN'");
+        logger.info("{} Open Contracts found...", openContractsList.size());
+        openContractsList.parallelStream().forEach(openContract->{
+            String contract_id = openContract.get("contract_id");
+            logger.info("Sending ProposalOpenContract request for {}", contract_id);
+            sendRequest(new ProposalOpenContractRequest(Long.valueOf(contract_id), true) );
+        });
+    }
+
 
     private void createAndSendTrade(){
         try {

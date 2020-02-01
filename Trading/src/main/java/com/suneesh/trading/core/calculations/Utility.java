@@ -6,6 +6,7 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.requests.BuyContractParameters;
+import com.suneesh.trading.models.requests.ProposalOpenContractRequest;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,12 @@ public class Utility {
     void sleepTillStartOfNextMinuteMinusSeconds(int seconds){
         int secondsToNextMinute = 60 - getPresentEpochtime()%60 ;
         int secondsToNextMinute2 = secondsToNextMinute - seconds;
+
+        if(secondsToNextMinute2<0){
+            secondsToNextMinute2+=60;
+        }
+
+        log.info("Going to sleep for {} seconds.", secondsToNextMinute2);
         AutoTradingUtility.sleep(secondsToNextMinute2*1000);
     }
 

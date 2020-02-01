@@ -7,6 +7,7 @@ import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.models.WebsocketEvent;
 
 import com.suneesh.trading.models.responses.*;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import lombok.Data;
@@ -46,6 +47,26 @@ WebsocketListener extends WebSocketListener {
         });
     }
 
+    private void writeToDatabase(ResponseBase objectToWrite, boolean debug, String queryMode){
+        if(queryMode.equalsIgnoreCase("INSERT")) {
+            objectToWrite.databaseInsertStringList().forEach(f -> {
+                if (debug) {
+                    logger.debug(f);
+                }
+                databaseConnection.executeNoResultSet(f);
+            });
+        }
+
+        if(queryMode.equalsIgnoreCase("UPDATE")) {
+            objectToWrite.databaseUpdateStringList().forEach(f -> {
+                if (debug) {
+                    logger.debug(f);
+                }
+                databaseConnection.executeNoResultSet(f);
+            });
+        }
+
+    }
 
     public WebsocketListener(BehaviorSubject<WebsocketEvent> wsEmitter,
                              PublishSubject<String> responseEmitter,
@@ -173,6 +194,30 @@ WebsocketListener extends WebSocketListener {
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
                                     logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
                                     writeToDatabase(transactionsStreamResponse, true);
+                                }
+
+                                break;
+                                // Returns the complete contract details of an open trade contract, which is required for calculating Realtime Delta Percentage.
+                            case "proposal_open_contract":
+                                logger.info("Received Message: {}", o);
+
+                                ProposalOpenContractResponse proposalOpenContractResponse = new ProposalOpenContractResponse();
+                                JSONObject proposalOpenContractData = (JSONObject) jsonObject.get("proposal_open_contract");
+
+                                if(proposalOpenContractData != null) {
+                                    OpenContract openContract = gson.fromJson(String.valueOf(proposalOpenContractData), OpenContract.class);
+                                    logger.info(openContract.toString());
+
+                                    proposalOpenContractResponse.setOpenContract(openContract);
+
+                                    String checkContractIdExistsQuery = "select 1 from open_contract WHERE contractId = " + AutoTradingUtility.quotedString(openContract.getContractId());
+                                    String dbQueryType = "INSERT";
+                                    if(databaseConnection.executeQuery(checkContractIdExistsQuery).size()>0){
+                                        dbQueryType="UPDATE";
+                                    }
+
+
+                                    writeToDatabase(proposalOpenContractResponse, true);
                                 }
 
                                 break;

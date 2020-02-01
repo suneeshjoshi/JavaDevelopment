@@ -2,6 +2,7 @@ package com.suneesh.trading.models.requests;
 
 import com.suneesh.trading.models.responses.ProposalOpenContractResponse;
 import com.google.gson.annotations.SerializedName;
+import io.reactivex.annotations.Nullable;
 
 /**
  * <h1>ProposalOpenContractRequest</h1>
@@ -26,9 +27,23 @@ public class ProposalOpenContractRequest extends RequestBase {
     @SerializedName("contract_id")
     private Long contractId;
 
+    /**
+     * If set to 1, will send updates whenever the price changes
+     */
+    @SerializedName("subscribe")
+    @Nullable
+    private Integer subscribe = null;
+
+
     public ProposalOpenContractRequest(Long contractId) {
         this.responseType = ProposalOpenContractResponse.class;
         this.contractId = contractId;
+    }
+
+    public ProposalOpenContractRequest(Long contractId, Boolean subscribe) {
+        this.responseType = ProposalOpenContractResponse.class;
+        this.contractId = contractId;
+        this.subscribe = subscribe? 1: null;
     }
 
     public Long getContractId() {
@@ -37,5 +52,13 @@ public class ProposalOpenContractRequest extends RequestBase {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Integer getSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(Integer subscribe) {
+        this.subscribe = subscribe;
     }
 }

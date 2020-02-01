@@ -42,7 +42,11 @@ public class AutoTradingUtility {
     }
 
     public static String quotedString(Object str){
-        return "'"+String.valueOf(str)+"'";
+        String result = null;
+        if(str!=null){
+            result ="'"+String.valueOf(str)+"'";
+        }
+        return result;
     }
 
     public static String getTimeStampString(long epochTime){

@@ -1,6 +1,7 @@
 package com.suneesh.trading.models.responses;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Map;
  * @version 1.0.0
  * @since 8/8/2017
  */
+@Data
 public class OpenContract {
 
     /**
@@ -76,7 +78,7 @@ public class OpenContract {
      * Example: 9874.52
      */
     @SerializedName("entry_spot")
-    private Long entrySpot;
+    private BigDecimal entrySpot;
 
     /**
      * Expiry date (epoch) of the Contract. Example: 1446629000.
@@ -218,6 +220,12 @@ public class OpenContract {
     private String validationError;
 
     /**
+     * Error message if validation fails
+     */
+    @SerializedName("status")
+    private String status;
+
+    /**
      * Price at which contract was sold, only available when contract has been sold.
      */
     @SerializedName("sell_price")
@@ -303,7 +311,7 @@ public class OpenContract {
         return currentSpotTime;
     }
 
-    public Long getEntrySpot() {
+    public BigDecimal getEntrySpot() {
         return entrySpot;
     }
 
