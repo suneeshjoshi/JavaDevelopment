@@ -95,7 +95,11 @@ public class Engine extends AbstractCommandGenerator {
                 sendProposalOpenContract();
 //                calculationUtility.checkDeltaPercentageToCloseTrade();
 
-                calculationUtility.checkPotentialProfit();
+                SellContractRequest sellContractRequest = calculationUtility.checkPotentialProfit();
+                if(sellContractRequest!=null){
+                    sendRequest(sellContractRequest);
+                    calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
+                }
 
                 AutoTradingUtility.sleep(2000);
             }

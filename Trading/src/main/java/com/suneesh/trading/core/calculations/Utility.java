@@ -6,6 +6,7 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.requests.BuyContractParameters;
+import com.suneesh.trading.models.requests.SellContractRequest;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -298,11 +299,14 @@ public class Utility {
         return Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
     }
 
-    public void checkPotentialProfit() {
+    public SellContractRequest checkPotentialProfit() {
+        SellContractRequest sellContractRequest = null;
+
         log.info("This method will check the profitability of a given open trade.");
         List<Map<String, String>> proposalOpenContractSentTradeList = getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
         for(Map<String, String> trade : proposalOpenContractSentTradeList){
             long tradeId = Long.valueOf(trade.get("identifier"));
+            long contractId = Long.valueOf(trade.get("contract_id"));
             long strategyId = Long.valueOf(trade.get("strategy_id"));
             Strategy strategy = getStrategy(Optional.of(strategyId), Optional.empty());
             HashMap<Integer, StrategySteps> stepToStrategyStepsMap1 = strategy.getStepToStrategyStepsMap();
@@ -320,10 +324,11 @@ public class Utility {
             else{
                 if(tradeInstantaneousProfitPercentage > profitPercentageThreshold){
                     log.info("Trade {} has profit percentage of {} , which is >= {}. [ strategyID {} -> step_count {} profit threshold {} ] ",tradeId,tradeInstantaneousProfitPercentage,profitPercentageThreshold,strategyId,step_count,profitPercentageThreshold);
+                    sellContractRequest = new SellContractRequest(contractId,new BigDecimal(0.0));
                 }
             }
 
         }
-
+        return sellContractRequest;
     }
 }
