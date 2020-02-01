@@ -49,13 +49,15 @@ public class ProposalOpenContractResponse extends ResponseBase<ProposalOpenContr
                 "isExpired =  " + AutoTradingUtility.quotedString(openContract.getIsExpired()) + " , " +
                 "isSettleable =  " + AutoTradingUtility.quotedString(openContract.getIsSettleable()) + " , " +
                 "isValidToSell =  " + AutoTradingUtility.quotedString(openContract.getIsValidToSell()) + " , " +
+                "profit =  " + AutoTradingUtility.quotedString(openContract.getProfit()) + " , " +
+                "profit_percentage =  " + AutoTradingUtility.quotedString(openContract.getProfit_percentage()) + " , " +
                 "sellPrice =  " + AutoTradingUtility.quotedString(openContract.getSellPrice()) + " , " +
                 "sellSpot =  " + AutoTradingUtility.quotedString(openContract.getSellSpot()) + " , " +
                 "sellSpotTime =  " + AutoTradingUtility.quotedString(openContract.getSellSpotTime()) + " , " +
                 "sellTime =  " + AutoTradingUtility.quotedString(openContract.getSellTime()) + " , " +
                 "status =  " + AutoTradingUtility.quotedString(openContract.getStatus()) + " , " +
-                "validation_error =  " + AutoTradingUtility.quotedString(openContract.getValidationError()) + " , " +
-                "WHERE contractId = " + AutoTradingUtility.quotedString(openContract.getContractId())
+                "validation_error =  " + AutoTradingUtility.quotedString(openContract.getValidationError()) +
+                " WHERE contractId = " + AutoTradingUtility.quotedString(openContract.getContractId())
         );
     }
 
@@ -66,7 +68,8 @@ public class ProposalOpenContractResponse extends ResponseBase<ProposalOpenContr
                 "(barrier, barrierCount, bidPrice, buyPrice, contractId, contractType, currency, currentSpot, " +
                 "currentSpotTime, expiryDate, dateSetelment, dateStart, displayName, entryTick, entryTickTime, " +
                 "exitTick, exitTickTime, isExpired, isIntraday, isSettleable, isValidToSell, longCode, payout, " +
-                "purchaseTime, sellPrice, sellSpot, sellSpotTime, sellTime, shortCode, status, validation_error) " +
+                "profit, profit_percentage, purchaseTime, sellPrice, sellSpot, sellSpotTime, sellTime, shortCode, " +
+                "status, validation_error) " +
                 " VALUES (" +
                 AutoTradingUtility.quotedString(openContract.getBarrier()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getBarrierCount()) + ", " +
@@ -91,6 +94,8 @@ public class ProposalOpenContractResponse extends ResponseBase<ProposalOpenContr
                 AutoTradingUtility.quotedString(openContract.getIsValidToSell()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getLongCode()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getPayout()) + ", " +
+                AutoTradingUtility.quotedString(openContract.getProfit()) + ", " +
+                AutoTradingUtility.quotedString(openContract.getProfit_percentage()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getPurchaseTime()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getSellPrice()) + ", " +
                 AutoTradingUtility.quotedString(openContract.getSellSpot()) + ", " +

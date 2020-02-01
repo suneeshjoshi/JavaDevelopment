@@ -255,10 +255,8 @@ public class Utility {
         final double TRADE_DURATION = 300D;
 
         try {
-            log.info("Going to check open trades...");
             ArrayList<HashMap<String, String>> list =
                     (ArrayList<HashMap<String, String>>) databaseConnection.executeQuery("select identifier,  CAST( ( extract(epoch from now() ) - trade_time) as BIGINT) as time_since_trade_booked , strike_price ,symbol  from trade where result = 'OPEN'");
-            log.info("open trades = {}", list.size());
 
             if (list.size() > 1) {
                 log.error("#######################################################################################");
@@ -298,4 +296,7 @@ public class Utility {
         return Math.toIntExact(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
     }
 
+    public void checkPotentialProfit() {
+        log.info("This method will check the profitability of a given open trade.");
+    }
 }

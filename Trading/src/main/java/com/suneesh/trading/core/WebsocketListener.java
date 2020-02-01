@@ -150,7 +150,6 @@ WebsocketListener extends WebSocketListener {
 
                                 break;
                             case "ohlc":
-
                                 TickHistoryResponse ohlcTickHistoryResponse = new TickHistoryResponse();
                                 Candle newOHLCObject = new Candle();
                                 JSONObject OHLCData = (JSONObject) jsonObject.get("ohlc");
@@ -197,6 +196,7 @@ WebsocketListener extends WebSocketListener {
                                 }
 
                                 break;
+
                                 // Returns the complete contract details of an open trade contract, which is required for calculating Realtime Delta Percentage.
                             case "proposal_open_contract":
                                 logger.info("Received Message: {}", o);
@@ -217,7 +217,7 @@ WebsocketListener extends WebSocketListener {
                                     }
 
 
-                                    writeToDatabase(proposalOpenContractResponse, true);
+                                    writeToDatabase(proposalOpenContractResponse, true,dbQueryType);
                                 }
 
                                 break;

@@ -271,6 +271,18 @@ public class OpenContract {
     @SerializedName("transaction_ids")
     private Map<String, Long> transactionIds;
 
+    /**
+     * Latest spot value at the sell time. Example: 86.630 (only present for contracts already sold)
+     */
+    @SerializedName("profit")
+    private BigDecimal profit;
+
+    /**
+     * Latest spot value at the sell time. Example: 86.630 (only present for contracts already sold)
+     */
+    @SerializedName("profit_percentage")
+    private BigDecimal profit_percentage;
+
     public BigDecimal getHighBarrier() {
         return highBarrier;
     }

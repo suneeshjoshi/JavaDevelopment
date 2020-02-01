@@ -93,7 +93,10 @@ public class Engine extends AbstractCommandGenerator {
             while(calculationUtility.waitToBookNextTrade()){
 
                 sendProposalOpenContract();
-                calculationUtility.checkDeltaPercentageToCloseTrade();
+//                calculationUtility.checkDeltaPercentageToCloseTrade();
+
+                calculationUtility.checkPotentialProfit();
+
                 AutoTradingUtility.sleep(2000);
             }
             logger.info("Trade {} completed.",tradeCount);
@@ -103,11 +106,11 @@ public class Engine extends AbstractCommandGenerator {
 
     private void sendProposalOpenContract() {
         List<HashMap<String,String>> openContractsList = databaseConnection.executeQuery("select contract_id From trade where result ='OPEN'");
-        logger.info("{} Open Contracts found...", openContractsList.size());
         openContractsList.parallelStream().forEach(openContract->{
             String contract_id = openContract.get("contract_id");
             logger.info("Sending ProposalOpenContract request for {}", contract_id);
             sendRequest(new ProposalOpenContractRequest(Long.valueOf(contract_id), true) );
+            databaseConnection.executeNoResultSet("UPDATE trade SET result ='PROPOSAL_OPEN_CONTRACT_SENT' WHERE contract_id = " +AutoTradingUtility.quotedString(contract_id));
         });
     }
 
