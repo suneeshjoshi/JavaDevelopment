@@ -99,9 +99,11 @@ public class Engine extends AbstractCommandGenerator {
                 if(sellContractRequest!=null){
                     sendRequest(sellContractRequest);
                     calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
+                    continue;
                 }
-
-                AutoTradingUtility.sleep(2000);
+                else {
+                    AutoTradingUtility.sleep(2000);
+                }
             }
             logger.info("Trade {} completed.",tradeCount);
             tradeCount++;

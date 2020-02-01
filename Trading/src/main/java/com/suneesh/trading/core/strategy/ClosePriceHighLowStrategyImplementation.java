@@ -4,6 +4,7 @@ import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
+import com.suneesh.trading.models.StrategySteps;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +74,8 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
         boolean increaseAmount = false;
 
         int nextStepCount = nextTradeDetails.getNextStepCount();
-        amount = strategy.getStepToStrategyStepsMap().get(nextStepCount);
+        StrategySteps strategyStep = strategy.getStepToStrategyStepsMap().get(nextStepCount);
+        amount = strategyStep.getValue();
 
         nextTradeDetails.setAmount(amount);
 
