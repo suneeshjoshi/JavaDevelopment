@@ -317,7 +317,10 @@ public class Utility {
             double profitPercentageThreshold = strategyStepsForGivenStepCount.getProfit_percentage_threshold();
 
             double tradeInstantaneousProfitPercentage = 0;
-            List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery("select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.identifier = " + tradeId);
+
+            String tradeQuery = "select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.identifier = " + tradeId;
+            log.info("trade Query = {}",tradeQuery);
+            List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery(tradeQuery);
             if(CollectionUtils.isEmpty(tradeProfitPercentageResult)){
                 log.error("ERROR! Unable to get profit_percentage for trade {} -> strategy {} -> step_count {}.",tradeId, strategyId, step_count);
             }
