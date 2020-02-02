@@ -94,6 +94,16 @@ WebsocketListener extends WebSocketListener {
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
 
+                    // Write to a DB Table , and then add details in CommonDprocessor's checkAuthorisation()
+//                    {"code":"AuthorizationRequired","message":"Please log in."}
+                    if(jsonObject.has("code") ) {
+                        String message = jsonObject.getString("code");
+
+                        if(message.equalsIgnoreCase("AuthorizationRequired")){
+                            databaseConnection.executeNoResultSet("insert into error_table (error_message , status, creation_time) VALUES ("+AutoTradingUtility.quotedString(message)+", 'ACTIVE', now())");
+                        }
+                    }
+
                     if(!jsonObject.has("error") ){
                         String msg_type = jsonObject.getString("msg_type");
 

@@ -12,6 +12,7 @@ import com.suneesh.trading.utils.ClassUtils;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+import lombok.Data;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
@@ -24,7 +25,7 @@ import java.io.IOException;
 /**
  * Created by morteza on 7/19/2017.
  */
-
+@Data
 public class ApiWrapper {
 
     Logger logger = LogManager.getLogger();
@@ -38,6 +39,7 @@ public class ApiWrapper {
     public BehaviorSubject<WebsocketEvent> websocketEmitter = BehaviorSubject.create();
     private PublishSubject<String> responseEmitter = PublishSubject.create();
     private PublishSubject<String> requestEmitter = PublishSubject.create();
+    protected String applicationId;
 
     protected DatabaseConnection databaseConnection;
 
@@ -45,6 +47,7 @@ public class ApiWrapper {
     private ApiWrapper(String applicationId, String language, String url, DatabaseConnection dbConnection){
         this.databaseConnection = dbConnection;
         this.websocketUrl = url + String.format("?app_id=%s&l=%s", applicationId, language);
+        this.applicationId = applicationId;
 
         try {
             logger.info("Attempting to connect to Binary WebSocket, url = {}", websocketUrl);
