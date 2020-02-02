@@ -153,13 +153,22 @@ public class Engine extends AbstractCommandGenerator {
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
             Strategy strategyToUse = calculationUtility.getStrategyToUse();
 
-            // Create Trade
-            logger.info("Creating trade ... ");
-            BuyContractRequest buyContractRequest = createTrade(strategyToUse, nextTradeDetails, currency, lastCandle, lastTrade, true);
+            // Get Present Strategy's details for booking trade
+            StrategyImplementationInterface strategyImplementation = strategyFactory.getStrategyImplementation(strategyToUse);
 
-            logger.info("Sending buy Contract Request ... ");
-            // Send trade
-            sendRequest(buyContractRequest);
+            // Check if signal received for generating trade as per the given strategy
+            if(strategyImplementation.bookTrade(lastTrade, lastCandle)){
+                // Create Trade
+                logger.info("Creating trade ... ");
+                BuyContractRequest buyContractRequest = createTrade(strategyToUse, strategyImplementation, nextTradeDetails, currency, lastCandle, lastTrade, true);
+
+                logger.info("Sending buy Contract Request ... ");
+                // Send trade
+                sendRequest(buyContractRequest);
+            }
+
+
+
         }
         catch(Exception e) {
             logger.info("Exception caught while creating new trade. {}",e.getMessage());
@@ -167,17 +176,15 @@ public class Engine extends AbstractCommandGenerator {
         }
     }
 
-    public BuyContractRequest createTrade(Strategy strategyToUse, NextTradeDetails nextTradeDetails, String currency, Map<String, String> lastCandle, Map<String, String> lastTrade, boolean debug) {
+    public BuyContractRequest createTrade(Strategy strategyToUse, StrategyImplementationInterface strategyImplementation, NextTradeDetails nextTradeDetails, String currency, Map<String, String> lastCandle, Map<String, String> lastTrade, boolean debug) {
         BuyContractRequest buyContractRequest = null;
         try{
 
-            // Get Present Strategy's details for booking trade
-            StrategyImplementationInterface strategy = strategyFactory.getStrategyImplementation(strategyToUse);
-            strategy.getCallOrPut(nextTradeDetails, lastCandle);
-            strategy.getContractDuration(nextTradeDetails);
-            strategy.getNextStepCount(nextTradeDetails, lastTrade);
-            strategy.getNextTradeStrategyId(nextTradeDetails, lastTrade);
-            strategy.getBidAmount(nextTradeDetails, lastCandle);
+            strategyImplementation.getCallOrPut(nextTradeDetails, lastCandle);
+            strategyImplementation.getContractDuration(nextTradeDetails);
+            strategyImplementation.getNextStepCount(nextTradeDetails, lastTrade);
+            strategyImplementation.getNextTradeStrategyId(nextTradeDetails, lastTrade);
+            strategyImplementation.getBidAmount(nextTradeDetails, lastCandle);
             BuyContractParameters parameters = calculationUtility.getParameters(symbol, nextTradeDetails, currency);
             nextTradeDetails.setStrikePrice(calculationUtility.getTickForEpochTime(Optional.empty(),symbol));
             String tradeInsertStatement = calculationUtility.getTradeDatabaseInsertString(parameters, nextTradeDetails);

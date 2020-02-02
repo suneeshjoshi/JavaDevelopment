@@ -15,12 +15,10 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
 
 
 public class BackTestingEngine extends Engine {
@@ -115,7 +113,7 @@ public class BackTestingEngine extends Engine {
             Map<String, String> lastCandle = candleData;
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
 
-            BuyContractRequest buyContractRequest = calculationEngine.createTrade(backTestingStrategy, nextTradeDetails, currency, lastCandle, lastTrade, debug);
+            BuyContractRequest buyContractRequest = calculationEngine.createTrade(backTestingStrategy, strategyImplementation, nextTradeDetails, currency, lastCandle, lastTrade, debug);
             if(buyContractRequest!=null && debug==true){
                 logger.info("Dummy Trade Booked.");
             }
