@@ -199,8 +199,6 @@ WebsocketListener extends WebSocketListener {
 
                                 // Returns the complete contract details of an open trade contract, which is required for calculating Realtime Delta Percentage.
                             case "proposal_open_contract":
-//                                logger.info("Received Message: {}", o);
-
                                 ProposalOpenContractResponse proposalOpenContractResponse = new ProposalOpenContractResponse();
                                 JSONObject proposalOpenContractData = (JSONObject) jsonObject.get("proposal_open_contract");
 
@@ -234,21 +232,22 @@ WebsocketListener extends WebSocketListener {
                                 }
 
                                 break;
-
-                            case "sell":
-                                SellContractResponse sellContractResponse = new SellContractResponse();
-                                JSONObject sellData = (JSONObject) jsonObject.get("buy");
-
-                                if( (sellData != null) && ( sellData.has("contract_id")) ) {
-                                    Integer req_id = (Integer) jsonObject.get("req_id");
-
-                                    processTransaction(msg_type, sellData, req_id);
-
-                                    SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
-                                    logger.info("SellContractResponse =  {}",sellContractResponse1.toString());
-                                }
-
-                                break;
+//
+//                            case "sell":
+//                                logger.info("Received Message: {}", o);
+//                                SellContractResponse sellContractResponse = new SellContractResponse();
+//                                JSONObject sellData = (JSONObject) jsonObject.get("sell");
+//
+//                                if( (sellData != null) && ( sellData.has("contract_id")) ) {
+//                                    Integer req_id = (Integer) jsonObject.get("req_id");
+//
+//                                    processTransaction(msg_type, sellData, req_id);
+//
+//                                    SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
+//                                    logger.info("SellContractResponse =  {}",sellContractResponse1.toString());
+//                                }
+//
+//                                break;
 
                             case "portfolio":
                                 PortfolioResponse portfolioResponse = new PortfolioResponse();
@@ -320,7 +319,7 @@ WebsocketListener extends WebSocketListener {
                     BigDecimal amount = jsonData.getBigDecimal("amount");
                     String tradeResult = amount.doubleValue() > 0 ? "SUCCESS" : "FAIL";
                     if (tradeIdentifier == null) {
-                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result ='OPEN'";
+                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT' ) ";
                     } else {
                         updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE identifier = " + tradeIdentifier;
                     }

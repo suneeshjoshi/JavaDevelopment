@@ -211,7 +211,7 @@ public class Utility {
             } else {
                 if (strategyIdToUse != INVALID_STRATEGY_ID) {
                     long finalStrategyIdToUse = strategyIdToUse;
-                    List<Strategy> filteredStrategies = allStrategies.stream().filter(ele -> ele.isDefaultStrategy()).collect(Collectors.toList());
+                    List<Strategy> filteredStrategies = allStrategies.stream().filter(ele -> ele.getIdentifier() == finalStrategyIdToUse).collect(Collectors.toList());
                     if (filteredStrategies.size() > 1) {
                         log.error("ERROR! Multiple strategies have same identifier. ALL STRATEGIES MUST HAVE UNIQUE Identifier.");
                         System.exit(-4);
@@ -317,7 +317,7 @@ public class Utility {
 
             double tradeInstantaneousProfitPercentage = 0;
 
-            String tradeQuery = "select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.identifier = " + tradeId;
+            String tradeQuery = "select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.result = 'PROPOSAL_OPEN_CONTRACT_SENT' AND t.identifier = " + tradeId;
             log.info("trade Query = {}",tradeQuery);
             List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery(tradeQuery);
 
@@ -336,4 +336,39 @@ public class Utility {
         }
         return sellContractRequest;
     }
+
+    public void updateTradeResult(Optional<Long> tradeIdentifier, Optional<Long> contractIdentifier, Optional<String> oldResultState, Optional<String> newResultState, boolean debug){
+        long tradeId = tradeIdentifier.isPresent()?tradeIdentifier.get():-1;
+        long contractId = contractIdentifier.isPresent()?contractIdentifier.get():-1;
+        String oldResultString = oldResultState.isPresent()?oldResultState.get():null;
+
+//        String elementsAsString = "";
+//
+//        for(String element : oldResultString){
+//            elementsAsString+=elementsAsString + AutoTradingUtility.quotedString(String.valueOf(element)) + ",";
+//        }
+//
+//        String substring = elementsAsString.substring(0, elementsAsString.length() - 1);
+//        oldResultStateList.stream().map(m -> AutoTradingUtility.quotedString(String.valueOf(m))).collect(Collectors.joining(","));
+
+//        String join = String.join(",", oldResultStateList.jo);
+
+        String newResultString = newResultState.isPresent()?newResultState.get():null;
+
+        String queryString = "";
+        switch (newResultString){
+            case "SELL_CONTRACT_SENT":
+                queryString = "UPDATE trade SET result = "+AutoTradingUtility.quotedString(newResultString)+" WHERE result IN ("+oldResultString+") AND contract_id = "+contractId;
+                break;
+            default:
+
+        }
+
+        if(debug) {
+            log.debug(queryString);
+        }
+        databaseConnection.executeNoResultSet(queryString);
+
+    }
+
 }

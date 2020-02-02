@@ -19,8 +19,8 @@ INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (2, 10,
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (2, 11, 10.00);
 
 INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (3, 1, 1.00);
-INSERT INTO public.strategy_steps(strategy_id, step_count, value) VALUES (3, 2, 2.50);
-INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 3, 6.25, 80);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 2, 2.50, 80);
+INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 3, 6.25, 70);
 INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 4, 15.63, 70);
 INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 5, 39.07, 70);
 INSERT INTO public.strategy_steps(strategy_id, step_count, value, profit_percentage_threshold) VALUES (3, 6, 97.66, 60);

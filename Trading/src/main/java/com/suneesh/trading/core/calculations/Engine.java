@@ -9,16 +9,15 @@ import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.enums.TickStyles;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 public class Engine extends AbstractCommandGenerator {
     private static final Logger logger = LogManager.getLogger();
@@ -97,9 +96,25 @@ public class Engine extends AbstractCommandGenerator {
 
                 SellContractRequest sellContractRequest = calculationUtility.checkPotentialProfit();
                 if(sellContractRequest!=null){
-                    sendRequest(sellContractRequest);
-                    calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
-                    continue;
+                    logger.info("Going to sell Trade number {}, as Threshold value reached.", tradeCount);
+
+
+                    List<Map<String, String>> proposalOpenContractSent = calculationUtility.getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
+                    if(CollectionUtils.isNotEmpty(proposalOpenContractSent)){
+                        // Get list of all trades with result PROPOSAL_OPEN_CONTRACT_SENT
+                        List<String> contractIds = proposalOpenContractSent.stream().map(ele -> ele.get("contract_id")).collect(Collectors.toList());
+
+                        // If present contract is defined as PROPOSAL_OPEN_CONTRACT_SENT send the SELL_REQUEST and will then be changing its Result state too.
+                        if(contractIds.contains(String.valueOf(sellContractRequest.getContractId()))) {
+                            sendRequest(sellContractRequest);
+                            String resultStates =AutoTradingUtility.quotedString("PROPOSAL_OPEN_CONTRACT_SENT") +","+AutoTradingUtility.quotedString("OPEN");
+
+                            calculationUtility.updateTradeResult(Optional.empty(), Optional.ofNullable(sellContractRequest.getContractId()), Optional.ofNullable(resultStates), Optional.ofNullable("SELL_CONTRACT_SENT"), true);
+                            logger.info("Going to sleep till the remaining time in the present candle");
+                            calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
+
+                        }
+                    }
                 }
                 else {
                     AutoTradingUtility.sleep(2000);
@@ -108,6 +123,10 @@ public class Engine extends AbstractCommandGenerator {
             logger.info("Trade {} completed.",tradeCount);
             tradeCount++;
         }
+    }
+
+    private void sendSellContractRequest(SellContractRequest sellContractRequest) {
+        databaseConnection.executeNoResultSet("UPDATE ");
     }
 
     private void sendProposalOpenContract() {
