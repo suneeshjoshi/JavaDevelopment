@@ -3,6 +3,7 @@ package com.suneesh.trading.core;
 import com.suneesh.trading.core.calculations.Engine;
 import com.suneesh.trading.core.calculations.Utility;
 import com.suneesh.trading.core.strategy.StrategyFactory;
+import com.suneesh.trading.core.strategy.StrategyImplementationInterface;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.enums.TickStyles;
@@ -112,6 +113,9 @@ public class BackTestingEngine extends Engine {
 
             Map<String, String> lastCandle = candleData;
             NextTradeDetails nextTradeDetails = new NextTradeDetails(lastTradeId);
+
+            // Get Present Strategy's details for booking trade
+            StrategyImplementationInterface strategyImplementation = strategyFactory.getStrategyImplementation(backTestingStrategy);
 
             BuyContractRequest buyContractRequest = calculationEngine.createTrade(backTestingStrategy, strategyImplementation, nextTradeDetails, currency, lastCandle, lastTrade, debug);
             if(buyContractRequest!=null && debug==true){

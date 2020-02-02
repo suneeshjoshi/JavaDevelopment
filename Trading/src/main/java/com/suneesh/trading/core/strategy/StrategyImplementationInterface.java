@@ -13,5 +13,5 @@ public interface StrategyImplementationInterface {
     void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade);
     void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle);
 
-    boolean bookTrade(Map<String, String> lastTrade, Map<String, String> lastCandle);
+    default boolean bookTrade(Map<String, String> lastTrade, Map<String, String> lastCandle){return true;}
 }
