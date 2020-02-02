@@ -255,7 +255,7 @@ public class Utility {
         HashMap<String, Double> inputMap = new HashMap<>();
         final double VOLATILITY = 0.03D;
         final double INTEREST = 0.01D;
-        final double TRADE_DURATION = 300D;
+        final double TRADE_DURATION = 60D;
 
         try {
             ArrayList<HashMap<String, String>> list =

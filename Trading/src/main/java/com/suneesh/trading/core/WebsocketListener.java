@@ -199,7 +199,7 @@ WebsocketListener extends WebSocketListener {
 
                                 // Returns the complete contract details of an open trade contract, which is required for calculating Realtime Delta Percentage.
                             case "proposal_open_contract":
-                                logger.info("Received Message: {}", o);
+//                                logger.info("Received Message: {}", o);
 
                                 ProposalOpenContractResponse proposalOpenContractResponse = new ProposalOpenContractResponse();
                                 JSONObject proposalOpenContractData = (JSONObject) jsonObject.get("proposal_open_contract");

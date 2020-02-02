@@ -56,7 +56,7 @@ public class BackTestingEngine extends Engine {
         TickHistoryRequest tickHistoryRequest = new TickHistoryRequest(symbol, "latest");
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setCount(candleDataPoints);
-        tickHistoryRequest.setGranularity(300);
+        tickHistoryRequest.setGranularity(60);
         sendRequest(tickHistoryRequest);
     }
 

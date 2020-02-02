@@ -65,7 +65,7 @@ public class Engine extends AbstractCommandGenerator {
         tickHistoryRequest.setStyle(TickStyles.CANDLES);
         tickHistoryRequest.setSubscribe(1);
         tickHistoryRequest.setCount(NUMBER_OF_INITIAL_CANDLES_TO_READ);
-        tickHistoryRequest.setGranularity(CANDLE_300_SECOND_GRANULARITY);
+        tickHistoryRequest.setGranularity(CANDLE_60_SECOND_GRANULARITY);
         sendRequest(tickHistoryRequest);
     }
 
