@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.trade
     strategy_id int NOT NULL,
     contract_id bigint,
     trade_time bigint,
+    close_type character varying(255) ,
     CONSTRAINT trade_pkey PRIMARY KEY (identifier)
 );
 

@@ -341,24 +341,12 @@ public class Utility {
         long tradeId = tradeIdentifier.isPresent()?tradeIdentifier.get():-1;
         long contractId = contractIdentifier.isPresent()?contractIdentifier.get():-1;
         String oldResultString = oldResultState.isPresent()?oldResultState.get():null;
-
-//        String elementsAsString = "";
-//
-//        for(String element : oldResultString){
-//            elementsAsString+=elementsAsString + AutoTradingUtility.quotedString(String.valueOf(element)) + ",";
-//        }
-//
-//        String substring = elementsAsString.substring(0, elementsAsString.length() - 1);
-//        oldResultStateList.stream().map(m -> AutoTradingUtility.quotedString(String.valueOf(m))).collect(Collectors.joining(","));
-
-//        String join = String.join(",", oldResultStateList.jo);
-
         String newResultString = newResultState.isPresent()?newResultState.get():null;
 
         String queryString = "";
         switch (newResultString){
             case "SELL_CONTRACT_SENT":
-                queryString = "UPDATE trade SET result = "+AutoTradingUtility.quotedString(newResultString)+" WHERE result IN ("+oldResultString+") AND contract_id = "+contractId;
+                queryString = "UPDATE trade SET result = "+AutoTradingUtility.quotedString(newResultString)+" , close_type='PROFIT_THRESHOLD_TRIGGERED' WHERE result IN ("+oldResultString+") AND contract_id = "+contractId;
                 break;
             default:
 

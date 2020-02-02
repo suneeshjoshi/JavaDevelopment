@@ -329,9 +329,9 @@ WebsocketListener extends WebSocketListener {
                     BigDecimal amount = jsonData.getBigDecimal("amount");
                     String tradeResult = amount.doubleValue() > 0 ? "SUCCESS" : "FAIL";
                     if (tradeIdentifier == null) {
-                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT' ) ";
+                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type = 'CLOSE_AT_EXPIRY' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT' ) ";
                     } else {
-                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "' WHERE identifier = " + tradeIdentifier;
+                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type = 'CLOSE_AT_EXPIRY' WHERE identifier = " + tradeIdentifier;
                     }
                 }
                 break;
