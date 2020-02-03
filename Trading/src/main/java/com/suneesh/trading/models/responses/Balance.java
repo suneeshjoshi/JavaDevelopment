@@ -3,11 +3,6 @@ package com.suneesh.trading.models.responses;
 import com.google.gson.annotations.SerializedName;
 import io.reactivex.annotations.Nullable;
 import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.math.BigDecimal;
 
 /**

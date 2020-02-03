@@ -60,17 +60,18 @@ public class ApiWrapper {
 
             logger.info("Connection status = {}", e.isOpened());
             if(!e.isOpened()) {
-                final int maxAttemptCount = 100;
+                final int maxAttemptCount = 5;
                 int attemptCount = 1;
                 while (!e.isOpened() && attemptCount < maxAttemptCount) {
                     logger.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
                     this.connect();
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                     attemptCount++;
                 }
 
                 if (attemptCount >= maxAttemptCount) {
-                    logger.info("ERROR ! Unable to connect to remote Binary WebSocket. url = {}", websocketUrl);
+                    logger.info("ERROR! MAx Attempts {} reached. Unable to connect to remote Binary WebSocket. url = {}. Exiting.", attemptCount, websocketUrl);
+                    System.exit(-1);
 
                 }
             }

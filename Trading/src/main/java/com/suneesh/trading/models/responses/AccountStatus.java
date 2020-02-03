@@ -3,19 +3,13 @@ package com.suneesh.trading.models.responses;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.List;
-
 /**
  * @author Morteza Tavanarad
  * @version 1.0.0
  * @since 8/4/2017
  */
-@Entity
 @Data
 public class AccountStatus {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long identifier;
 
     /**
