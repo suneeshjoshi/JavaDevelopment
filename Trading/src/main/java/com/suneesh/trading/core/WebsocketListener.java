@@ -102,6 +102,10 @@ WebsocketListener extends WebSocketListener {
                         if(message.equalsIgnoreCase("AuthorizationRequired")){
                             databaseConnection.executeNoResultSet("insert into error_table (error_message , status, creation_time) VALUES ("+AutoTradingUtility.quotedString(message)+", 'ACTIVE', now())");
                         }
+
+                        if(message.equalsIgnoreCase("WrongResponse")){
+                            databaseConnection.executeNoResultSet("insert into error_table (error_message , status, creation_time) VALUES ("+AutoTradingUtility.quotedString(message)+", 'ACTIVE', now())");
+                        }
                     }
 
                     if(!jsonObject.has("error") ){
