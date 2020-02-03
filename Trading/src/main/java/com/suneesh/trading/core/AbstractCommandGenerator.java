@@ -2,8 +2,6 @@ package com.suneesh.trading.core;
 
 import com.suneesh.trading.models.requests.RequestBase;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
 
