@@ -20,9 +20,9 @@ public class Strategy {
     @Expose
     String strategyName ;
 
-    @SerializedName("strategy_algorithm")
+    @SerializedName("strategy_algorithm_id")
     @Expose
-    long strategyAlgorithm;
+    long strategyAlgorithmId;
 
     @SerializedName("creation_date")
     @Expose

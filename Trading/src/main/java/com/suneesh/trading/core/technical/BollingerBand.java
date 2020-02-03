@@ -1,5 +1,7 @@
 package com.suneesh.trading.core.technical;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
@@ -11,14 +13,40 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 public class BollingerBand {
-    List<Map<String, String>> candleList;
+    @SerializedName("identifier")
+    @Expose
+    long identifier;
+
+    @SerializedName("average")
+    @Expose
     double average;
+
+    @SerializedName("standard_deviation")
+    @Expose
     double standardDeviation;
+
+    @SerializedName("upper_band")
+    @Expose
     double upperBand;
+
+    @SerializedName("lower_band")
+    @Expose
     double lowerBand;
+
+    @SerializedName("bandwidth")
+    @Expose
     double bandWidth;
+
+    @SerializedName("candle_id")
+    @Expose
     long candleIdentifier;
+
+    @SerializedName("candle_epoch_string")
+    @Expose
     String candle_epoch_string;
+
+    List<Map<String, String>> candleList;
+
     final int bandMultiple=2;
 
     public BollingerBand(List<Map<String, String>> subList){
@@ -53,7 +81,7 @@ public class BollingerBand {
     }
 
     public List<String> databaseInsertStringList(){
-        String query = "INSERT INTO bollinger_band ( average, standardDeviation, upperBand, lowerBand, bandWidth, candle_id, candle_epoch_string) VALUES " +
+        String query = "INSERT INTO bollinger_band ( average, standard_deviation, upper_band, lower_band, bandwidth, candle_id, candle_epoch_string) VALUES " +
                 "(" + getAverage() + "," +
                 getStandardDeviation() + "," +
                 getUpperBand() + "," +

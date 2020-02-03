@@ -92,12 +92,10 @@ public class Engine extends AbstractCommandGenerator {
             while(calculationUtility.waitToBookNextTrade()){
 
                 sendProposalOpenContract();
-//                calculationUtility.checkDeltaPercentageToCloseTrade();
 
                 SellContractRequest sellContractRequest = calculationUtility.checkPotentialProfit();
                 if(sellContractRequest!=null){
                     logger.info("Going to sell Trade number {}, as Threshold value reached.", tradeCount);
-
 
                     List<Map<String, String>> proposalOpenContractSent = calculationUtility.getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
                     if(CollectionUtils.isNotEmpty(proposalOpenContractSent)){

@@ -22,7 +22,7 @@ public class StrategyFactory {
 
     public StrategyImplementationInterface getStrategyImplementation(Strategy strategyObj){
         AbstractStrategyClass strategyImplementation = null;
-        long strategyAlgorithmId = strategyObj.getStrategyAlgorithm();
+        long strategyAlgorithmId = strategyObj.getStrategyAlgorithmId();
 
         switch(Math.toIntExact(strategyAlgorithmId)){
             case 1: strategyImplementation =  new CandleFollowWithIncreaseStrategyImplementation(databaseConnection, strategyObj, calculationUtility, isBackTestingMode); break;
