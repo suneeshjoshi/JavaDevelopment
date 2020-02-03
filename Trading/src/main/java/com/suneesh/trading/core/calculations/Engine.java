@@ -28,7 +28,7 @@ public class Engine extends AbstractCommandGenerator {
     StrategyFactory strategyFactory;
     Boolean isBackTestingMode;
 
-    final int TRADE_SIGNAL_CHECKS_DELAY_IN_MILLISECONDS=100;
+    final int TRADE_SIGNAL_CHECKS_DELAY_IN_MILLISECONDS=500;
     final int NUMBER_OF_INITIAL_CANDLES_TO_READ=25;
     final int CANDLE_60_SECOND_GRANULARITY=60;
     final int CANDLE_300_SECOND_GRANULARITY=300;

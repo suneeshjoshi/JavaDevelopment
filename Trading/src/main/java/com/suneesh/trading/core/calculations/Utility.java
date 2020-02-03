@@ -318,7 +318,6 @@ public class Utility {
             double tradeInstantaneousProfitPercentage = 0;
 
             String tradeQuery = "select oc.profit_percentage from trade t JOIN open_contract oc on ( t.contract_id = oc.contractId) WHERE t.result = 'PROPOSAL_OPEN_CONTRACT_SENT' AND t.identifier = " + tradeId;
-            log.info("trade Query = {}",tradeQuery);
             List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery(tradeQuery);
 
             if(CollectionUtils.isEmpty(tradeProfitPercentageResult)){
@@ -326,7 +325,7 @@ public class Utility {
             }
             else{
                 tradeInstantaneousProfitPercentage = Double.parseDouble(tradeProfitPercentageResult.get(0).get("profit_percentage"));
-                log.info("Trade {} has profit percentage of {} , which is >= {}. [ strategyID {} -> step_count {} profit threshold {} ] ",tradeId,tradeInstantaneousProfitPercentage,profitPercentageThreshold,strategyId,step_count,profitPercentageThreshold);
+//                log.debug("Trade {} has profit percentage of {} , which is >= {}. [ strategyID {} -> step_count {} profit threshold {} ] ",tradeId,tradeInstantaneousProfitPercentage,profitPercentageThreshold,strategyId,step_count,profitPercentageThreshold);
                 if(tradeInstantaneousProfitPercentage > profitPercentageThreshold){
                     log.info("Trade {} has profit percentage of {} , which is >= {}. [ strategyID {} -> step_count {} profit threshold {} ] ",tradeId,tradeInstantaneousProfitPercentage,profitPercentageThreshold,strategyId,step_count,profitPercentageThreshold);
                     sellContractRequest = new SellContractRequest(contractId,new BigDecimal(0.0));
@@ -346,7 +345,7 @@ public class Utility {
         String queryString = "";
         switch (newResultString){
             case "SELL_CONTRACT_SENT":
-                queryString = "UPDATE trade SET result = "+AutoTradingUtility.quotedString(newResultString)+" , close_type='PROFIT_THRESHOLD_TRIGGERED' WHERE result IN ("+oldResultString+") AND contract_id = "+contractId;
+                queryString = "UPDATE trade SET result = "+AutoTradingUtility.quotedString(newResultString)+"  WHERE result IN ("+oldResultString+") AND contract_id = "+contractId;
                 break;
             default:
 

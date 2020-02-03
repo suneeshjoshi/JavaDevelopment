@@ -333,7 +333,17 @@ WebsocketListener extends WebSocketListener {
                     BigDecimal amount = jsonData.getBigDecimal("amount");
                     String tradeResult = amount.doubleValue() > 0 ? "SUCCESS" : "FAIL";
                     if (tradeIdentifier == null) {
-                        updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type = 'CLOSE_AT_EXPIRY' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT', 'SELL_CONTRACT_SENT') ";
+
+                        String firstElementFromDBQuery = databaseConnection.getFirstElementFromDBQuery("SELECT result from trade where contract_id = " + AutoTradingUtility.quotedString(contract_id));
+                        if(firstElementFromDBQuery.equalsIgnoreCase("SELL_CONTRACT_SENT")){
+                            updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type='PROFIT_THRESHOLD_TRIGGERED' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT', 'SELL_CONTRACT_SENT') ";
+
+                        }
+                        else{
+                            updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type = 'CLOSE_AT_EXPIRY' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT', 'SELL_CONTRACT_SENT') ";
+                        }
+
+
                     } else {
                         updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type = 'CLOSE_AT_EXPIRY' WHERE identifier = " + tradeIdentifier;
                     }
