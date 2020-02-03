@@ -12,7 +12,7 @@ public class MainApplication {
         log.info("Starting application count = {}",++count);
         Process process = null;
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("notepad.exe");
+        processBuilder.command("java -jar ");
 
         try {
             process = processBuilder.start();
