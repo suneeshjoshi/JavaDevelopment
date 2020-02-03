@@ -31,7 +31,7 @@ public class BollingerStrategyImplementation extends AbstractStrategyClass {
         ArrayList<String> jsonResultDBQuery = databaseConnection.getJsonResultDBQuery("select * from bollinger_band");
         ArrayList<BollingerBand> bollingerBands = (ArrayList<BollingerBand>) jsonResultDBQuery.stream().map(ele -> gson.fromJson(String.valueOf(ele), BollingerBand.class)).collect(Collectors.toList());
 
-        bollingerBands.stream().forEach(bollingerBand -> log.info("{} : {} : {}", candleClose, candleDirection, bollingerBand.toString()));
+//        bollingerBands.stream().forEach(bollingerBand -> log.debug("{} : {} : {}", candleClose, candleDirection, bollingerBand.toString()));
 
         BollingerBand lastBollingerBand = bollingerBands.get(bollingerBands.size()-1);
 

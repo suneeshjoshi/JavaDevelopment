@@ -28,6 +28,7 @@ public class Engine extends AbstractCommandGenerator {
     StrategyFactory strategyFactory;
     Boolean isBackTestingMode;
 
+    final int TRADE_SIGNAL_CHECKS_DELAY_IN_MILLISECONDS=100;
     final int NUMBER_OF_INITIAL_CANDLES_TO_READ=25;
     final int CANDLE_60_SECOND_GRANULARITY=60;
     final int CANDLE_300_SECOND_GRANULARITY=300;
@@ -78,48 +79,55 @@ public class Engine extends AbstractCommandGenerator {
 
         logger.info("\n\n");
         logger.info("*************************************************************************************************************************************");
-        logger.info("*** Sleeping for another minute to stabalise last candle values, and to ensure its recorded completely and accurately for trading. ***");
+        logger.info("*** Sleeping for another minute to stabilise last candle values, and to ensure its recorded completely and accurately for trading. ***");
         logger.info("*************************************************************************************************************************************\n\n");
 //        calculationEngineUtility.sleepTillStartOfNextMinute();
 
         // Keep booking trades
         while(true) {
-            logger.info("Going to send trade {}...",tradeCount);
-            createAndSendTrade();
-            logger.info("Trade {} sent, waiting for the trade to be completed...", tradeCount);
+            if (createAndSendTrade(tradeCount)) {
 
-            /// waiting till last trade is completed.
-            while(calculationUtility.waitToBookNextTrade()){
+                // waiting till last trade is completed.
+                while (calculationUtility.waitToBookNextTrade()) {
 
-                sendProposalOpenContract();
+                    sendProposalOpenContract();
 
-                SellContractRequest sellContractRequest = calculationUtility.checkPotentialProfit();
-                if(sellContractRequest!=null){
-                    logger.info("Going to sell Trade number {}, as Threshold value reached.", tradeCount);
-
-                    List<Map<String, String>> proposalOpenContractSent = calculationUtility.getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
-                    if(CollectionUtils.isNotEmpty(proposalOpenContractSent)){
-                        // Get list of all trades with result PROPOSAL_OPEN_CONTRACT_SENT
-                        List<String> contractIds = proposalOpenContractSent.stream().map(ele -> ele.get("contract_id")).collect(Collectors.toList());
-
-                        // If present contract is defined as PROPOSAL_OPEN_CONTRACT_SENT send the SELL_REQUEST and will then be changing its Result state too.
-                        if(contractIds.contains(String.valueOf(sellContractRequest.getContractId()))) {
-                            sendRequest(sellContractRequest);
-                            String resultStates =AutoTradingUtility.quotedString("PROPOSAL_OPEN_CONTRACT_SENT") +","+AutoTradingUtility.quotedString("OPEN");
-
-                            calculationUtility.updateTradeResult(Optional.empty(), Optional.ofNullable(sellContractRequest.getContractId()), Optional.ofNullable(resultStates), Optional.ofNullable("SELL_CONTRACT_SENT"), true);
-                            logger.info("Going to sleep till the remaining time in the present candle");
-                            calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
-
-                        }
+                    SellContractRequest sellContractRequest = calculationUtility.checkPotentialProfit();
+                    if (sellContractRequest != null) {
+                        sellContract(sellContractRequest, tradeCount);
+                    } else {
+                        AutoTradingUtility.sleep(2000);
                     }
                 }
-                else {
-                    AutoTradingUtility.sleep(2000);
-                }
+                logger.info("Trade {} : COMPLETED.", tradeCount);
+                tradeCount++;
             }
-            logger.info("Trade {} completed.",tradeCount);
-            tradeCount++;
+            else{
+                logger.info("Trade booking Signal not received. Sleeping for {} milliseconds",TRADE_SIGNAL_CHECKS_DELAY_IN_MILLISECONDS);
+                AutoTradingUtility.sleep(TRADE_SIGNAL_CHECKS_DELAY_IN_MILLISECONDS);
+            }
+        }
+
+    }
+
+    private void sellContract(SellContractRequest sellContractRequest, int tradeCount){
+        logger.info("Going to sell Trade number {}, as Threshold value reached.", tradeCount);
+
+        List<Map<String, String>> proposalOpenContractSent = calculationUtility.getTradesByResult("PROPOSAL_OPEN_CONTRACT_SENT");
+        if(CollectionUtils.isNotEmpty(proposalOpenContractSent)){
+            // Get list of all trades with result PROPOSAL_OPEN_CONTRACT_SENT
+            List<String> contractIds = proposalOpenContractSent.stream().map(ele -> ele.get("contract_id")).collect(Collectors.toList());
+
+            // If present contract is defined as PROPOSAL_OPEN_CONTRACT_SENT send the SELL_REQUEST and will then be changing its Result state too.
+            if(contractIds.contains(String.valueOf(sellContractRequest.getContractId()))) {
+                sendRequest(sellContractRequest);
+                String resultStates =AutoTradingUtility.quotedString("PROPOSAL_OPEN_CONTRACT_SENT") +","+AutoTradingUtility.quotedString("OPEN");
+
+                calculationUtility.updateTradeResult(Optional.empty(), Optional.ofNullable(sellContractRequest.getContractId()), Optional.ofNullable(resultStates), Optional.ofNullable("SELL_CONTRACT_SENT"), true);
+                logger.info("Going to sleep till the remaining time in the present candle");
+                calculationUtility.sleepTillStartOfNextMinuteMinusSeconds(5);
+
+            }
         }
     }
 
@@ -138,7 +146,8 @@ public class Engine extends AbstractCommandGenerator {
     }
 
 
-    private void createAndSendTrade(){
+    private boolean createAndSendTrade(int tradeCount){
+        boolean bookTrade = false;
         try {
             long lastTradeId = 0L;
             Map<String, String> lastTrade = calculationUtility.getLastTrade();
@@ -154,24 +163,26 @@ public class Engine extends AbstractCommandGenerator {
             // Get Present Strategy's details for booking trade
             StrategyImplementationInterface strategyImplementation = strategyFactory.getStrategyImplementation(strategyToUse);
 
+            logger.info("Checking if we should be booking a trade using Strategy = {}", strategyImplementation.getClass().getSimpleName());
             // Check if signal received for generating trade as per the given strategy
-            if(strategyImplementation.bookTrade(lastTrade, lastCandle)){
+            bookTrade = strategyImplementation.bookTrade(lastTrade, lastCandle);
+            if(bookTrade){
                 // Create Trade
-                logger.info("Creating trade ... ");
+                logger.info("Trade {} : SIGNALLED",tradeCount);
                 BuyContractRequest buyContractRequest = createTrade(strategyToUse, strategyImplementation, nextTradeDetails, currency, lastCandle, lastTrade, true);
 
-                logger.info("Sending buy Contract Request ... ");
+                logger.info("Trade {} : CREATED",tradeCount);
                 // Send trade
                 sendRequest(buyContractRequest);
+                logger.info("Trade {} : SENT",tradeCount);
             }
-
-
 
         }
         catch(Exception e) {
             logger.info("Exception caught while creating new trade. {}",e.getMessage());
             e.printStackTrace();
         }
+        return bookTrade;
     }
 
     public BuyContractRequest createTrade(Strategy strategyToUse, StrategyImplementationInterface strategyImplementation, NextTradeDetails nextTradeDetails, String currency, Map<String, String> lastCandle, Map<String, String> lastTrade, boolean debug) {

@@ -1,14 +1,18 @@
 package com.suneesh.trading.core.strategy;
 
+import com.google.gson.Gson;
 import com.suneesh.trading.core.NextTradeDetails;
 import com.suneesh.trading.core.calculations.Utility;
+import com.suneesh.trading.core.technical.BollingerBand;
 import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.StrategySteps;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -19,11 +23,10 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
     }
 
 
-    public boolean closePriceAtDirectionExtreme(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle){
+    @Override
+    public boolean bookTrade(Map<String, String> lastTrade, Map<String, String> lastCandle){
         boolean result = false;
-        final int maxStepCountToApplyFactor=3;
-        // Here i am testing the logic to see if the close value of the
-        // candle is high or low , then the chance of next candle going in similar direction is higher
+        // if the close value of the candle is high or low , then the chance of next candle going in similar direction is higher
         if(lastCandle!=null){
             double high = Double.parseDouble(lastCandle.get("high"));
             double low = Double.parseDouble(lastCandle.get("low"));
@@ -32,15 +35,13 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
             String direction = lastCandle.get("direction");
 
             if(direction.equalsIgnoreCase("UP")){
-                if(close==high && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
-                    log.info(lastCandle.toString());
+                if(close==high ){
                     result= true;
                 }
             }
 
             if(direction.equalsIgnoreCase("DOWN")){
-                if(close==low && nextTradeDetails.getNextStepCount()<=maxStepCountToApplyFactor){
-                    log.info(lastCandle.toString());
+                if(close==low ){
                     result= true;
                 }
             }
@@ -48,29 +49,9 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
         return result;
     }
 
-    @Override
-    public void getCallOrPut(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
-
-    }
-
-    @Override
-    public void getContractDuration(NextTradeDetails nextTradeDetails) {
-
-    }
-
-    @Override
-    public void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-
-    }
-
-    @Override
-    public void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-
-    }
-
     public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
         double amount = INITIAL_BID_AMOUNT;
-        final double INCREASED_MOMENTUM_FACTOR= 2.5;
+        final double INCREASED_MOMENTUM_FACTOR= 1.0;
         boolean increaseAmount = false;
 
         int nextStepCount = nextTradeDetails.getNextStepCount();
@@ -79,7 +60,7 @@ public class ClosePriceHighLowStrategyImplementation extends AbstractStrategyCla
 
         nextTradeDetails.setAmount(amount);
 
-        increaseAmount = closePriceAtDirectionExtreme(nextTradeDetails,lastCandle);
+        increaseAmount = bookTrade(null,lastCandle);
         if(increaseAmount){
             nextTradeDetails.setAmount(nextTradeDetails.getAmount() * INCREASED_MOMENTUM_FACTOR);
         }

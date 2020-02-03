@@ -45,7 +45,7 @@ public class Signals {
                 }
             }
         }
-        log.info("Bollinger Band calculations done.");
+        log.debug("Bollinger Band calculations done.");
     }
 
 }
