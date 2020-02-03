@@ -1,13 +1,15 @@
 package com.suneesh.trading.core;
 
 import com.suneesh.trading.models.requests.RequestBase;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.BlockingQueue;
 
+@Slf4j
 public abstract class AbstractCommandGenerator {
-    private static final Logger LOGGER = LogManager.getLogger();
+//    private static final Logger LOGGER = LogManager.getLogger();
     protected BlockingQueue<RequestBase> commandQueue = null;
 
     public AbstractCommandGenerator(BlockingQueue<RequestBase> inputMessageQueue) {
@@ -16,7 +18,7 @@ public abstract class AbstractCommandGenerator {
 
     public void sendRequest(RequestBase requestObject){
         try {
-            LOGGER.info("Sending message on Command Queue ... {}", String.valueOf(requestObject));
+            log.info("Sending message on Command Queue ... {}", String.valueOf(requestObject));
             commandQueue.put(requestObject);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -13,11 +13,10 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 import java.io.IOException;
@@ -26,9 +25,8 @@ import java.io.IOException;
  * Created by morteza on 7/19/2017.
  */
 @Data
+@Slf4j
 public class ApiWrapper {
-
-    Logger logger = LogManager.getLogger();
 
     private static ApiWrapper instance;
 
@@ -50,27 +48,27 @@ public class ApiWrapper {
         this.applicationId = applicationId;
 
         try {
-            logger.info("Attempting to connect to Binary WebSocket, url = {}", websocketUrl);
+            log.info("Attempting to connect to Binary WebSocket, url = {}", websocketUrl);
             this.connect();
         } catch (IOException e) {
-            logger.debug(e.getMessage());
+            log.debug(e.getMessage());
         }
 
         this.websocketEmitter.subscribe(e -> {
 
-            logger.info("Connection status = {}", e.isOpened());
+            log.info("Connection status = {}", e.isOpened());
             if(!e.isOpened()) {
                 final int maxAttemptCount = 5;
                 int attemptCount = 1;
                 while (!e.isOpened() && attemptCount < maxAttemptCount) {
-                    logger.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
+                    log.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
                     this.connect();
                     Thread.sleep(1000);
                     attemptCount++;
                 }
 
                 if (attemptCount >= maxAttemptCount) {
-                    logger.info("ERROR! MAx Attempts {} reached. Unable to connect to remote Binary WebSocket. url = {}. Exiting.", attemptCount, websocketUrl);
+                    log.info("ERROR! MAx Attempts {} reached. Unable to connect to remote Binary WebSocket. url = {}. Exiting.", attemptCount, websocketUrl);
                     System.exit(-1);
 
                 }

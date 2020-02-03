@@ -64,23 +64,4 @@ public class BollingerStrategyImplementation extends AbstractStrategyClass {
         nextTradeDetails.setCallOrPut(callOrPutResult);
     }
 
-    @Override
-    public void getContractDuration(NextTradeDetails nextTradeDetails) {
-
-    }
-
-    @Override
-    public void getNextStepCount(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-
-    }
-
-    @Override
-    public void getNextTradeStrategyId(NextTradeDetails nextTradeDetails, Map<String, String> lastTrade) {
-
-    }
-
-    @Override
-    public void getBidAmount(NextTradeDetails nextTradeDetails, Map<String, String> lastCandle) {
-
-    }
 }

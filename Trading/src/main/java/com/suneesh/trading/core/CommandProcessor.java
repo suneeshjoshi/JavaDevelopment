@@ -2,9 +2,8 @@ package com.suneesh.trading.core;
 
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 import java.util.List;
@@ -13,8 +12,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class CommandProcessor {
-    private static  final Logger logger = LogManager.getLogger();
     private BlockingQueue<RequestBase> commandQueue = new LinkedBlockingQueue<>();
     private float startValue;
     private ApiWrapper api;
@@ -44,14 +43,14 @@ public class CommandProcessor {
     }
 
     public void threadWork(){
-        logger.info("Thread work ... ");
+        log.info("Thread work ... ");
         while(true){
             try {
                 boolean allowedToSendRequest = false;
                 RequestBase request = commandQueue.poll(100, TimeUnit.MILLISECONDS);
                 if(request!=null){
                     checkAndSendAuthorisationTokenIfRequired();
-                    logger.info("Sending message to Binary.com ... {}", String.valueOf(request));
+                    log.info("Sending message to Binary.com ... {}", String.valueOf(request));
                     api.sendRequest(request);
                 }
             } catch (Exception e) {

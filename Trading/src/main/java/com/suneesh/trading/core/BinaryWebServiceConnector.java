@@ -7,15 +7,13 @@ import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
 
 @Data
+@Slf4j
 public class BinaryWebServiceConnector {
-
-    private static final Logger logger = (Logger) LogManager.getLogger();
     private ApiWrapper api;
     private String applicationId;
     private String applicationAuthorizeToken;
@@ -46,19 +44,19 @@ public class BinaryWebServiceConnector {
         switch(databaseServer.toLowerCase()){
             case "postgres" : result =  new PostgreSQLDatabaseConnection(databaseURL);
                                 break;
-            default: logger.error("Database Server not supported.");
+            default: log.error("Database Server not supported.");
         }
         return result;
     }
 
     public void init() {
-        logger.info("Creating WebConnection to Binary.com ....");
-        logger.info("Application ID = {}", this::getApplicationId);
-        logger.info("Application Authorize Token = {}", this::getApplicationAuthorizeToken);
-        logger.info("Database URL = {}", this::getDatabaseURL);
-        logger.info("SymbolToTrade = {}", this::getSymbolToTrade);
+        log.info("Creating WebConnection to Binary.com ....");
+        log.info("Application ID = {}", getApplicationId());
+        log.info("Application Authorize Token = {}", getApplicationAuthorizeToken());
+        log.info("Database URL = {}", getDatabaseURL());
+        log.info("SymbolToTrade = {}", getSymbolToTrade());
 
-        logger.info("Checking Database Schema, if not present creating schema...");
+        log.info("Checking Database Schema, if not present creating schema...");
         databaseConnection.init(isBackTestingMode());
 
         commandProcessor = new CommandProcessor(commandQueue,api);
@@ -84,19 +82,19 @@ public class BinaryWebServiceConnector {
 
     //-------------
     public void threadCreation(){
-        logger.info("Timed threads...");
+        log.info("Timed threads...");
 
         ExecutorService commandProcessorThread = Executors.newFixedThreadPool(1);
         commandProcessorThread.submit(()->{
             Thread.currentThread().setName("CommandProcessorThread");
-            logger.info("{} started ... ", Thread.currentThread().getName());
+            log.info("{} started ... ", Thread.currentThread().getName());
             commandProcessor.threadWork();
         });
 
         ExecutorService errorManagerThread = Executors.newFixedThreadPool(1);
         errorManagerThread.submit(()->{
             Thread.currentThread().setName("ErrorManagerThread");
-            logger.info("{} started ... ", Thread.currentThread().getName());
+            log.info("{} started ... ", Thread.currentThread().getName());
             errorManager.threadWork();
         });
 
@@ -104,7 +102,7 @@ public class BinaryWebServiceConnector {
             ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
             commandGeneratorThread.submit(()->{
                 Thread.currentThread().setName("Engine");
-                logger.info("{} started ... ", Thread.currentThread().getName());
+                log.info("{} started ... ", Thread.currentThread().getName());
                 calculationEngine.process();
             });
 
@@ -119,7 +117,7 @@ public class BinaryWebServiceConnector {
             ExecutorService commandGeneratorThread = Executors.newFixedThreadPool(1);
             commandGeneratorThread.submit(()->{
                 Thread.currentThread().setName("BackTestingEngine");
-                logger.info("{} started ... ", Thread.currentThread().getName());
+                log.info("{} started ... ", Thread.currentThread().getName());
                 new BackTestingEngine(commandQueue, databaseConnection, symbolToTrade, true).process();
             });
         }

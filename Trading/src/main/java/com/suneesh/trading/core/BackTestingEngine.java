@@ -11,19 +11,17 @@ import com.suneesh.trading.models.requests.BuyContractRequest;
 import com.suneesh.trading.models.requests.RequestBase;
 import com.suneesh.trading.models.requests.TickHistoryRequest;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-
+@Slf4j
 public class BackTestingEngine extends Engine {
-    private static final Logger logger = LogManager.getLogger();
     private String symbol;
     StrategyFactory strategyFactory;
     Utility calculationUtility;
@@ -61,11 +59,11 @@ public class BackTestingEngine extends Engine {
 
     public void process(){
         init();
-        logger.info("Waiting to receive data from Binary WS ...");
+        log.info("Waiting to receive data from Binary WS ...");
         AutoTradingUtility.sleep(CANDLE_DATA_DELAY_MILLISECONDS);
 
         List<Map<String,String>> candleDataFromDB = calculationUtility.getCandles(Optional.empty(), Optional.empty());
-        logger.info("Received {} candle data points", candleDataFromDB.size());
+        log.info("Received {} candle data points", candleDataFromDB.size());
 
         int test_run_id = getTestRunId();
 
@@ -74,7 +72,7 @@ public class BackTestingEngine extends Engine {
 
         // Defaulting to 5 steps.
          for(int simulate_max_steps_count = 5; simulate_max_steps_count <= 5; ++simulate_max_steps_count){
-            logger.info("Setting Backtesting strategy's MAX Step = {}",simulate_max_steps_count);
+            log.info("Setting Backtesting strategy's MAX Step = {}",simulate_max_steps_count);
 
             simulateAndReport(candleDataFromDB, test_run_id, simulate_max_steps_count);
             test_run_id++;
@@ -119,7 +117,7 @@ public class BackTestingEngine extends Engine {
 
             BuyContractRequest buyContractRequest = calculationEngine.createTrade(backTestingStrategy, strategyImplementation, nextTradeDetails, currency, lastCandle, lastTrade, debug);
             if(buyContractRequest!=null && debug==true){
-                logger.info("Dummy Trade Booked.");
+                log.info("Dummy Trade Booked.");
             }
 
             //Get Result of the Dummy booked trade
@@ -127,7 +125,7 @@ public class BackTestingEngine extends Engine {
 
         }
         catch (Exception e ){
-            logger.info("Exception caught while create new trade. {}",e.getMessage());
+            log.info("Exception caught while create new trade. {}",e.getMessage());
             e.printStackTrace();
         }
 
@@ -152,7 +150,7 @@ public class BackTestingEngine extends Engine {
         }
 
         tradeResultString = tradeResultString+whereString;
-//            logger.info("UPDATING trade result / amount / contract_id... {}",tradeResultString);
+//            log.info("UPDATING trade result / amount / contract_id... {}",tradeResultString);
         databaseConnection.executeNoResultSet(tradeResultString);
 
     }

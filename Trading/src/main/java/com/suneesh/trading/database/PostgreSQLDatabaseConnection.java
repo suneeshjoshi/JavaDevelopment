@@ -2,6 +2,7 @@ package com.suneesh.trading.database;
 
 import com.suneesh.trading.utils.AutoTradingUtility;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,10 +14,9 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 public class PostgreSQLDatabaseConnection implements DatabaseConnection {
-    private static Logger logger = LogManager.getLogger();
-
     String URL;
     Connection connection;
     private List<String> listOfTables;
@@ -126,19 +126,19 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     @Override
     public void dropTables(){
         if(dropDbTables){
-            logger.info("DROPPING DATABASE TABLES.");
+            log.info("DROPPING DATABASE TABLES.");
             if(CollectionUtils.isNotEmpty(tablesToDrop)){
                 tablesToDrop.stream().forEach(table -> {
-                    logger.info("Dropping table, {}", table);
+                    log.info("Dropping table, {}", table);
                     executeNoResultSet("DROP TABLE "+table);
                 });
             }
             else{
-                logger.info("No Tables defined to be dropped.");
+                log.info("No Tables defined to be dropped.");
             }
         }
         else{
-            logger.info("NOT DROPPING DATABASE TABLES.");
+            log.info("NOT DROPPING DATABASE TABLES.");
         }
     }
 
@@ -146,10 +146,10 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     public void createDBSchema() {
         listOfTables.stream().forEach(table -> {
             if(checkTableExists(table)){
-                logger.info("Table {} Exists.", table);
+                log.info("Table {} Exists.", table);
             }
             else{
-                logger.info("Table {} does not Exist.", table);
+                log.info("Table {} does not Exist.", table);
                 File file = AutoTradingUtility.getFileFromResources(table+".sql");
                 try {
                     executeNoResultSet(AutoTradingUtility.readFile(file));
@@ -157,12 +157,12 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
                     e.printStackTrace();
                 }
 
-                logger.info("Checking after Create table query...");
+                log.info("Checking after Create table query...");
                 if(checkTableExists(table)){
-                    logger.info("Table {} Exists.", table);
+                    log.info("Table {} Exists.", table);
                 }
                 else {
-                    logger.info("Table {} still does not Exists.", table);
+                    log.info("Table {} still does not Exists.", table);
                 }
             }
         });
@@ -175,23 +175,23 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
             List<HashMap<String, String>> result = (List<HashMap<String,String>>)executeQuery("select * from "+table);
 
             if(CollectionUtils.isEmpty(result)){
-                logger.info("{} Table not populated.", table);
+                log.info("{} Table not populated.", table);
                 File file = AutoTradingUtility.getFileFromResources("populate_"+table+".sql");
                 try {
                     executeNoResultSet(AutoTradingUtility.readFile(file));
                     if( !CollectionUtils.isEmpty(executeQuery("select * from "+table) ))
                     {
-                        logger.info("{} tables populated.", table);
+                        log.info("{} tables populated.", table);
                     }
                     else{
-                        logger.error("ERROR! {} tables NOT populated.",table);
+                        log.error("ERROR! {} tables NOT populated.",table);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
             else {
-                logger.info("{} table already populated.",table);
+                log.info("{} table already populated.",table);
             }
         });
     }

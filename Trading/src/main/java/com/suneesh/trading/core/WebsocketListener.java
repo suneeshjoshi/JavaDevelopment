@@ -1,26 +1,26 @@
 package com.suneesh.trading.core;
 
 import com.google.gson.Gson;
-import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.core.calculations.Signals;
 import com.suneesh.trading.core.calculations.Utility;
+import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.WebsocketEvent;
-
 import com.suneesh.trading.models.responses.*;
 import com.suneesh.trading.utils.AutoTradingUtility;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.json.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -28,11 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 @Data
-public class
-WebsocketListener extends WebSocketListener {
-
-    Logger logger = LoggerFactory.getLogger(WebsocketListener.class);
-
+@Slf4j
+public class WebsocketListener extends WebSocketListener {
     private BehaviorSubject<WebsocketEvent> websocketEmitter;
     private PublishSubject<String> responseEmitter;
     private PublishSubject<String> requestEmitter;
@@ -41,7 +38,7 @@ WebsocketListener extends WebSocketListener {
     private void writeToDatabase(ResponseBase objectToWrite, boolean debug){
         objectToWrite.databaseInsertStringList().forEach(f->{
             if(debug) {
-                logger.debug(f);
+                log.debug(f);
             }
             databaseConnection.executeNoResultSet(f);
         });
@@ -51,7 +48,7 @@ WebsocketListener extends WebSocketListener {
         if(queryMode.equalsIgnoreCase("INSERT")) {
             objectToWrite.databaseInsertStringList().forEach(f -> {
                 if (debug) {
-                    logger.debug(f);
+                    log.debug(f);
                 }
                 databaseConnection.executeNoResultSet(f);
             });
@@ -60,7 +57,7 @@ WebsocketListener extends WebSocketListener {
         if(queryMode.equalsIgnoreCase("UPDATE")) {
             objectToWrite.databaseUpdateStringList().forEach(f -> {
                 if (debug) {
-                    logger.debug((String) f);
+                    log.debug((String) f);
                 }
                 databaseConnection.executeNoResultSet((String) f);
             });
@@ -89,7 +86,7 @@ WebsocketListener extends WebSocketListener {
 
         this.responseEmitter.subscribe(
                 o -> {
-//                    logger.info("Received Message: {}", o);
+//                    log.info("Received Message: {}", o);
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(o);
                     JSONObject echo_req = (JSONObject) jsonObject.get("echo_req");
@@ -117,7 +114,7 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject tickData = (JSONObject) jsonObject.get("tick");
                                 if (tickData != null) {
                                     tickResponse.setTick(gson.fromJson(String.valueOf(tickData), Tick.class));
-//                                    logger.info(String.valueOf(tickResponse.getTick()));
+//                                    log.info(String.valueOf(tickResponse.getTick()));
                                     writeToDatabase(tickResponse, false);
                                 }
 
@@ -127,7 +124,7 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject authorizeData = (JSONObject) jsonObject.get("authorize");
                                 if (authorizeData != null) {
                                     authorizeResponse.setAuthorize(gson.fromJson(String.valueOf(authorizeData), Authorize.class));
-//                                    logger.info(String.valueOf(authorizeResponse.getAuthorize()));
+//                                    log.info(String.valueOf(authorizeResponse.getAuthorize()));
                                     writeToDatabase(authorizeResponse, false);
                                 }
 
@@ -137,7 +134,7 @@ WebsocketListener extends WebSocketListener {
                                 JSONObject balanceData = (JSONObject) jsonObject.get("balance");
                                 if (balanceData != null) {
                                     balanceResponse.setBalance(gson.fromJson(String.valueOf(balanceData), Balance.class));
-//                                    logger.info(String.valueOf(balanceResponse.getBalance()));
+//                                    log.info(String.valueOf(balanceResponse.getBalance()));
                                     writeToDatabase(balanceResponse, false);
                                 }
 
@@ -155,7 +152,7 @@ WebsocketListener extends WebSocketListener {
                                         candleArrayList.add(candle);
                                     });
                                     tickHistoryResponse.setCandles(candleArrayList);
-//                                    logger.info(String.valueOf(tickHistoryResponse.getCandles()));
+//                                    log.info(String.valueOf(tickHistoryResponse.getCandles()));
 
                                     writeToDatabase(tickHistoryResponse, false);
                                 }
@@ -178,7 +175,7 @@ WebsocketListener extends WebSocketListener {
                                         ArrayList<Candle> candles = new ArrayList<>();
                                         candles.add(updatedPreviousCandle);
                                         ohlcTickHistoryResponse.setCandles(candles);
-//                                        logger.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
+//                                        log.info(String.valueOf(ohlcTickHistoryResponse.getCandles()));
 
                                         // If this is the first OHLC candle received, then we will have a duplicate candle record
                                         // all the candles received in "CANDLE" message contais an incomplete last candle , which this OHLC candle is completing
@@ -195,7 +192,7 @@ WebsocketListener extends WebSocketListener {
 
                                 break;
                             case "transaction":
-                                logger.info("Received Message: {}", o);
+                                log.info("Received Message: {}", o);
 
                                 TransactionsStreamResponse transactionsStreamResponse = new TransactionsStreamResponse();
                                 JSONObject transactionData = (JSONObject) jsonObject.get("transaction");
@@ -205,7 +202,7 @@ WebsocketListener extends WebSocketListener {
                                     processTransaction(msg_type, transactionData, null);
 
                                     transactionsStreamResponse.setTransaction(gson.fromJson(String.valueOf(transactionData), Transaction.class));
-                                    logger.info(String.valueOf(transactionsStreamResponse.getTransaction()));
+                                    log.info(String.valueOf(transactionsStreamResponse.getTransaction()));
                                     writeToDatabase(transactionsStreamResponse, true);
                                 }
 
@@ -218,7 +215,7 @@ WebsocketListener extends WebSocketListener {
 
                                 if(proposalOpenContractData != null) {
                                     OpenContract openContract = gson.fromJson(String.valueOf(proposalOpenContractData), OpenContract.class);
-//                                    logger.info(openContract.toString());
+//                                    log.info(openContract.toString());
 
                                     proposalOpenContractResponse.setOpenContract(openContract);
 
@@ -242,13 +239,13 @@ WebsocketListener extends WebSocketListener {
                                     processTransaction(msg_type, buyData, req_id);
 
                                     BuyContractResponse buyContractResponse1 = gson.fromJson(String.valueOf(buyData), BuyContractResponse.class);
-                                    logger.info("BuyContractResponse =  {}",buyContractResponse1.toString());
+                                    log.info("BuyContractResponse =  {}",buyContractResponse1.toString());
                                 }
 
                                 break;
 
                             case "sell":
-//                                logger.info("Received Message: {}", o);
+//                                log.info("Received Message: {}", o);
 //                                SellContractResponse sellContractResponse = new SellContractResponse();
 //                                JSONObject sellData = (JSONObject) jsonObject.get("sell");
 //
@@ -258,7 +255,7 @@ WebsocketListener extends WebSocketListener {
 //                                    processTransaction(msg_type, sellData, req_id);
 //
 //                                    SellContractResponse sellContractResponse1 = gson.fromJson(String.valueOf(sellData), SellContractResponse.class);
-//                                    logger.info("SellContractResponse =  {}",sellContractResponse1.toString());
+//                                    log.info("SellContractResponse =  {}",sellContractResponse1.toString());
 //                                }
 //
                                 break;
@@ -281,26 +278,26 @@ WebsocketListener extends WebSocketListener {
                                     Portfolio portfolio = new Portfolio();
                                     portfolio.setContracts(portfolioTransactionList);
                                     portfolioResponse.setPortfolio(portfolio);
-//                                    logger.info(String.valueOf(portfolioResponse.getPortfolio()));
+//                                    log.info(String.valueOf(portfolioResponse.getPortfolio()));
                                     writeToDatabase(portfolioResponse, false);
                                 }
 
                                 break;
 
                             case "ping":
-                                logger.info("PING Response received from Binary Websocket.");
+                                log.info("PING Response received from Binary Websocket.");
                                 break;
 
                             default:
-                                logger.info("Case not implemented.");
+                                log.info("Case not implemented.");
                                 for (Map.Entry<String, Object> entry : jsonObject.toMap().entrySet()) {
-                                    logger.info("{} - {}", entry.getKey(), String.valueOf(entry.getValue()));
+                                    log.info("{} - {}", entry.getKey(), String.valueOf(entry.getValue()));
                                 }
                         }
                     }
                     else{
                         Object jsonException = jsonObject.get("error");
-                        logger.error(String.valueOf(jsonException));
+                        log.error(String.valueOf(jsonException));
                     }
                 }
         );
@@ -314,7 +311,7 @@ WebsocketListener extends WebSocketListener {
         if(req_id!=null){
             tradeIdentifier = String.valueOf(req_id);
             if (tradeIdentifier == null) {
-                logger.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
+                log.error("ERROR! req_id field not having data in transaction Response. Reverting to using 'contract is NULL & result is NULL clause'");
             }
         }
 
@@ -334,8 +331,8 @@ WebsocketListener extends WebSocketListener {
                     String tradeResult = amount.doubleValue() > 0 ? "SUCCESS" : "FAIL";
                     if (tradeIdentifier == null) {
 
-                        String firstElementFromDBQuery = databaseConnection.getFirstElementFromDBQuery("SELECT result from trade where contract_id = " + AutoTradingUtility.quotedString(contract_id));
-                        if(firstElementFromDBQuery.equalsIgnoreCase("SELL_CONTRACT_SENT")){
+                        String resultForTradeByContractId = databaseConnection.getFirstElementFromDBQuery("SELECT result from trade where contract_id = " + AutoTradingUtility.quotedString(contract_id));
+                        if(resultForTradeByContractId!=null &&  resultForTradeByContractId.equalsIgnoreCase("SELL_CONTRACT_SENT")){
                             updateString = "UPDATE trade SET result='" + tradeResult + "', amount_won = '" + amount.toPlainString() + "', close_type='PROFIT_THRESHOLD_TRIGGERED' WHERE contract_id ='" + String.valueOf(contract_id) + "' AND result IN ( 'OPEN' , 'PROPOSAL_OPEN_CONTRACT_SENT', 'SELL_CONTRACT_SENT') ";
 
                         }
@@ -349,18 +346,18 @@ WebsocketListener extends WebSocketListener {
                     }
                 }
                 break;
-            default : logger.info("Unhandled action . action = {}",msg_type);
+            default : log.info("Unhandled action . action = {}",msg_type);
         }
 
         if(updateString!=null && !updateString.isEmpty()){
-            logger.info("action / Command = {} / {}", msg_type, updateString);
+            log.info("action / Command = {} / {}", msg_type, updateString);
             databaseConnection.executeNoResultSet(updateString);
         }
     }
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        logger.info("Connection is opened!");
+        log.info("Connection is opened!");
         WebsocketEvent wse = new WebsocketEvent(true, null);
         this.requestEmitter.subscribe( request -> {
             webSocket.send(request);
@@ -377,13 +374,13 @@ WebsocketListener extends WebSocketListener {
 
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
-        logger.info("Connection closed: {}", reason);
+        log.info("Connection closed: {}", reason);
         this.websocketEmitter.onNext(new WebsocketEvent(false, reason));
     }
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        logger.info("Connection failed: {}", response != null ? response.message() : "");
+        log.info("Connection failed: {}", response != null ? response.message() : "");
         this.websocketEmitter.onNext(new WebsocketEvent(false, response != null ? response.message() : ""));
     }
 

@@ -4,17 +4,17 @@ import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.requests.*;
 import com.suneesh.trading.models.responses.AuthorizeResponse;
 import com.suneesh.trading.utils.AutoTradingUtility;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Slf4j
 public class ErrorManager {
-    private static  final Logger logger = LogManager.getLogger();
     private BlockingQueue<RequestBase> commandQueue = new LinkedBlockingQueue<>();
     private float startValue;
     private ApiWrapper api;
@@ -37,7 +37,7 @@ public class ErrorManager {
     }
 
     public void threadWork(){
-        logger.info("Thread work ... ");
+        log.info("Thread work ... ");
         while(true){
             try {
                 checkErrorsRecordedInDbTable();
