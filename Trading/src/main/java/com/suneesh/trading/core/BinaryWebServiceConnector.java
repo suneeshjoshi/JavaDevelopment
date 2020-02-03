@@ -23,6 +23,7 @@ public class BinaryWebServiceConnector {
     private DatabaseConnection databaseConnection;
     private String databaseServer;
     private String databaseURL;
+    protected ErrorManager errorManager;
     protected CommandProcessor commandProcessor;
     protected Engine calculationEngine;
     protected String symbolToTrade;
@@ -61,6 +62,7 @@ public class BinaryWebServiceConnector {
         databaseConnection.init(isBackTestingMode());
 
         commandProcessor = new CommandProcessor(commandQueue,api);
+        errorManager = new ErrorManager(commandQueue,api);
         calculationEngine = new Engine(commandQueue, databaseConnection, symbolToTrade, false);
         threadCreation();
         sendInitialSetupRequest();
@@ -89,6 +91,13 @@ public class BinaryWebServiceConnector {
             Thread.currentThread().setName("CommandProcessorThread");
             logger.info("{} started ... ", Thread.currentThread().getName());
             commandProcessor.threadWork();
+        });
+
+        ExecutorService errorManagerThread = Executors.newFixedThreadPool(1);
+        errorManagerThread.submit(()->{
+            Thread.currentThread().setName("ErrorManagerThread");
+            logger.info("{} started ... ", Thread.currentThread().getName());
+            errorManager.threadWork();
         });
 
         if(!isBackTestingMode()){
