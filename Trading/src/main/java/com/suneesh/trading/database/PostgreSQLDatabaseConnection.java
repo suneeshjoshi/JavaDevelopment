@@ -7,6 +7,8 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.*;
@@ -148,7 +150,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
             }
             else{
                 log.info("Table {} does not Exist.", table);
-                File file = AutoTradingUtility.getFileFromResources(table+".sql");
+                InputStreamReader file = AutoTradingUtility.getFileFromResources(table + ".sql");
                 try {
                     executeNoResultSet(AutoTradingUtility.readFile(file));
                 } catch (IOException e) {
@@ -174,7 +176,7 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
             if(CollectionUtils.isEmpty(result)){
                 log.info("{} Table not populated.", table);
-                File file = AutoTradingUtility.getFileFromResources("populate_"+table+".sql");
+                InputStreamReader file = AutoTradingUtility.getFileFromResources("populate_" + table + ".sql");
                 try {
                     executeNoResultSet(AutoTradingUtility.readFile(file));
                     if( !CollectionUtils.isEmpty(executeQuery("select * from "+table) ))
