@@ -16,12 +16,7 @@ public class AutoTradingUtility {
 
     // get file from classpath, resources folder
     public static InputStreamReader getFileFromResources(String fileName) {
-        InputStream resourceAsStream = AutoTradingUtility.class.getClassLoader().getResourceAsStream(fileName);
-
-        log.info("fileName = {}", fileName);
-        log.info("resourceAsStream = {}", resourceAsStream);
-
-        return new InputStreamReader(resourceAsStream);
+        return new InputStreamReader(AutoTradingUtility.class.getClassLoader().getResourceAsStream(fileName));
     }
 
     public static String readFile(InputStreamReader file) throws IOException {
