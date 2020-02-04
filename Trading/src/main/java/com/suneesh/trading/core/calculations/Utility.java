@@ -1,8 +1,8 @@
 package com.suneesh.trading.core.calculations;
 
 import com.google.gson.Gson;
-import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.core.NextTradeDetails;
+import com.suneesh.trading.database.DatabaseConnection;
 import com.suneesh.trading.models.Strategy;
 import com.suneesh.trading.models.StrategySteps;
 import com.suneesh.trading.models.requests.BuyContractParameters;
@@ -321,7 +321,7 @@ public class Utility {
             List<Map<String, String>> tradeProfitPercentageResult = databaseConnection.executeQuery(tradeQuery);
 
             if(CollectionUtils.isEmpty(tradeProfitPercentageResult)){
-                log.error("ERROR! Unable to get profit_percentage for trade {} -> strategy {} -> step_count {}.",tradeId, strategyId, step_count);
+                log.warn("WARNING! Unable to get profit_percentage for trade {} -> strategy {} -> step_count {}.",tradeId, strategyId, step_count);
             }
             else{
                 tradeInstantaneousProfitPercentage = Double.parseDouble(tradeProfitPercentageResult.get(0).get("profit_percentage"));
@@ -331,7 +331,6 @@ public class Utility {
                     sellContractRequest = new SellContractRequest(contractId,new BigDecimal(0.0));
                 }
             }
-
         }
         return sellContractRequest;
     }

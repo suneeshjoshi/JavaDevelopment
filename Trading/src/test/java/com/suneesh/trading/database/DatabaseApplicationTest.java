@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class DatabaseApplicationTest {
             }
             else{
                 log.info("Table {} does not Exist.", table);
-                File file = AutoTradingUtility.getFileFromResources(table+".sql");
+                InputStreamReader file = AutoTradingUtility.getFileFromResources(table + ".sql");
                 try {
                     postgreSQLDatabaseConnection.executeNoResultSet(AutoTradingUtility.readFile(file));
                 } catch (IOException e) {
@@ -69,7 +69,7 @@ public class DatabaseApplicationTest {
 
         if(CollectionUtils.isEmpty(result)){
             log.info("Strategy Table not populated.");
-            File file = AutoTradingUtility.getFileFromResources("populate_strategy_steps.sql");
+            InputStreamReader file = AutoTradingUtility.getFileFromResources("populate_strategy_steps.sql");
             try {
                 postgreSQLDatabaseConnection.executeNoResultSet(AutoTradingUtility.readFile(file));
                 if( !CollectionUtils.isEmpty(postgreSQLDatabaseConnection.executeQuery("select * from strategy") ))
