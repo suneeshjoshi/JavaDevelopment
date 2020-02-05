@@ -39,6 +39,7 @@ public class ApiWrapper {
     private PublishSubject<String> responseEmitter = PublishSubject.create();
     private PublishSubject<String> requestEmitter = PublishSubject.create();
     protected String applicationId;
+    final private String WEBSOCKET_ERROR = "Binary WebSocket connection failure";
 
     protected DatabaseConnection databaseConnection;
 
@@ -67,7 +68,7 @@ public class ApiWrapper {
 
                 if (!e.isOpened() ) {
                     log.info("Reconnect attempt failed. Exiting application.");
-                    databaseConnection.recordInDBAndExit("insert into error_table (error_message , status, creation_time) VALUES ('Unable to Connect to Binary WebSocket', 'ACTIVE', now())");
+                    databaseConnection.recordInDBAndExit("insert into error_table (error_message , status, creation_time) VALUES ("+AutoTradingUtility.quotedString(WEBSOCKET_ERROR)+", 'ACTIVE', now())");
                 }
             }
         });

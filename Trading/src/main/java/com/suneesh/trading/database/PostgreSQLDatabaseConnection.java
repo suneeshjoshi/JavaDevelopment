@@ -23,7 +23,14 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
     private List<String> tablesToPopulate;
     private List<String> tablesToDrop;
     private boolean dropDbTables;
+    final private String WEBSOCKET_ERROR = "Binary WebSocket connection failure";
 
+
+    public void init(boolean backTestingMode){
+        dropTables();
+        createDBSchema();
+        checkAndPopulateTables();
+    }
 
     public PostgreSQLDatabaseConnection(String url) {
         this.URL =url;
@@ -125,20 +132,25 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
 
     @Override
     public void dropTables(){
-        if(dropDbTables){
-            log.info("DROPPING DATABASE TABLES.");
-            if(CollectionUtils.isNotEmpty(tablesToDrop)){
-                tablesToDrop.stream().forEach(table -> {
-                    log.info("Dropping table, {}", table);
-                    executeNoResultSet("DROP TABLE "+table);
-                });
-            }
-            else{
-                log.info("No Tables defined to be dropped.");
-            }
+        String lastErrorMessage = getFirstElementFromDBQuery("select status from error_table WHERE status = 'ACTIVE' and fix_time is null order by identifier DESC LIMIT 1");
+        if(lastErrorMessage!=null && lastErrorMessage.equalsIgnoreCase(WEBSOCKET_ERROR)){
+            log.info("RECOVERING FROM AN APPLICATION CRASH / EXIT. NOT DROPPING DATABASE.");
+            executeNoResultSet("UPDATE error_table SET status ='FIXED' AND fix_time = now() WHERE status = 'ACTIVE' and error_message = 'AuthorizationRequired' and fix_time is null");
         }
-        else{
-            log.info("NOT DROPPING DATABASE TABLES.");
+        else {
+            if (dropDbTables) {
+                log.info("DROPPING DATABASE TABLES.");
+                if (CollectionUtils.isNotEmpty(tablesToDrop)) {
+                    tablesToDrop.stream().forEach(table -> {
+                        log.info("Dropping table, {}", table);
+                        executeNoResultSet("DROP TABLE " + table);
+                    });
+                } else {
+                    log.info("No Tables defined to be dropped.");
+                }
+            } else {
+                log.info("NOT DROPPING DATABASE TABLES.");
+            }
         }
     }
 
@@ -194,12 +206,6 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
                 log.info("{} table already populated.",table);
             }
         });
-    }
-
-    public void init(boolean backTestingMode){
-        dropTables();
-        createDBSchema();
-        checkAndPopulateTables();
     }
 
     public String getFirstElementFromDBQuery(String query) {

@@ -24,8 +24,8 @@ public class CommandProcessor {
     }
 
     private void checkAndSendAuthorisationTokenIfRequired(){
-        List<Map<String,String>> authorizationErrorList = api.getDatabaseConnection().executeQuery("SELECT * from error_table WHERE status = 'ACTIVE' and error_message = 'AuthorizationRequired' and fix_time is null");
-        if(!CollectionUtils.isEmpty(authorizationErrorList)){
+        List<Map<String,String>> authorizationErrorList = api.getDatabaseConnection().executeQuery("SELECT 1 from error_table WHERE status = 'ACTIVE' and error_message = 'AuthorizationRequired' and fix_time is null");
+        if(CollectionUtils.isNotEmpty(authorizationErrorList)){
 
             AuthorizeRequest authorizeRequest = new AuthorizeRequest(api.getApplicationId());
             api.sendRequest(authorizeRequest).subscribe(response -> {
