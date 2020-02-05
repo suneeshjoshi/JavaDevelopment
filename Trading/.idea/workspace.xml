@@ -1,138 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ArtifactsWorkspaceSettings">
-    <artifacts-to-build>
-      <artifact name="autoBinary:jar" />
-    </artifacts-to-build>
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="7147cc64-5859-4dcf-81e5-1a83c886f442" name="Default Changelist" comment="Adindg docker file">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__joda_time_joda_time_2_10_5.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_math3_3_6_1.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__antlr_antlr_2_7_7.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__ch_qos_logback_logback_classic_1_2_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__ch_qos_logback_logback_core_1_2_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_classmate_1_4_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_jayway_jsonpath_json_path_2_4_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_vaadin_external_google_android_json_0_0_20131108_vaadin1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_zaxxer_HikariCP_3_2_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_activation_javax_activation_api_1_2_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_annotation_javax_annotation_api_1_3_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_persistence_javax_persistence_api_2_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_transaction_javax_transaction_api_1_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_xml_bind_jaxb_api_2_3_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_bytebuddy_byte_buddy_1_9_7.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_bytebuddy_byte_buddy_agent_1_9_7.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_minidev_accessors_smart_1_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_minidev_json_smart_2_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_logging_log4j_log4j_to_slf4j_2_11_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_aspectj_aspectjweaver_1_9_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_assertj_assertj_core_3_11_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_dom4j_dom4j_2_1_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_library_1_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hibernate_common_hibernate_commons_annotations_5_0_4_Final.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hibernate_hibernate_core_5_3_7_Final.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_javassist_javassist_3_23_1_GA.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jboss_jandex_2_0_5_Final.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jboss_logging_jboss_logging_3_3_2_Final.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_2_71.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_3_50.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_common_1_2_71.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_common_1_3_50.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mockito_mockito_core_2_23_4.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_objenesis_objenesis_2_6.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_ow2_asm_asm_5_0_4.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_postgresql_postgresql_42_2_5.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_postgresql_postgresql_42_2_9.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_reactivestreams_reactive_streams_1_0_2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_reactivestreams_reactive_streams_1_0_3.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_skyscreamer_jsonassert_1_5_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_jul_to_slf4j_1_7_25.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_autoconfigure_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_aop_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_data_jpa_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_jdbc_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_logging_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_test_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_test_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_test_autoconfigure_2_1_2_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_data_spring_data_commons_2_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_data_spring_data_jpa_2_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_aop_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_aspects_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_beans_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_context_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_core_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_expression_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_jcl_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_jdbc_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_orm_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_test_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_tx_5_1_4_RELEASE.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_xmlunit_xmlunit_core_2_6_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_yaml_snakeyaml_1_23.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/autoBinary.iml" beforeDir="false" afterPath="$PROJECT_DIR$/autoBinary.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j2.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/ApiWrapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/MainApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/WebsocketListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/requests/BuyContractRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/requests/BuyContractRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/requests/ProposalOpenContractRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/requests/ProposalOpenContractRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AccountStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AccountStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AccountStatusResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AccountStatusResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Authorize.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Authorize.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AuthorizeResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/AuthorizeResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Balance.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Balance.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/BalanceResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/BalanceResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/BuyContractResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/BuyContractResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Candle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Candle.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/OpenContract.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/OpenContract.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Portfolio.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Portfolio.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/PortfolioResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/PortfolioResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/PortfolioTransaction.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/PortfolioTransaction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/ProposalOpenContractResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/ProposalOpenContractResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/ResponseBase.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/ResponseBase.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/SellContractResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/SellContractResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Tick.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Tick.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TickHistoryResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TickHistoryResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TickResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TickResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Transaction.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/Transaction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TransactionsStreamResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/suneesh/trading/models/responses/TransactionsStreamResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-    </list>
+    <list default="true" id="7147cc64-5859-4dcf-81e5-1a83c886f442" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ChangesViewManager">
-    <option name="groupingKeys">
-      <option value="directory" />
-    </option>
-  </component>
-  <component name="ErrorTreeViewConfiguration">
-    <option name="hideWarnings" value="true" />
-    <option name="HIDE_WARNINGS" value="true" />
-  </component>
-  <component name="Git.Settings">
-    <option name="PREVIOUS_COMMIT_AUTHORS">
-      <list>
-        <option value="SuneeshJoshi &lt;suneesh.joshi@gmail.com&gt;" />
-        <option value="suneesh.joshi@gmail.com" />
-        <option value="Suneesh Joshi &lt;suneesh.joshi@gmail.com&gt;" />
-      </list>
-    </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="$PROJECT_DIR$/../../apache-maven-3.6.3" />
-        <option name="userSettingsFile" value="D:\Development\apache-maven-3.6.3\conf\settings.xml" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../apache-maven-3.6.0" />
+        <option name="userSettingsFile" value="G:\Development\apache-maven-3.6.0\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
     <option name="importingSettings">
@@ -141,113 +21,28 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="MavenRunner">
-    <option name="skipTests" value="true" />
-  </component>
   <component name="ProjectId" id="1WJKIu4iIeMzboFTDB5SKYY1iul" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
   <component name="PropertiesComponent">
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Artifacts" />
-    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="MavenSettings" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Development\JavaDevelopment\Trading" />
-    </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.suneesh.trading.core" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Development\JavaDevelopment\Trading\src\main\resources" />
-    </key>
   </component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="mvn clean" />
-      <command value="mvn clean install compile -DskipTests" />
-      <command value="mvn clean install compile" />
-      <command value="mvn clean package" />
     </option>
   </component>
-  <component name="RunManager" selected="Application.AutoTrading">
-    <configuration name="AutoTrading" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="com.suneesh.trading.BinaryMainApplication" />
-      <module name="autoBinary" />
-      <option name="VM_PARAMETERS" value="-DconfigFile=&quot;application.properties&quot;" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AutoBinary" type="docker-deploy" factoryName="docker-image" temporary="true" server-name="Docker2">
-      <deployment type="docker-image">
-        <settings>
-          <option name="command" value="" />
-          <option name="containerName" value="autoBinary" />
-          <option name="entrypoint" value="" />
-          <option name="imageTag" value="sha256:42f02ab845ee3c985a0babf70a0310e7321e89028e2860ed10811748d933f25d" />
-          <option name="commandLineOptions" value="" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker2">
-      <deployment type="dockerfile">
-        <settings>
-          <option name="buildCliOptions" value="" />
-          <option name="command" value="" />
-          <option name="containerName" value="" />
-          <option name="entrypoint" value="" />
-          <option name="imageTag" value="" />
-          <option name="commandLineOptions" value="" />
-          <option name="sourceFilePath" value="src/main/docker/Dockerfile" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="Application.AutoTrading" />
-      <item itemvalue="Docker.docker/Dockerfile" />
-      <item itemvalue="Docker.AutoBinary" />
-    </list>
-    <recent_temporary>
+  <component name="RunDashboard">
+    <option name="ruleStates">
       <list>
-        <item itemvalue="Docker.AutoBinary" />
-        <item itemvalue="Docker.docker/Dockerfile" />
-      </list>
-    </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="Docker2" type="9fbbdea:ServiceModel$ServiceNode" />
-              </path>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="Docker2" type="9fbbdea:ServiceModel$ServiceNode" />
-                <item name="Containers" type="9fbbdea:ServiceModel$ServiceNode" />
-              </path>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="Docker2" type="9fbbdea:ServiceModel$ServiceNode" />
-                <item name="Images" type="9fbbdea:ServiceModel$ServiceNode" />
-              </path>
-            </expand>
-            <select />
-          </treeState>
-        </serviceView>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
       </list>
     </option>
   </component>
@@ -262,270 +57,6 @@
       <option name="presentableId" value="Default" />
       <updated>1578862180649</updated>
     </task>
-    <task id="LOCAL-00001" summary="fixed bug with reporting result &amp; amount when SELL_CONTRACT_SENT trade type is closed">
-      <created>1580733615538</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1580733615539</updated>
-    </task>
-    <task id="LOCAL-00002" summary="New Thread - ErrorManager added, to handle Database inconsistent states">
-      <created>1580738782386</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1580738782386</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Removing Spring and other libraries not needed for making an UBER-JAR">
-      <created>1580749296542</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1580749296542</updated>
-    </task>
-    <task id="LOCAL-00004" summary="syncing from laptop to desktop">
-      <created>1580765526494</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1580765526494</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Reading file from Resources as Stream , to ensure the JAR file can also read the files.">
-      <created>1580810629416</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1580810629416</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Reading file from Resources as Stream , to ensure the JAR file can also read the files.">
-      <created>1580810881366</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1580810881367</updated>
-    </task>
-    <task id="LOCAL-00007" summary="syncing from laptop to desktop">
-      <created>1580849201150</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1580849201151</updated>
-    </task>
-    <task id="LOCAL-00008" summary="syncing from laptop to desktop">
-      <created>1580849268733</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1580849268733</updated>
-    </task>
-    <task id="LOCAL-00009" summary="syncing from laptop to desktop">
-      <created>1580858691698</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1580858691698</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Adindg docker file">
-      <created>1580899436898</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1580899436898</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Changing the log4j2 config file to read from XML file and not properties file">
-      <created>1580903518713</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1580903518713</updated>
-    </task>
-    <task id="LOCAL-00012" summary="changing log4j2 properties file">
-      <created>1580904285444</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1580904285444</updated>
-    </task>
-    <task id="LOCAL-00013" summary="changing log4j2 properties file">
-      <created>1580905342803</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1580905342803</updated>
-    </task>
-    <task id="LOCAL-00014" summary="changing log4j2 properties file">
-      <created>1580906528982</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1580906528982</updated>
-    </task>
-    <option name="localTasksCounter" value="15" />
     <servers />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed bug with reporting result &amp; amount when SELL_CONTRACT_SENT trade type is closed" />
-    <MESSAGE value="New Thread - ErrorManager added, to handle Database inconsistent states" />
-    <MESSAGE value="Removing Spring and other libraries not needed for making an UBER-JAR" />
-    <MESSAGE value="Reading file from Resources as Stream , to ensure the JAR file can also read the files." />
-    <MESSAGE value="syncing from laptop to desktop" />
-    <MESSAGE value="Adindg docker file" />
-    <MESSAGE value="Changing the log4j2 config file to read from XML file and not properties file" />
-    <MESSAGE value="changing log4j2 properties file" />
-    <option name="LAST_COMMIT_MESSAGE" value="changing log4j2 properties file" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="233" y="0" key="#Docker" timestamp="1580899021075">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="233" y="0" key="#Docker/0.0.1280.680@0.0.1280.680" timestamp="1580899021075" />
-    <state x="361" y="0" key="#Docker_Image" timestamp="1580899232760">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="361" y="0" key="#Docker_Image/0.0.1280.680@0.0.1280.680" timestamp="1580899232760" />
-    <state x="233" y="0" key="#New_Docker_Connection" timestamp="1580899075567">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="233" y="0" key="#New_Docker_Connection/0.0.1280.680@0.0.1280.680" timestamp="1580899075567" />
-    <state x="233" y="0" key="#Notifications" timestamp="1580898900587">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="233" y="0" key="#Notifications/0.0.1280.680@0.0.1280.680" timestamp="1580898900587" />
-    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1580899110752">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1580899110752" />
-    <state x="371" y="125" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1580749704654">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="371" y="125" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1280.680@0.0.1280.680" timestamp="1580749704654" />
-    <state x="490" y="231" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1580729921234">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="490" y="231" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1280.680@0.0.1280.680" timestamp="1580729921234" />
-    <state x="371" y="89" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1580810744620">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="371" y="89" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1280.680@0.0.1280.680" timestamp="1580810744620" />
-    <state x="361" y="0" key="#docker/Dockerfile" timestamp="1580899033172">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="361" y="0" key="#docker/Dockerfile/0.0.1280.680@0.0.1280.680" timestamp="1580899033172" />
-    <state x="297" y="0" key="CommitChangelistDialog2" timestamp="1580906527690">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="297" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1580906527690" />
-    <state x="93" y="93" width="1095" height="495" key="DiffContextDialog" timestamp="1580910463764">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="93" y="93" width="1095" height="495" key="DiffContextDialog/0.0.1280.680@0.0.1280.680" timestamp="1580910463764" />
-    <state x="421" y="96" key="FileChooserDialogImpl" timestamp="1580742969934">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1580742969934" />
-    <state width="1237" height="227" key="GridCell.Tab.-1.bottom" timestamp="1580806541807">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.-1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1580806541807" />
-    <state width="1237" height="227" key="GridCell.Tab.-1.center" timestamp="1580806541807">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.-1.center/0.0.1280.680@0.0.1280.680" timestamp="1580806541807" />
-    <state width="1237" height="227" key="GridCell.Tab.-1.left" timestamp="1580806541807">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.-1.left/0.0.1280.680@0.0.1280.680" timestamp="1580806541807" />
-    <state width="1237" height="227" key="GridCell.Tab.-1.right" timestamp="1580806541807">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.-1.right/0.0.1280.680@0.0.1280.680" timestamp="1580806541807" />
-    <state width="1237" height="233" key="GridCell.Tab.0.bottom" timestamp="1580910439968">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="233" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1580910439968" />
-    <state width="1237" height="233" key="GridCell.Tab.0.center" timestamp="1580910439968">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="233" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1580910439968" />
-    <state width="1237" height="233" key="GridCell.Tab.0.left" timestamp="1580910439967">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="233" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1580910439967" />
-    <state width="1237" height="233" key="GridCell.Tab.0.right" timestamp="1580910439968">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="233" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1580910439968" />
-    <state width="1237" height="227" key="GridCell.Tab.1.bottom" timestamp="1580907246620">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1580907246620" />
-    <state width="1237" height="227" key="GridCell.Tab.1.center" timestamp="1580907246619">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1580907246619" />
-    <state width="1237" height="227" key="GridCell.Tab.1.left" timestamp="1580907246619">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1580907246619" />
-    <state width="1237" height="227" key="GridCell.Tab.1.right" timestamp="1580907246619">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state width="1237" height="227" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1580907246619" />
-    <state x="413" y="53" key="RollbackChangesDialog" timestamp="1580907652942">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="413" y="53" key="RollbackChangesDialog/0.0.1280.680@0.0.1280.680" timestamp="1580907652942" />
-    <state x="142" y="0" key="SettingsEditor" timestamp="1580765484295">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1580765484295" />
-    <state x="233" y="63" key="Vcs.Push.Dialog.v2" timestamp="1580906531054">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="233" y="63" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1580906531054" />
-    <state x="93" y="93" width="1095" height="495" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1580808080130">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="93" y="93" width="1095" height="495" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1280.680@0.0.1280.680" timestamp="1580808080130" />
-    <state x="337" y="166" key="com.intellij.ide.util.TipDialog" timestamp="1580898980919">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="337" y="166" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1580898980919" />
-    <state x="336" y="72" width="609" height="536" key="find.popup" timestamp="1580812523093">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="336" y="72" width="609" height="536" key="find.popup/0.0.1280.680@0.0.1280.680" timestamp="1580812523093" />
-    <state x="91" y="0" key="new project wizard" timestamp="1580741040375">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="91" y="0" key="new project wizard/0.0.1280.680@0.0.1280.680" timestamp="1580741040375" />
-    <state x="297" y="151" width="672" height="677" key="run.anything.popup" timestamp="1580749834787">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="297" y="151" width="672" height="677" key="run.anything.popup/0.0.1280.680@0.0.1280.680" timestamp="1580749834787" />
-    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup" timestamp="1580750144171">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="303" y="1" width="672" height="678" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1580750144171" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/suneesh/trading/core/WebsocketListener.java</url>
-          <line>333</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/suneesh/trading/core/BinaryWebServiceConnector.java</url>
-          <line>59</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/autoBinary$AutoTrading.ic" NAME="AutoTrading Coverage Results" MODIFIED="1580733212394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
