@@ -7,11 +7,14 @@
     </Properties>
 
     <Appenders>
-        <RollingFile name="fileLogger" fileName="${basePath}/autoTrading.log" filePattern="${basePath}/autoTrading-%d{yyyy-MM-dd}.log">
+        <RollingFile name="fileLogger" fileName="${basePath}/autoTrading.log" filePattern="${basePath}/autoTrading-%d{yyyy-MM-dd}.log.gz">
             <PatternLayout   pattern= "${LOG_PATTERN}" />
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="300 MB"/>
             </Policies>
+            <DefaultRolloverStrategy max="50" compressionLevel="9"/>
+
         </RollingFile>
 
         <Console name="console" target="SYSTEM_OUT">
