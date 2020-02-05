@@ -356,5 +356,4 @@ public class Utility {
         databaseConnection.executeNoResultSet(queryString);
 
     }
-
 }

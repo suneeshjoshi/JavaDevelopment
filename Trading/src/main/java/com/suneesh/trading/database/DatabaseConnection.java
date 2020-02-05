@@ -31,4 +31,6 @@ public interface DatabaseConnection {
     String getFirstElementFromDBQuery(String Query);
 
     ArrayList<String> getJsonResultDBQuery(String query);
+
+    void recordInDBAndExit(String sqlQueryForDB);
 }

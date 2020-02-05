@@ -222,4 +222,11 @@ public class PostgreSQLDatabaseConnection implements DatabaseConnection {
         return result;
     }
 
+    @Override
+    public void recordInDBAndExit(String sqlQueryForDB) {
+        executeNoResultSet(sqlQueryForDB);
+        log.error("ERROR OCCURED!. Exiting application for respawning again by docker.");
+        System.exit(-1);
+    }
+
 }

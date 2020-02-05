@@ -8,6 +8,7 @@ import com.suneesh.trading.models.requests.RequestBase;
 import com.suneesh.trading.models.responses.AssetIndex;
 import com.suneesh.trading.models.responses.ResponseBase;
 import com.suneesh.trading.utils.AssetIndexDeserializer;
+import com.suneesh.trading.utils.AutoTradingUtility;
 import com.suneesh.trading.utils.ClassUtils;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -58,29 +59,23 @@ public class ApiWrapper {
 
             log.info("Connection status = {}", e.isOpened());
             if(!e.isOpened()) {
-                final int maxAttemptCount = 5;
-                int attemptCount = 1;
-                while (!e.isOpened() && attemptCount < maxAttemptCount) {
-                    log.info("Attempting to connect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl, attemptCount);
+                if (!e.isOpened() ) {
+                    log.info("Attempting to reconnect to Binary WebSocket, url = {}. Attempt : {}", websocketUrl);
                     this.connect();
                     Thread.sleep(1000);
-                    attemptCount++;
                 }
 
-                if (attemptCount >= maxAttemptCount) {
-                    log.info("ERROR! MAx Attempts {} reached. Unable to connect to remote Binary WebSocket. url = {}. Exiting.", attemptCount, websocketUrl);
-                    System.exit(-1);
-
+                if (!e.isOpened() ) {
+                    log.info("Reconnect attempt failed. Exiting application.");
+                    databaseConnection.recordInDBAndExit("insert into error_table (error_message , status, creation_time) VALUES ('Unable to Connect to Binary WebSocket', 'ACTIVE', now())");
                 }
             }
         });
-
     }
 
     public static ApiWrapper build(String applicationId, DatabaseConnection databaseConnection) {
         return build(applicationId, "en", "wss://ws.binaryws.com/websockets/v3", databaseConnection);
     }
-
 
     private void connect() throws IOException {
         if (this.client != null) {
