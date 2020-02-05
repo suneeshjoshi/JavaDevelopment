@@ -51,7 +51,7 @@ public abstract class AbstractStrategyClass implements StrategyImplementationInt
         double amount = INITIAL_BID_AMOUNT;
         int nextStepCount = nextTradeDetails.getNextStepCount();
         StrategySteps strategyStep = strategy.getStepToStrategyStepsMap().get(nextStepCount);
-        amount = strategyStep.getValue();
+        amount = strategyStep.getValue() * strategy.getBidAmountMultiple();
 
         nextTradeDetails.setAmount(amount);
     }

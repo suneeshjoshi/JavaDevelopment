@@ -48,10 +48,13 @@ public class Strategy {
     @Expose
     boolean resetStepCountOnSuccess;
 
-
     @SerializedName("active_strategy")
     @Expose
     boolean activeStrategy;
+
+    @SerializedName("bid_amount_multiple")
+    @Expose
+    double bidAmountMultiple;
 
     HashMap<Integer, StrategySteps> stepToStrategyStepsMap = new HashMap<>();
 

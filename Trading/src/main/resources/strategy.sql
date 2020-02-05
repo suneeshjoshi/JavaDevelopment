@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.strategy
     reset_step_count_on_success boolean,
     strategy_algorithm_id bigint ,
     creation_date timestamp NOT NULL,
+    bid_amount_multiple NUMERIC(10,2) DEFAULT 1.00,
     CONSTRAINT strategy_pkey PRIMARY KEY (identifier)
 )
 
