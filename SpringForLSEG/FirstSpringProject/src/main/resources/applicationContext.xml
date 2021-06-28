@@ -9,7 +9,11 @@
 
     <!-- Define your beans here -->
 
-    <bean id="myCoach" class="com.example.demo.BaseballCoach"></bean>
+    <bean id="myFortuneService" class="com.example.demo.HappyFortuneService"></bean>
+
+    <bean id="myCoach" class="com.example.demo.CricketCoach">
+        <constructor-arg ref="myFortuneService" />
+    </bean>
 
 
 </beans>

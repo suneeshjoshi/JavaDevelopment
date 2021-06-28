@@ -18,6 +18,7 @@ public class DemoApplication {
 
 		// Call methods on teh bean
 		System.out.println(myCoach.getDailyWorkout());
+		System.out.println(myCoach.getDailyFortune());
 
 		// close the context
 		context.close();
