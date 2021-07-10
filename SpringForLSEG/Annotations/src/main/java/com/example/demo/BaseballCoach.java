@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 @Component
 //@Scope("prototype")
 public class BaseballCoach implements Coach{
@@ -16,6 +19,15 @@ public class BaseballCoach implements Coach{
     private String team;
 
 
+    @PostConstruct
+    public void myInitMethod(){
+        System.out.println("Can be used to initialize.");
+    }
+
+    @PreDestroy
+    public void myDestroyMethod(){
+        System.out.println("Can be used to de-initialize.");
+    }
 
     public BaseballCoach() {
         System.out.println("BaseballCoach() : Inside Constructor");
