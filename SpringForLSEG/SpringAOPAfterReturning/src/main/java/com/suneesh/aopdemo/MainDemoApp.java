@@ -3,6 +3,8 @@ package com.suneesh.aopdemo;
 import com.suneesh.aopdemo.dao.AccountDAO;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.List;
+
 public class MainDemoApp {
 
     public static void main(String[] args) {
@@ -19,7 +21,10 @@ public class MainDemoApp {
         accountDAO.addAccount();
 
         accountDAO.displayAccount();
-        accountDAO.findAccount();
+        List<String> account = accountDAO.findAccount();
+
+        System.out.println("Return from accountDAO.findAccount() =>");
+        account.forEach(System.out::println);
 
         // Close Context
         context.close();
