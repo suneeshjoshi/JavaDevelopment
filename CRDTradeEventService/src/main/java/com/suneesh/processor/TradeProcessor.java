@@ -1,10 +1,10 @@
-package com.example.processor;
+package com.suneesh.processor;
 
-import com.example.events.ExecuteEvent;
-import com.example.events.UnwindEvent;
-import com.example.events.UpsizeEvent;
-import com.example.model.Trade;
-import com.example.repository.TradeRepository;
+import com.suneesh.events.ExecuteEvent;
+import com.suneesh.events.UnwindEvent;
+import com.suneesh.events.UpsizeEvent;
+import com.suneesh.model.Trade;
+import com.suneesh.repository.TradeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

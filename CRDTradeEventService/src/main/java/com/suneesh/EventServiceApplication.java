@@ -1,6 +1,6 @@
-package com.example;
+package com.suneesh;
 
-import com.example.service.EventService;
+import com.suneesh.service.EventService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

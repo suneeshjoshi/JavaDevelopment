@@ -1,6 +1,6 @@
-package com.example.repository;
+package com.suneesh.repository;
 
-import com.example.model.Trade;
+import com.suneesh.model.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

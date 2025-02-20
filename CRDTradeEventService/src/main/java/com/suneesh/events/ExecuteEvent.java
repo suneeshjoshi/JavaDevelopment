@@ -1,4 +1,4 @@
-package com.example.events;
+package com.suneesh.events;
 public record ExecuteEvent(
         String tradeId,
         int quantity) implements TradeEvent {

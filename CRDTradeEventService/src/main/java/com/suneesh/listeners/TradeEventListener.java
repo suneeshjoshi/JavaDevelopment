@@ -1,4 +1,4 @@
-package com.example.listeners;
+package com.suneesh.listeners;
 
 public interface TradeEventListener {
 }

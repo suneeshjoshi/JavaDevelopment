@@ -1,7 +1,7 @@
-package com.example.listeners;
+package com.suneesh.listeners;
 
-import com.example.events.UpsizeEvent;
-import com.example.processor.TradeProcessor;
+import com.suneesh.events.UpsizeEvent;
+import com.suneesh.processor.TradeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
-package com.example.controller;
+package com.suneesh.controller;
 
-import com.example.service.EventService;
+import com.suneesh.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

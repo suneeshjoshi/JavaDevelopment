@@ -1,6 +1,6 @@
-//package com.example.model;
+//package com.suneesh.model;
 //
-//import com.example.events.TradeEvent;
+//import com.suneesh.events.TradeEvent;
 //import lombok.AllArgsConstructor;
 //import lombok.Data;
 //import lombok.NoArgsConstructor;
@@ -32,9 +32,9 @@
 //    }
 //
 //}
-package com.example.model;
+package com.suneesh.model;
 
-import com.example.events.TradeEvent;
+import com.suneesh.events.TradeEvent;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

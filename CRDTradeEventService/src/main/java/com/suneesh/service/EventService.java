@@ -1,8 +1,8 @@
-package com.example.service;
+package com.suneesh.service;
 
-import com.example.events.ExecuteEvent;
-import com.example.events.UnwindEvent;
-import com.example.events.UpsizeEvent;
+import com.suneesh.events.ExecuteEvent;
+import com.suneesh.events.UnwindEvent;
+import com.suneesh.events.UpsizeEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

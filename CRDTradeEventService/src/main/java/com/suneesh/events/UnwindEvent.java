@@ -1,4 +1,4 @@
-package com.example.events;
+package com.suneesh.events;
 public record UnwindEvent(
         String tradeId,
         int quantity
