@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.processor.TradeProcessor;
 import com.example.service.EventService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,8 +22,8 @@ public class EventServiceApplication {
             eventService.publishUnwindEvent("T123", 50);
             eventService.publishUpsizeEvent("T123", 75);
 
-            TradeProcessor tradeProcessor = context.getBean(TradeProcessor.class);
-            tradeProcessor.getTradeEventHistory("T123");
+//            TradeProcessor tradeProcessor = context.getBean(TradeProcessor.class);
+//            tradeProcessor.getTradeEventHistory("T123");
         };
     }
 }
