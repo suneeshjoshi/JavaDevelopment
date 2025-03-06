@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "14c75f1c-36b3-43d5-b632-dfa8355cafa5",
+		"name": "CRD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1337957"
+	},
+	"item": [
+		{
+			"name": "EventService",
+			"item": [
+				{
+					"name": "api/events",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TradeVersioningMongoDb",
+			"item": [
+				{
+					"name": "New Trade Entry",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instrument\": \"AAPL\",\r\n    \"quantity\": 100,\r\n    \"price\": 150.25,\r\n    \"tradeType\": \"BUY\",\r\n    \"metadata\": {\r\n        \"broker\": \"XYZ Securities\",\r\n        \"exchange\": \"NASDAQ\",\r\n        \"timestamp\": \"2025-03-06T10:00:00Z\"\r\n    },\r\n    \"orderDetails\": {\r\n        \"orderId\": \"ORD12345\",\r\n        \"status\": \"Executed\",\r\n        \"executionDetails\": {\r\n            \"filledQuantity\": 100,\r\n            \"executionPrice\": 150.30\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Execute Trade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123",
+								"execute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unwind Trade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instrument\": \"AAPL\",\r\n    \"quantity\": 100,\r\n    \"price\": 150.25,\r\n    \"tradeType\": \"BUY\",\r\n    \"metadata\": {\r\n        \"broker\": \"XYZ Securities\",\r\n        \"exchange\": \"NASDAQ\",\r\n        \"timestamp\": \"2025-03-06T10:00:00Z\"\r\n    },\r\n    \"orderDetails\": {\r\n        \"orderId\": \"ORD12345\",\r\n        \"status\": \"Executed\",\r\n        \"executionDetails\": {\r\n            \"filledQuantity\": 100,\r\n            \"executionPrice\": 150.30\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123/unwind",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123",
+								"unwind"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Trade",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instrument\": \"AAPL\",\r\n    \"quantity\": 100,\r\n    \"price\": 150.25,\r\n    \"tradeType\": \"BUY\",\r\n    \"metadata\": {\r\n        \"broker\": \"XYZ Securities\",\r\n        \"exchange\": \"NASDAQ\",\r\n        \"timestamp\": \"2025-03-06T10:00:00Z\"\r\n    },\r\n    \"orderDetails\": {\r\n        \"orderId\": \"ORD12345\",\r\n        \"status\": \"Executed\",\r\n        \"executionDetails\": {\r\n            \"filledQuantity\": 100,\r\n            \"executionPrice\": 150.30\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123/latest",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Previous Trade Version",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instrument\": \"AAPL\",\r\n    \"quantity\": 100,\r\n    \"price\": 150.25,\r\n    \"tradeType\": \"BUY\",\r\n    \"metadata\": {\r\n        \"broker\": \"XYZ Securities\",\r\n        \"exchange\": \"NASDAQ\",\r\n        \"timestamp\": \"2025-03-06T10:00:00Z\"\r\n    },\r\n    \"orderDetails\": {\r\n        \"orderId\": \"ORD12345\",\r\n        \"status\": \"Executed\",\r\n        \"executionDetails\": {\r\n            \"filledQuantity\": 100,\r\n            \"executionPrice\": 150.30\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123/previous/0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123",
+								"previous",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upsize Trade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instrument\": \"AAPL\",\r\n    \"quantity\": 100,\r\n    \"price\": 150.25,\r\n    \"tradeType\": \"BUY\",\r\n    \"metadata\": {\r\n        \"broker\": \"XYZ Securities\",\r\n        \"exchange\": \"NASDAQ\",\r\n        \"timestamp\": \"2025-03-06T10:00:00Z\"\r\n    },\r\n    \"orderDetails\": {\r\n        \"orderId\": \"ORD12345\",\r\n        \"status\": \"Executed\",\r\n        \"executionDetails\": {\r\n            \"filledQuantity\": 100,\r\n            \"executionPrice\": 150.30\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/trades/T123/upsize/50",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"trades",
+								"T123",
+								"upsize",
+								"50"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
