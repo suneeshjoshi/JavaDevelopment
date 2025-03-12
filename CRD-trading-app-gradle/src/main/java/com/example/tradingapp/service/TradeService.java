@@ -5,6 +5,8 @@ import com.example.tradingapp.repository.TradeRepository;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
@@ -23,27 +25,28 @@ public class TradeService {
             .build();
     private final ObjectMapper objectMapper;
 
+    @CachePut(value = "trades", key = "#result.tradeId + '-' + #result.version")
     public Trade saveTrade(String tradeJson) throws Exception {
         Trade trade = objectMapper.readValue(tradeJson, Trade.class);
         trade.setTimestamp(LocalDateTime.now());
         trade.setTradeJson(tradeJson);
         tradeRepository.save(trade);
-        tradeCache.put(trade.getTradeId() + "-" + trade.getVersion(), trade);
         return trade;
     }
 
+    @Cacheable(value = "trades", key = "#tradeId + '-' + #version")
     public Optional<Trade> getTrade(String tradeId, int version) {
-        String cacheKey = tradeId + "-" + version;
-        Trade trade = tradeCache.getIfPresent(cacheKey);
-        if (trade == null) {
-            trade = tradeRepository.findByTradeIdAndVersion(tradeId, version).orElse(null);
-            if (trade != null) {
-                tradeCache.put(cacheKey, trade);
-            }
-        }
-        return Optional.ofNullable(trade);
+        return tradeRepository.findByTradeIdAndVersion(tradeId, version);
     }
 
+// This is a way to evict the entry from cache but retain in DB by marking it as deleted
+//    @CacheEvict(value = "trades", key = "#tradeId + '-' + #version")
+//    public void deleteTrade(String tradeId, int version) {
+//        tradeRepository.findByTradeIdAndVersion(tradeId, version).ifPresent(trade -> {
+//            trade.setDeleted(true);
+//            tradeRepository.save(trade);
+//        });
+//    }
     public void deleteTrade(String tradeId, int version) {
         tradeRepository.findByTradeIdAndVersion(tradeId, version).ifPresent(tradeRepository::delete);
         tradeCache.invalidate(tradeId + "-" + version);
